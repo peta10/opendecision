@@ -1,0 +1,162 @@
+/* ============================================
+   PANORAMIC TOOLTIP - Premium Tooltip Styles
+   ============================================ */
+
+/* Container to hold relative positioning */
+.panoramic-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* The Trigger Icon Style */
+.panoramic-tooltip__trigger {
+  color: #64748b; /* Slate gray */
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panoramic-tooltip:hover .panoramic-tooltip__trigger {
+  color: #0072bc; /* Panoramic Blue on hover */
+}
+
+/* The Tooltip Card */
+.panoramic-tooltip__content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 140%; /* Position above the icon */
+  left: 50%;
+  transform: translateX(-50%) translateY(10px); /* Start slightly lower for animation */
+
+  width: 280px; /* Fixed width for readability */
+  background-color: #ffffff;
+  color: #334155; /* Dark slate text */
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+
+  /* Premium Soft Shadow */
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.05); /* Subtle border ring */
+
+  transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+  z-index: 100;
+  overflow: hidden; /* Clips the accent bar */
+}
+
+/* Width variants */
+.panoramic-tooltip__content--narrow {
+  width: 200px;
+}
+
+.panoramic-tooltip__content--wide {
+  width: 320px;
+}
+
+/* Position variants */
+.panoramic-tooltip__content--bottom {
+  bottom: auto;
+  top: 140%;
+}
+
+.panoramic-tooltip__content--bottom::after {
+  top: auto;
+  bottom: 100%;
+  border-color: transparent transparent #ffffff transparent;
+}
+
+.panoramic-tooltip__content--left {
+  left: auto;
+  right: 0;
+  transform: translateX(0) translateY(10px);
+}
+
+.panoramic-tooltip__content--left::after {
+  left: auto;
+  right: 16px;
+}
+
+.panoramic-tooltip__content--right {
+  left: 0;
+  transform: translateX(0) translateY(10px);
+}
+
+.panoramic-tooltip__content--right::after {
+  left: 16px;
+}
+
+/* The Panoramic Brand Gradient Bar on the left */
+.panoramic-tooltip__accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, #FFB300, #0072bc, #00C853);
+}
+
+/* Bold text highlight */
+.panoramic-tooltip__content strong {
+  color: #0072bc; /* Highlight key numbers in blue */
+  font-weight: 600;
+}
+
+/* The Little Triangle Arrow at the bottom */
+.panoramic-tooltip__content::after {
+  content: "";
+  position: absolute;
+  top: 100%; /* Bottom of tooltip */
+  left: 50%;
+  margin-left: -6px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+}
+
+/* Hover State */
+.panoramic-tooltip:hover .panoramic-tooltip__content {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.panoramic-tooltip:hover .panoramic-tooltip__content--left {
+  transform: translateX(0) translateY(0);
+}
+
+.panoramic-tooltip:hover .panoramic-tooltip__content--right {
+  transform: translateX(0) translateY(0);
+}
+
+/* Touch device support - show on tap */
+.panoramic-tooltip--touch .panoramic-tooltip__content {
+  /* Touch devices need click/tap to show */
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  .panoramic-tooltip__content--dark {
+    background-color: #1e293b;
+    color: #e2e8f0;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.3),
+      0 4px 6px -2px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  .panoramic-tooltip__content--dark::after {
+    border-color: #1e293b transparent transparent transparent;
+  }
+
+  .panoramic-tooltip__content--dark.panoramic-tooltip__content--bottom::after {
+    border-color: transparent transparent #1e293b transparent;
+  }
+}

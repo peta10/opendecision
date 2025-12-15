@@ -1,0 +1,137 @@
+/* --- CONTAINER --- */
+.report-pill {
+  position: relative;
+  /* Compact padding to match PanoramicPill */
+  padding: 6px 12px 6px 10px;
+  border-radius: 100px;
+  border: 0;
+  cursor: pointer;
+  overflow: hidden;
+
+  /* Match alpine-blue-400 (rgb(26, 128, 255) / #1A80FF) from criteria slider */
+  background: linear-gradient(to bottom, #3d94ff, #1A80FF);
+
+  /* Tighter, cleaner grounding shadow - match alpine-blue-400 */
+  box-shadow:
+    0 2px 8px -2px rgba(26, 128, 255, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform: translateY(0);
+}
+
+/* Medium screens and up */
+@media (min-width: 768px) {
+  .report-pill {
+    padding: 8px 16px 8px 12px;
+  }
+}
+
+/* --- LIGHTING (SHARP BEZEL) --- */
+.report-pill-lighting {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  /* Sharper inset shadows for a crisp glass edge - scaled down */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 2px 3px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 3px rgba(0, 20, 60, 0.4);
+  transition: all 0.3s ease;
+}
+
+/* Top Horizontal Glare */
+.report-pill-lighting::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 10px;
+  right: 10px;
+  height: 30%;
+  border-radius: 100px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(1px);
+  transition: all 0.3s ease;
+}
+
+/* --- CONTENT --- */
+.report-pill-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (min-width: 768px) {
+  .report-pill-content {
+    gap: 8px;
+  }
+}
+
+.report-pill-text {
+  color: white;
+  font-size: 0.75rem; /* 12px - matches text-xs */
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 768px) {
+  .report-pill-text {
+    font-size: 0.875rem; /* 14px - matches text-sm */
+  }
+}
+
+/* --- ICON --- */
+.report-pill-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .report-pill-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* --- HOVER --- */
+.report-pill:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(to bottom, #5aa3ff, #1A80FF);
+  box-shadow:
+    0 4px 10px -2px rgba(26, 128, 255, 0.5),
+    0 0 0 2px rgba(26, 128, 255, 0.3); /* Alpine blue halo */
+}
+
+.report-pill:hover .report-pill-lighting::after {
+  opacity: 1;
+  top: 1px; /* Glare moves up */
+}
+
+/* --- ACTIVE --- */
+.report-pill:active {
+  transform: translateY(1px);
+  background: linear-gradient(to bottom, #1A80FF, #0057B7);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* --- FOCUS STATE --- */
+.report-pill:focus {
+  outline: none;
+  box-shadow:
+    0 2px 8px -2px rgba(26, 128, 255, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 0 0 2px rgba(26, 128, 255, 0.5);
+}

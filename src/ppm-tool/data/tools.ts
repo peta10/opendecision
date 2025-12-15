@@ -1,0 +1,322 @@
+export const defaultTools = [
+  {
+    id: 'smartsheet',
+    name: 'Smartsheet',
+    logo: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=64&h=64&fit=crop',
+    useCases: ['Waterfall', 'Marketing', 'R&D'],
+    methodologies: ['Waterfall', 'Continuous Improvement'],
+    functions: ['Marketing', 'Product & Design', 'Engineering'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 4,
+      integrations: 4,
+      easeOfUse: 5,
+      flexibility: 3,
+      ppmFeatures: 4,
+      reporting: 4,
+      security: 4
+    },
+    ratingExplanations: {
+      scalability: 'Handles enterprise-level workloads with proven performance for 10,000+ users. Automatic load balancing and resource optimization.',
+      integrations: 'Rich API ecosystem with 100+ pre-built integrations. Custom API access available for enterprise plans.',
+      easeOfUse: 'Intuitive grid interface familiar to spreadsheet users. Some advanced features require training.',
+      flexibility: 'Highly customizable workflows with conditional logic and automation. Custom form building and process design.',
+      ppmFeatures: 'Comprehensive portfolio management with resource allocation, capacity planning, and program tracking.',
+      reporting: 'Advanced analytics with real-time dashboards, custom reports, and AI-powered insights.',
+      security: 'SOC 2 Type II, ISO 27001, and GDPR compliant. Enterprise-grade encryption and access controls.'
+    }
+  },
+  {
+    id: 'airtable',
+    name: 'Airtable',
+    logo: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=64&h=64&fit=crop',
+    useCases: ['Waterfall', 'Agile', 'Marketing', 'R&D'],
+    methodologies: ['Waterfall', 'Agile', 'Continuous Improvement'],
+    functions: ['Marketing', 'Product & Design', 'Engineering', 'Sales & Account Management'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 5,
+      integrations: 5,
+      easeOfUse: 5,
+      flexibility: 5,
+      ppmFeatures: 5,
+      reporting: 5,
+      security: 5
+    },
+    ratingExplanations: {
+      scalability: 'Enterprise-grade scalability with proven performance for large organizations. Advanced caching and optimization for massive datasets.',
+      integrations: 'Industry-leading integration capabilities with extensive API support, webhooks, and automation options. Large marketplace of pre-built connectors.',
+      easeOfUse: 'User-friendly interface with drag-and-drop functionality. Quick learning curve.',
+      flexibility: 'Unmatched flexibility with fully customizable views, fields, relationships, and automation. Advanced workflow builder and scripting capabilities.',
+      ppmFeatures: 'Comprehensive portfolio management with advanced resource allocation, capacity planning, and program tracking features.',
+      reporting: 'Advanced analytics engine with AI-powered insights, custom dashboards, and real-time reporting capabilities.',
+      security: 'Enterprise-grade security with SOC 2 Type II, ISO 27001 compliance, advanced encryption, and comprehensive audit trails.'
+    }
+  },
+  {
+    id: 'monday',
+    name: 'Monday.com',
+    logo: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=64&h=64&fit=crop',
+    useCases: ['Waterfall', 'Marketing'],
+    methodologies: ['Waterfall', 'Continuous Improvement'],
+    functions: ['Marketing', 'Sales & Account Management', 'Customer Service'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 3,
+      integrations: 4,
+      easeOfUse: 5,
+      flexibility: 4,
+      ppmFeatures: 3,
+      reporting: 3,
+      security: 4
+    },
+    ratingExplanations: {
+      scalability: 'Strong performance with enterprise-ready infrastructure. Good handling of large datasets.',
+      integrations: 'Wide range of integrations with popular tools. Robust API and automation options.',
+      easeOfUse: 'Highly intuitive visual interface. Minimal training required for basic features.',
+      flexibility: 'Customizable boards and workflows. Good automation capabilities.',
+      ppmFeatures: 'Solid project management features with growing portfolio capabilities.',
+      reporting: 'Strong reporting features with customizable dashboards and analytics.',
+      security: 'Enterprise-grade security with SOC 2 compliance and advanced permissions.'
+    }
+  },
+  {
+    id: 'clickup',
+    name: 'ClickUp',
+    logo: 'https://images.unsplash.com/photo-1512758017271-d7b84c2113f1?w=64&h=64&fit=crop',
+    useCases: ['Waterfall', 'Marketing', 'R&D'],
+    methodologies: ['Waterfall'],
+    functions: ['Engineering', 'Product & Design', 'IT & Support'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 3,
+      integrations: 4,
+      easeOfUse: 2,
+      flexibility: 5,
+      ppmFeatures: 3,
+      reporting: 4,
+      security: 3
+    },
+    ratingExplanations: {
+      scalability: 'Good performance for medium to large teams. Some limitations with very large organizations.',
+      integrations: 'Growing integration marketplace. Native integrations with popular tools.',
+      easeOfUse: 'Feature-rich interface with moderate learning curve.',
+      flexibility: 'Highly customizable with multiple view options and custom fields.',
+      ppmFeatures: 'Good project management features with basic portfolio capabilities.',
+      reporting: 'Decent reporting options with customizable dashboards.',
+      security: 'Standard security features with role-based access control.'
+    }
+  },
+  {
+    id: 'asana',
+    name: 'Asana',
+    logo: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=64&h=64&fit=crop',
+    useCases: ['Waterfall', 'Marketing'],
+    methodologies: ['Waterfall'],
+    functions: ['Marketing', 'Product & Design', 'Engineering'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 3,
+      integrations: 4,
+      easeOfUse: 5,
+      flexibility: 3,
+      ppmFeatures: 3,
+      reporting: 2,
+      security: 4
+    },
+    ratingExplanations: {
+      scalability: 'Reliable performance for large organizations. Good handling of concurrent users.',
+      integrations: 'Strong integration ecosystem with major business tools. Good API support.',
+      easeOfUse: 'Clean, intuitive interface. Easy onboarding for new users.',
+      flexibility: 'Good customization options but some limitations in complex workflows.',
+      ppmFeatures: 'Strong task management but limited portfolio-level features.',
+      reporting: 'Basic reporting with some advanced features in enterprise tier.',
+      security: 'Enterprise-grade security with SSO and advanced admin controls.'
+    }
+  },
+  {
+    id: 'msproject',
+    name: 'MS Project',
+    logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=64&h=64&fit=crop',
+    useCases: ['Waterfall'],
+    methodologies: ['Waterfall'],
+    functions: ['Engineering', 'Manufacturing', 'Operations'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 4,
+      integrations: 3,
+      easeOfUse: 2,
+      flexibility: 3,
+      ppmFeatures: 5,
+      reporting: 5,
+      security: 4
+    },
+    ratingExplanations: {
+      scalability: 'Enterprise-ready with excellent performance for large organizations.',
+      integrations: 'Strong Microsoft ecosystem integration. Limited third-party options.',
+      easeOfUse: 'Complex interface with steep learning curve. Professional training often needed.',
+      flexibility: 'Good customization within Microsoft framework. Some workflow limitations.',
+      ppmFeatures: 'Comprehensive portfolio management with advanced resource planning.',
+      reporting: 'Strong reporting capabilities with Power BI integration.',
+      security: 'Enterprise-level security with full Microsoft security stack.'
+    }
+  },
+  {
+    id: 'hive',
+    name: 'Hive',
+    logo: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=64&h=64&fit=crop',
+    useCases: ['Waterfall', 'Marketing'],
+    methodologies: ['Waterfall', 'Continuous Improvement'],
+    functions: ['Marketing', 'Sales & Account Management'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 3,
+      integrations: 4,
+      easeOfUse: 4,
+      flexibility: 3,
+      ppmFeatures: 3,
+      reporting: 2,
+      security: 4
+    },
+    ratingExplanations: {
+      scalability: 'Good for small to medium teams. Some limitations for enterprise scale.',
+      integrations: 'Basic integration options with popular tools. Growing marketplace.',
+      easeOfUse: 'Modern, intuitive interface. Quick adoption for most users.',
+      flexibility: 'Flexible project views and good customization options.',
+      ppmFeatures: 'Solid project management with basic portfolio features.',
+      reporting: 'Standard reporting capabilities with time tracking analytics.',
+      security: 'Industry-standard security features with basic access controls.'
+    }
+  },
+  {
+    id: 'workfront',
+    name: 'Adobe Workfront',
+    logo: 'https://images.unsplash.com/photo-1661956602116-aa6865609028?w=64&h=64&fit=crop',
+    useCases: ['Waterfall', 'Marketing', 'R&D'],
+    methodologies: ['Waterfall', 'Continuous Improvement'],
+    functions: ['Marketing', 'Product & Design', 'Engineering', 'IT & Support'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 4,
+      integrations: 4,
+      easeOfUse: 3,
+      flexibility: 4,
+      ppmFeatures: 4,
+      reporting: 4,
+      security: 4
+    },
+    ratingExplanations: {
+      scalability: 'Enterprise-grade platform handling thousands of users and projects. Cloud infrastructure with proven performance at scale.',
+      integrations: 'Strong Adobe Creative Cloud integration. Extensive API and pre-built connectors for major enterprise tools.',
+      easeOfUse: 'Modern interface with some complexity due to extensive feature set. Training recommended for advanced features.',
+      flexibility: 'Highly configurable workflows and processes. Custom forms, fields, and automation capabilities.',
+      ppmFeatures: 'Comprehensive portfolio management with resource planning, scenario modeling, and program tracking.',
+      reporting: 'Advanced reporting engine with custom dashboards, real-time analytics, and AI-powered insights.',
+      security: 'SOC 2 Type II, ISO 27001 certified. Enterprise-grade security with SSO and granular permissions.'
+    }
+  },
+  {
+    id: 'azure',
+    name: 'Azure DevOps',
+    logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=64&h=64&fit=crop',
+    useCases: ['Agile', 'R&D'],
+    methodologies: ['Agile'],
+    functions: ['Engineering', 'IT & Support'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 4,
+      integrations: 4,
+      easeOfUse: 3,
+      flexibility: 4,
+      ppmFeatures: 4,
+      reporting: 4,
+      security: 5
+    },
+    ratingExplanations: {
+      scalability: 'Enterprise-grade platform with proven scalability for large organizations. Handles thousands of concurrent users and projects efficiently.',
+      integrations: 'Extensive integration capabilities with Microsoft ecosystem and third-party tools. Rich API support and marketplace.',
+      easeOfUse: 'Feature-rich interface requires some learning. Good documentation but initial complexity for new users.',
+      flexibility: 'Highly customizable with process templates, custom fields, and automation. Supports various development methodologies.',
+      ppmFeatures: 'Comprehensive portfolio management with advanced resource planning, capacity management, and program tracking.',
+      reporting: 'Powerful analytics with Power BI integration, custom dashboards, and advanced reporting capabilities.',
+      security: 'Enterprise-level security with Azure AD integration, compliance certifications, and granular access controls.'
+    }
+  },
+  {
+    id: 'jira',
+    name: 'Jira',
+    logo: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=64&h=64&fit=crop',
+    useCases: ['Agile', 'R&D'],
+    methodologies: ['Agile'],
+    functions: ['Engineering', 'Product & Design', 'IT & Support'],
+    type: 'application',
+    created_by: null,
+    criteria: [],
+    tags: [],
+    created_on: '2023-01-01T00:00:00Z',
+    submission_status: 'approved',
+    ratings: {
+      scalability: 4,
+      integrations: 5,
+      easeOfUse: 3,
+      flexibility: 4,
+      ppmFeatures: 4,
+      reporting: 4,
+      security: 4
+    },
+    ratingExplanations: {
+      scalability: 'Enterprise-ready with proven performance at scale. Cloud and data center options for different deployment needs.',
+      integrations: 'Largest ecosystem of integrations in the market. Extensive API capabilities and Atlassian marketplace.',
+      easeOfUse: 'Powerful but complex interface. Learning curve varies with configuration complexity.',
+      flexibility: 'Highly customizable workflows, fields, and screens. Supports multiple project methodologies.',
+      ppmFeatures: 'Strong portfolio features with Advanced Roadmaps. Good resource management and program tracking.',
+      reporting: 'Comprehensive reporting with custom dashboards, JQL queries, and eazyBI integration.',
+      security: 'Enterprise-grade security with compliance certifications, SSO, and fine-grained permissions.'
+    }
+  }
+];

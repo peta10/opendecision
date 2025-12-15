@@ -1,0 +1,75 @@
+/* =============================================================================
+   PANORAMIC NEW CHAT BUTTON
+   Circular gradient button with rotating plus icon
+   ============================================================================= */
+
+.panoramic-new-chat-btn {
+  /* --- PANORAMIC GRADIENT BACKGROUND --- */
+  background: linear-gradient(135deg, #ffb300 0%, #0072bc 50%, #00c853 100%);
+
+  /* Reset Button Styles */
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  /* Size & Shape - Compact for header */
+  width: 26px;
+  height: 26px;
+  border-radius: 50%; /* Perfect Circle */
+
+  /* Flex Centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Shadow for depth */
+  box-shadow: 0 2px 5px rgba(0, 114, 188, 0.3);
+
+  /* Animation setup */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.panoramic-new-chat-btn svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- HOVER STATE --- */
+.panoramic-new-chat-btn:hover {
+  /* Lift up */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 114, 188, 0.4);
+}
+
+.panoramic-new-chat-btn:hover svg {
+  /* Rotate the plus icon */
+  transform: rotate(90deg);
+}
+
+/* --- ACTIVE (CLICK) STATE --- */
+.panoramic-new-chat-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 3px rgba(0, 114, 188, 0.2);
+}
+
+.panoramic-new-chat-btn:active svg {
+  transform: rotate(90deg) scale(0.9);
+}
+
+/* --- DISABLED STATE --- */
+.panoramic-new-chat-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.panoramic-new-chat-btn:disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.panoramic-new-chat-btn:disabled:hover svg {
+  transform: none;
+}

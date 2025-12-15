@@ -1,0 +1,32 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        "additionalHooks": "(useCallback|useMemo)"
+      }
+    ],
+    "react/no-unknown-property": [
+      "error",
+      {
+        "ignore": ["dangerouslySetInnerHTML"]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/email/**/*.tsx", "**/PPMReportEmailTemplate.tsx"],
+      "rules": {
+        "react/no-unknown-property": "off"
+      }
+    },
+    {
+      "files": ["**/debug*.ts", "**/debug*.tsx", "**/development*.ts"],
+      "rules": {
+        "no-console": "off",
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
+}

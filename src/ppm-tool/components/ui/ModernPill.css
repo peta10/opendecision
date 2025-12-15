@@ -1,0 +1,283 @@
+/* ============================================
+   MODERN PILL - Base Styles
+   ============================================ */
+.modern-pill {
+  position: relative;
+  border-radius: 100px;
+  border: 0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform: translateY(0);
+}
+
+.modern-pill:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modern-pill--full {
+  width: 100%;
+}
+
+/* ============================================
+   SIZE VARIANTS
+   ============================================ */
+
+/* Small */
+.modern-pill--sm {
+  padding: 4px 10px 4px 8px;
+}
+
+@media (min-width: 768px) {
+  .modern-pill--sm {
+    padding: 6px 12px 6px 10px;
+  }
+}
+
+/* Medium (default) */
+.modern-pill--md {
+  padding: 6px 12px 6px 10px;
+}
+
+@media (min-width: 768px) {
+  .modern-pill--md {
+    padding: 8px 16px 8px 12px;
+  }
+}
+
+/* Large */
+.modern-pill--lg {
+  padding: 10px 20px 10px 16px;
+}
+
+@media (min-width: 768px) {
+  .modern-pill--lg {
+    padding: 12px 24px 12px 20px;
+  }
+}
+
+/* ============================================
+   LIGHTING EFFECT (Glass Bezel)
+   ============================================ */
+.modern-pill__lighting {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 2px 3px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 3px rgba(0, 20, 60, 0.4);
+  transition: all 0.3s ease;
+}
+
+.modern-pill__lighting::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 10px;
+  right: 10px;
+  height: 30%;
+  border-radius: 100px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(1px);
+  transition: all 0.3s ease;
+}
+
+/* ============================================
+   CONTENT
+   ============================================ */
+.modern-pill__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: white;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.modern-pill--sm .modern-pill__content {
+  font-size: 0.75rem;
+  gap: 4px;
+}
+
+.modern-pill--md .modern-pill__content {
+  font-size: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .modern-pill--md .modern-pill__content {
+    font-size: 0.875rem;
+    gap: 8px;
+  }
+}
+
+.modern-pill--lg .modern-pill__content {
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .modern-pill--lg .modern-pill__content {
+    font-size: 1rem;
+    gap: 10px;
+  }
+}
+
+/* Icon styling inside pill */
+.modern-pill__content svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .modern-pill--md .modern-pill__content svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .modern-pill--lg .modern-pill__content svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* ============================================
+   COLOR VARIANT: BLUE (Alpine Blue 400)
+   ============================================ */
+.modern-pill--blue {
+  background: linear-gradient(to bottom, #3d94ff, #1A80FF);
+  box-shadow:
+    0 2px 8px -2px rgba(26, 128, 255, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.modern-pill--blue:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: linear-gradient(to bottom, #5aa3ff, #1A80FF);
+  box-shadow:
+    0 4px 10px -2px rgba(26, 128, 255, 0.5),
+    0 0 0 2px rgba(26, 128, 255, 0.3);
+}
+
+.modern-pill--blue:active:not(:disabled) {
+  transform: translateY(1px);
+  background: linear-gradient(to bottom, #1A80FF, #0057B7);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.modern-pill--blue:focus {
+  outline: none;
+  box-shadow:
+    0 2px 8px -2px rgba(26, 128, 255, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 0 0 2px rgba(26, 128, 255, 0.5);
+}
+
+/* ============================================
+   COLOR VARIANT: GREEN (Green 600)
+   ============================================ */
+.modern-pill--green {
+  background: linear-gradient(to bottom, #34d399, #16a34a);
+  box-shadow:
+    0 2px 8px -2px rgba(22, 163, 74, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.modern-pill--green:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: linear-gradient(to bottom, #4ade80, #22c55e);
+  box-shadow:
+    0 4px 10px -2px rgba(22, 163, 74, 0.5),
+    0 0 0 2px rgba(34, 197, 94, 0.3);
+}
+
+.modern-pill--green:active:not(:disabled) {
+  transform: translateY(1px);
+  background: linear-gradient(to bottom, #16a34a, #15803d);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.modern-pill--green:focus {
+  outline: none;
+  box-shadow:
+    0 2px 8px -2px rgba(22, 163, 74, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 0 0 2px rgba(34, 197, 94, 0.5);
+}
+
+/* Adjust green lighting to be warmer */
+.modern-pill--green .modern-pill__lighting {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 2px 3px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 3px rgba(0, 40, 20, 0.4);
+}
+
+/* ============================================
+   COLOR VARIANT: GRAY (Secondary)
+   ============================================ */
+.modern-pill--gray {
+  background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
+  box-shadow:
+    0 2px 8px -2px rgba(107, 114, 128, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.modern-pill--gray .modern-pill__content {
+  color: #4b5563;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.modern-pill--gray:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+  box-shadow:
+    0 4px 10px -2px rgba(107, 114, 128, 0.4),
+    0 0 0 2px rgba(156, 163, 175, 0.3);
+}
+
+.modern-pill--gray:active:not(:disabled) {
+  transform: translateY(1px);
+  background: linear-gradient(to bottom, #e5e7eb, #d1d5db);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.modern-pill--gray:focus {
+  outline: none;
+  box-shadow:
+    0 2px 8px -2px rgba(107, 114, 128, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 0 0 2px rgba(156, 163, 175, 0.5);
+}
+
+/* Adjust gray lighting */
+.modern-pill--gray .modern-pill__lighting {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 2px 3px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   HOVER LIGHTING ANIMATION
+   ============================================ */
+.modern-pill:hover:not(:disabled) .modern-pill__lighting::after {
+  opacity: 1;
+  top: 1px;
+}

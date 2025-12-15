@@ -1,0 +1,150 @@
+/* =============================================================================
+   ATTACHMENT MENU
+   Expandable hamburger menu for file/image attachments
+   ============================================================================= */
+
+/* --- BASE CONTAINER --- */
+.attachment-menu {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+}
+
+/* --- MAIN BUTTON & ITEM SHARED STYLES --- */
+.attachment-menu .menu-item,
+.attachment-menu .menu-open-button {
+  background: linear-gradient(180deg, #0080d4 0%, #0072bc 100%);
+  border-radius: 100%;
+  width: 28px;
+  height: 28px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #FFFFFF;
+  text-align: center;
+  line-height: 28px;
+  font-size: 12px;
+  transform: translate3d(0, 0, 0);
+  transition: transform ease-out 200ms;
+  box-shadow: 0 2px 6px rgba(0, 114, 188, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- SUB-BUTTON SPECIFIC STYLES --- */
+.attachment-menu .menu-item {
+  background: #FFFFFF;
+  transition: all 0.3s ease;
+  z-index: 1;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Orange (Camera/Image) */
+.attachment-menu .item-orange { color: #FFB300; }
+.attachment-menu .item-orange:hover {
+  background: #FFB300;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(255, 179, 0, 0.4);
+}
+
+/* Green (Paperclip/File) */
+.attachment-menu .item-green { color: #00C853; }
+.attachment-menu .item-green:hover {
+  background: #00C853;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 200, 83, 0.4);
+}
+
+/* --- HAMBURGER ICON --- */
+.attachment-menu .menu-open {
+  display: none;
+}
+
+.attachment-menu .lines {
+  width: 12px;
+  height: 2px;
+  background: #FFFFFF;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -6px;
+  margin-top: -1px;
+  transition: transform 200ms;
+  border-radius: 1px;
+}
+
+.attachment-menu .line-1 { transform: translate3d(0, -4px, 0); }
+.attachment-menu .line-2 { transform: translate3d(0, 0, 0); }
+.attachment-menu .line-3 { transform: translate3d(0, 4px, 0); }
+
+/* Hamburger to X Animation */
+.attachment-menu .menu-open:checked + .menu-open-button .line-1 {
+  transform: translate3d(0, 0, 0) rotate(45deg);
+}
+.attachment-menu .menu-open:checked + .menu-open-button .line-2 {
+  transform: translate3d(0, 0, 0) scale(0.1, 1);
+}
+.attachment-menu .menu-open:checked + .menu-open-button .line-3 {
+  transform: translate3d(0, 0, 0) rotate(-45deg);
+}
+
+/* --- MAIN BUTTON INTERACTION --- */
+.attachment-menu .menu-open-button {
+  z-index: 2;
+  cursor: pointer;
+  transition-duration: 400ms;
+  border: none;
+}
+
+.attachment-menu .menu-open-button:hover {
+  transform: scale(1.1, 1.1) translate3d(0, 0, 0);
+  box-shadow: 0 4px 10px rgba(0, 114, 188, 0.4);
+}
+
+.attachment-menu .menu-open:checked + .menu-open-button {
+  transform: scale(0.9, 0.9) translate3d(0, 0, 0);
+  transition-timing-function: linear;
+  transition-duration: 200ms;
+}
+
+/* --- THE "OPEN RIGHT" ANIMATION --- */
+.attachment-menu .menu-open:checked ~ .menu-item {
+  transition-timing-function: cubic-bezier(0.935, 0, 0.34, 1.33);
+}
+
+/* Item 1 (Image): Moves Right */
+.attachment-menu .menu-open:checked ~ .menu-item:nth-child(3) {
+  transition-duration: 200ms;
+  transform: translate3d(34px, 0, 0);
+}
+
+/* Item 2 (File): Moves Further Right */
+.attachment-menu .menu-open:checked ~ .menu-item:nth-child(4) {
+  transition-duration: 300ms;
+  transform: translate3d(68px, 0, 0);
+}
+
+/* Icon sizing inside buttons */
+.attachment-menu .menu-item svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* Ensure consistent button sizing */
+.attachment-menu .menu-item,
+.attachment-menu .menu-open-button {
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
+}

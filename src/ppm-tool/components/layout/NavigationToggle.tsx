@@ -5,7 +5,7 @@ import { useMobileDetection } from '@/ppm-tool/shared/hooks/useMobileDetection';
 import { cn } from '@/ppm-tool/shared/lib/utils';
 import { ActionButtons } from './ActionButtons';
 import type { Tool, Criterion } from '@/ppm-tool/shared/types';
-import Image from 'next/image';
+// Image import removed - logo no longer displayed
 
 type NavigationStep = {
   id: string;
@@ -76,21 +76,11 @@ export const NavigationToggle: React.FC<NavigationToggleProps> = ({
   }, [onChartButtonPosition]);
 
   // Calculate header height (fixed - no scroll changes)
+  // Navigation aligns with the AI panel's top controls (collapse button level)
   const getHeaderHeight = useCallback(() => {
-    // Header.tsx uses:
-    // - py-0.5 = 2px top + 2px bottom
-    // - paddingTop style overrides: max(4px, env(safe-area-inset-top)) on mobile, max(8px, env) on desktop
-    // - Logo: h-8 (32px) on mobile, h-10 (40px) on desktop
-    
-    // Use mobile values as default during SSR to prevent hydration mismatch
     const effectiveIsMobile = !isHydrated || isMobile;
-    
-    const topPadding = effectiveIsMobile ? 4 : 8; // From paddingTop style override
-    const bottomPadding = 2; // py-0.5 = 2px bottom (consistent)
-    const logoHeight = effectiveIsMobile ? 32 : 40; // h-8 = 32px mobile, h-10 = 40px desktop
-    
-    // Total header height: top padding + bottom padding + logo height
-    return topPadding + bottomPadding + logoHeight;
+    // Both mobile and desktop: align with AI panel top (minimal offset for visual balance)
+    return effectiveIsMobile ? 4 : 0;
   }, [isMobile, isHydrated]);
 
   // Calculate navigation height (fixed - no scroll changes)
@@ -220,22 +210,21 @@ export const NavigationToggle: React.FC<NavigationToggleProps> = ({
         isProductBumperVisible && "blur-sm opacity-75",
         isScrolled && "shadow-md shadow-gray-300/70"
       )}
-        style={{ 
-          backgroundColor: '#F0F4FE',
-          // Mobile: Position directly below header (flush)
-          // Desktop: Add 16px gap below header (increased from 8px)
-          // Default to mobile for SSR
-          top: `${getHeaderHeight() + (!isHydrated || isMobile ? 0 : 16)}px`,
-          '--total-fixed-height': `${getTotalFixedHeight() + (!isHydrated || isMobile ? 0 : 16)}px` // Expose total height for content padding
+        style={{
+          backgroundColor: '#FFFFFF',
+          // Navigation now sits at the top with only safe area padding
+          top: `${getHeaderHeight()}px`,
+          '--total-fixed-height': `${getTotalFixedHeight()}px` // Expose total height for content padding
         } as React.CSSProperties}
       aria-label="PPM Tool Navigation"
       role="navigation"
     >
       <div
         className={cn(
-          "pb-2 pt-4",
-          // Mobile: standard padding, Desktop: account for responsive AI rail
-          "px-4"
+          "flex items-center",
+          // Mobile: standard padding, Desktop: match AI panel header (py-2 = 8px)
+          "px-4",
+          isHydrated && !isMobile ? "py-2 border-b border-gray-100" : "pt-4 pb-2"
         )}
         style={{
           // On desktop, offset and center relative to available space (excluding AI panel)
@@ -250,7 +239,7 @@ export const NavigationToggle: React.FC<NavigationToggleProps> = ({
         }}
       >
         <div className={cn(
-          "flex items-center",
+          "flex items-center w-full",
           !isHydrated ? "justify-center" : (isMobile ? "justify-center" : "justify-between")
         )}>
           {/* Navigation Steps - Left Side */}
@@ -333,31 +322,7 @@ export const NavigationToggle: React.FC<NavigationToggleProps> = ({
             </div>
           </div>
 
-          {/* PPM Tool Logo - Center relative to content area (accounts for AI panel state) */}
-          {isHydrated && !isMobile && (
-            <div
-              className="absolute transform -translate-x-1/2 text-center max-w-lg lg:max-w-xl"
-              style={{
-                // When AI panel expanded: center relative to remaining viewport
-                // When collapsed: center relative to viewport minus rail
-                left: isAIPanelExpanded
-                  ? 'calc(50% + (var(--ai-panel-width, 320px) / 2))'
-                  : 'calc(50% + (var(--ai-rail-width, 64px) / 2))',
-                transition: 'left 0.15s ease-out'
-              }}
-            >
-              <div className="flex justify-center">
-                <Image
-                  src="/images/PPM_Tool_Finder.png"
-                  alt="PPM Tool Finder"
-                  width={250}
-                  height={75}
-                  className="h-10 md:h-14 lg:h-18 w-auto object-contain"
-                  priority
-                />
-              </div>
-            </div>
-          )}
+          {/* PPM Tool Logo removed - navigation now sits at top */}
           
           {/* Action Buttons - Desktop: inline on right, Mobile: fixed bottom bar */}
           {isHydrated && (

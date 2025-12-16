@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 import { cn } from "@/ppm-tool/shared/lib/utils"
-import './PanoramicTooltip.css'
+import './ScoutTooltip.css'
 
 const TooltipProvider = TooltipPrimitive.Provider
 

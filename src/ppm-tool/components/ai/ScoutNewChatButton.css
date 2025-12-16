@@ -1,0 +1,76 @@
+/* =============================================================================
+   SCOUT NEW CHAT BUTTON
+   Circular gradient button with rotating plus icon
+   ============================================================================= */
+
+.scout-new-chat-btn {
+  /* Mint green gradient background */
+  background: linear-gradient(135deg, #CAFAED 0%, #6EDCD1 50%, #3ECBBE 100%);
+
+  /* Reset Button Styles */
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  /* Size & Shape - Compact for header */
+  width: 26px;
+  height: 26px;
+  border-radius: 50%; /* Perfect Circle */
+
+  /* Flex Centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Shadow for depth */
+  box-shadow: 0 2px 5px rgba(110, 220, 209, 0.3);
+
+  /* Animation setup */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.scout-new-chat-btn svg {
+  width: 14px;
+  height: 14px;
+  color: #0B1E2D;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- HOVER STATE --- */
+.scout-new-chat-btn:hover {
+  /* Lift up */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(110, 220, 209, 0.4);
+}
+
+.scout-new-chat-btn:hover svg {
+  /* Rotate the plus icon */
+  transform: rotate(90deg);
+}
+
+/* --- ACTIVE (CLICK) STATE --- */
+.scout-new-chat-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 3px rgba(110, 220, 209, 0.2);
+}
+
+.scout-new-chat-btn:active svg {
+  transform: rotate(90deg) scale(0.9);
+}
+
+/* --- DISABLED STATE --- */
+.scout-new-chat-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scout-new-chat-btn:disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.scout-new-chat-btn:disabled:hover svg {
+  transform: none;
+}

@@ -3,7 +3,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/ppm-tool/shared/lib/utils"
 import { useUnifiedMobileDetection } from "@/ppm-tool/shared/hooks/useUnifiedMobileDetection"
-import './PanoramicTooltip.css'
+import './ScoutTooltip.css'
 
 // Enhanced TooltipProvider with mobile-optimized settings
 const TooltipProvider = ({ children, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) => {
@@ -138,11 +138,11 @@ const TooltipContent = React.forwardRef<
         } : undefined}
         {...props}
       >
-        {/* Panoramic Brand Gradient Bar */}
+        {/* Scout Brand Gradient Bar */}
         {showAccent && (
           <div
             className="absolute left-0 top-0 bottom-0 w-1 rounded-l-lg"
-            style={{ background: 'linear-gradient(to bottom, #FFB300, #0072bc, #00C853)' }}
+            style={{ background: 'linear-gradient(to bottom, #CAFAED, #6EDCD1, #3ECBBE)' }}
           />
         )}
         {children}

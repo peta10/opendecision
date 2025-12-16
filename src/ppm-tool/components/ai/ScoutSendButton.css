@@ -1,0 +1,246 @@
+/* =============================================================================
+   SCOUT SEND BUTTON
+   Animated send button with paper plane icon and air streak effects
+   ============================================================================= */
+
+.scout-send-btn {
+  position: relative;
+  font-family: inherit;
+  font-size: 11px;
+  /* Mint green gradient */
+  background: linear-gradient(to bottom, #A5F0E4, #6EDCD1);
+  color: #0B1E2D;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  /* Full pill roundness */
+  border-radius: 100px;
+  /* Mint shadow */
+  box-shadow:
+    0 2px 8px -2px rgba(110, 220, 209, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  overflow: hidden;
+  height: 32px;
+}
+
+/* Wrapper to keep content above streaks */
+.scout-send-btn .content-wrapper {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+/* --- AIR STREAK ANIMATION SETUP --- */
+
+.scout-send-btn .air-streaks {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.scout-send-btn .air-streaks span {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.6);
+  height: 2px;
+  border-radius: 2px;
+  opacity: 0;
+  right: 0;
+}
+
+/* Varying the streaks for natural look */
+.scout-send-btn .air-streaks span:nth-child(1) {
+  top: 30%;
+  width: 8px;
+}
+.scout-send-btn .air-streaks span:nth-child(2) {
+  top: 50%;
+  width: 12px;
+  height: 2px;
+}
+.scout-send-btn .air-streaks span:nth-child(3) {
+  top: 70%;
+  width: 6px;
+}
+
+/* The flow animation keyframes */
+@keyframes scout-flow-left {
+  0% {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+}
+
+/* Continuous flow animation for loading state */
+@keyframes scout-flow-left-continuous {
+  0% {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+}
+
+/* Plane bobbing animation during loading */
+@keyframes scout-plane-fly {
+  0%, 100% {
+    transform: translateX(18px) translateY(0) rotate(45deg);
+  }
+  25% {
+    transform: translateX(20px) translateY(-1px) rotate(48deg);
+  }
+  50% {
+    transform: translateX(18px) translateY(0) rotate(45deg);
+  }
+  75% {
+    transform: translateX(16px) translateY(1px) rotate(42deg);
+  }
+}
+
+/* --- INTERACTION STATES --- */
+
+.scout-send-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  background: linear-gradient(to bottom, #CAFAED, #6EDCD1);
+  box-shadow:
+    0 4px 10px -2px rgba(110, 220, 209, 0.5),
+    0 0 0 2px rgba(110, 220, 209, 0.3);
+}
+
+.scout-send-btn:not(:disabled):hover svg {
+  transform: rotate(45deg) scale(1.1);
+}
+
+/* === CLICK (ACTIVE) ANIMATIONS === */
+
+/* 1. Button Press */
+.scout-send-btn:not(:disabled):active {
+  transform: translateY(1px);
+  background: linear-gradient(to bottom, #6EDCD1, #3ECBBE);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* 2. Text Vanishes */
+.scout-send-btn:not(:disabled):active .btn-text {
+  opacity: 0;
+  transform: translateX(5px);
+  transition: opacity 0.1s, transform 0.1s;
+}
+
+/* 3. Plane Flies Right */
+.scout-send-btn:not(:disabled):active .svg-wrapper {
+  transform: translateX(18px);
+  transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+/* 4. TRIGGER AIR STREAKS */
+.scout-send-btn:not(:disabled):active .air-streaks span:nth-child(1) {
+  animation: scout-flow-left 0.3s linear forwards;
+}
+.scout-send-btn:not(:disabled):active .air-streaks span:nth-child(2) {
+  animation: scout-flow-left 0.4s linear 0.05s forwards;
+}
+.scout-send-btn:not(:disabled):active .air-streaks span:nth-child(3) {
+  animation: scout-flow-left 0.25s linear 0.1s forwards;
+}
+
+/* === LOADING STATE - Continuous flying animation === */
+
+.scout-send-btn.is-loading {
+  pointer-events: none;
+}
+
+.scout-send-btn.is-loading .btn-text {
+  opacity: 0;
+  transform: translateX(5px);
+}
+
+.scout-send-btn.is-loading .svg-wrapper {
+  animation: scout-plane-fly 1.2s ease-in-out infinite;
+}
+
+.scout-send-btn.is-loading .air-streaks span:nth-child(1) {
+  animation: scout-flow-left-continuous 0.8s linear infinite;
+}
+.scout-send-btn.is-loading .air-streaks span:nth-child(2) {
+  animation: scout-flow-left-continuous 1s linear 0.1s infinite;
+}
+.scout-send-btn.is-loading .air-streaks span:nth-child(3) {
+  animation: scout-flow-left-continuous 0.7s linear 0.2s infinite;
+}
+
+/* --- DISABLED STATE --- */
+
+.scout-send-btn:disabled {
+  background: linear-gradient(to bottom, #d1d5db 0%, #9ca3af 100%);
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+  cursor: not-allowed;
+}
+
+.scout-send-btn:disabled .svg-wrapper {
+  background-color: #f3f4f6;
+}
+
+.scout-send-btn:disabled svg path:last-child {
+  fill: #9ca3af;
+}
+
+.scout-send-btn:disabled .btn-text {
+  opacity: 0.6;
+}
+
+/* --- STANDARD STYLING --- */
+
+.scout-send-btn .btn-text {
+  display: block;
+  margin-left: 0.4em;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.scout-send-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: all 0.3s;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+}
+
+.scout-send-btn .svg-wrapper-1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scout-send-btn .svg-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  margin-right: 6px;
+  transition: all 0.3s;
+}

@@ -80,15 +80,15 @@ const Slider = React.forwardRef<
       {...props}
     >
       <SliderPrimitive.Track className="relative h-3 w-full grow overflow-hidden rounded-full bg-gray-200 hover:bg-gray-250 transition-colors duration-150">
-        <SliderPrimitive.Range 
-          className="absolute h-full bg-alpine-blue-400"
+        <SliderPrimitive.Range
+          className="absolute h-full bg-scout"
         style={{
           transition: isDragging ? 'none' : 'width 3000ms cubic-bezier(0.25, 0.1, 0.25, 1)'
         }}
         />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb 
-        className="block h-6 w-6 rounded-full border-3 border-alpine-blue-400 bg-white shadow-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-alpine-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-105 hover:shadow-xl active:scale-100 cursor-grab active:cursor-grabbing will-change-transform" 
+      <SliderPrimitive.Thumb
+        className="block h-6 w-6 rounded-full border-3 border-scout bg-white shadow-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-scout focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-105 hover:shadow-xl active:scale-100 cursor-grab active:cursor-grabbing will-change-transform" 
         style={{
           // Cross-browser focus style overrides to prevent yellow highlighting
           outline: 'none',

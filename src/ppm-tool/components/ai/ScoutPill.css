@@ -1,0 +1,214 @@
+/* --- CONTAINER --- */
+.scout-pill {
+  position: relative;
+  /* Compact padding to match original button */
+  padding: 6px 12px 6px 8px;
+  border-radius: 100px;
+  border: 0;
+  cursor: pointer;
+  overflow: hidden;
+
+  /* Subtle mint gradient - matches Open Decision theme */
+  background: linear-gradient(to bottom, #B8D9D5, #94C4BE);
+
+  /* Subtle mint shadow */
+  box-shadow:
+    0 2px 8px -2px rgba(148, 196, 190, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform: translateY(0);
+}
+
+/* Medium screens and up */
+@media (min-width: 768px) {
+  .scout-pill {
+    padding: 8px 16px 8px 10px;
+  }
+}
+
+/* --- LIGHTING (SHARP BEZEL) --- */
+.scout-pill .pill-lighting {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  /* Sharper inset shadows for a crisp glass edge - scaled down */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 2px 3px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 3px rgba(0, 60, 50, 0.3);
+  transition: all 0.3s ease;
+}
+
+/* Top Horizontal Glare */
+.scout-pill .pill-lighting::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 10px;
+  right: 10px;
+  height: 30%;
+  border-radius: 100px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  filter: blur(1px);
+  transition: all 0.3s ease;
+}
+
+/* --- CONTENT --- */
+.scout-pill .pill-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (min-width: 768px) {
+  .scout-pill .pill-content {
+    gap: 6px;
+  }
+}
+
+.scout-pill .pill-text {
+  color: #0B1E2D; /* midnight text for better contrast on mint */
+  font-size: 0.75rem; /* 12px - matches text-xs */
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+@media (min-width: 768px) {
+  .scout-pill .pill-text {
+    font-size: 0.875rem; /* 14px - matches text-sm */
+  }
+}
+
+/* --- GRAPHIC WRAPPER --- */
+.scout-pill .pill-graphic-wrap {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .scout-pill .pill-graphic-wrap {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* MOUNTAINS - Fills the space */
+.scout-pill .pill-mountains {
+  position: absolute;
+  width: 120%; /* Make them slightly wider than the box */
+  height: 100%;
+  bottom: -2px; /* Anchor to bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.scout-pill .pill-cloud {
+  position: absolute;
+  width: 35%;
+  height: auto;
+  top: 15%;
+  left: 30%;
+  transform: translateX(-50%);
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.scout-pill .pill-star {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  top: 10%;
+  right: 10%;
+  opacity: 1;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.9));
+}
+
+@media (min-width: 768px) {
+  .scout-pill .pill-star {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* --- HOVER --- */
+.scout-pill:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(to bottom, #D4E8E6, #94C4BE);
+  box-shadow:
+    0 4px 10px -2px rgba(148, 196, 190, 0.5),
+    0 0 0 2px rgba(148, 196, 190, 0.3); /* Subtle mint halo */
+}
+
+.scout-pill:hover .pill-lighting::after {
+  opacity: 1;
+  top: 3px; /* Glare moves up */
+}
+
+/* --- ACTIVE --- */
+.scout-pill:active {
+  transform: translateY(1px);
+  background: linear-gradient(to bottom, #94C4BE, #70ADA5);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* --- FOCUS STATE --- */
+.scout-pill:focus {
+  outline: none;
+  box-shadow:
+    0 2px 8px -2px rgba(148, 196, 190, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 0 0 2px rgba(148, 196, 190, 0.5);
+}
+
+/* --- HIGHLIGHTED STATE (for product bumper) --- */
+.scout-pill.highlighted {
+  box-shadow:
+    0 2px 8px -2px rgba(148, 196, 190, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 0 0 3px rgba(148, 196, 190, 0.5);
+  transform: scale(1.05);
+}
+
+/* --- ARROW ANIMATIONS --- */
+.scout-pill .pill-cloud .arrow-up,
+.scout-pill .pill-cloud .arrow-down {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  animation: scout-flow-arrows 2s linear infinite;
+}
+
+.scout-pill .pill-cloud .arrow-down {
+  animation-delay: 1s;
+}
+
+@keyframes scout-flow-arrows {
+  0% {
+    stroke-dashoffset: 20;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}

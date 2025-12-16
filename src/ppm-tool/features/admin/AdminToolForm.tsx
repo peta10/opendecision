@@ -4,7 +4,7 @@ import { Criterion } from '@/ppm-tool/shared/types';
 import { useClickOutside } from '@/ppm-tool/shared/hooks/useClickOutside';
 import { supabase } from '@/lib/supabase';
 import { LoginModal } from '@/ppm-tool/components/auth/LoginModal';
-import { Slider } from '@/ppm-tool/components/ui/slider';
+import { Slider } from '@/ppm-tool/components/ui/Slider';
 
 interface AdminToolFormProps {
   onClose: () => void;

@@ -3,7 +3,7 @@ import { X, AlertCircle, Loader } from 'lucide-react';
 import { Tool, Criterion } from '@/ppm-tool/shared/types';
 import { useClickOutside } from '@/ppm-tool/shared/hooks/useClickOutside';
 import { supabase } from '@/lib/supabase';
-import { Slider } from '@/ppm-tool/components/ui/slider';
+import { Slider } from '@/ppm-tool/components/ui/Slider';
 
 interface EditToolFormProps {
   tool: Tool;

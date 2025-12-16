@@ -4,6 +4,7 @@ import './globals.css'
 import { ClientProviders } from '@/components/providers/ClientProviders'
 import { Toaster } from "@/components/ui/toaster"
 import { AnalyticsProvider } from '@/components/AnalyticsProvider'
+import { Header } from '@/components/layout/Header'
 
 const inter = Inter({
   subsets: ['latin'],

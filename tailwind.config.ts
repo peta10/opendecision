@@ -11,12 +11,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Open Decision brand colors (placeholder - customize later)
+        // Open Decision brand colors
         'midnight': '#0B1E2D',
-        'alpine': '#0057B7',
-        'summit': '#2E8B57',
+        'mint': '#D4E8E6',
+        'summit': '#5A9990',
 
-        // Alpine Blue scale for PPM Tool compatibility
+        // Scout AI color - ONLY the exact logo color #6EDCD1
+        // User explicitly requested: no brighter variants
+        'scout': '#6EDCD1',
+
+        // Mint Green scale - based on Scout AI color
+        'mint-green': {
+          25:  '#F0FDFA',  // almost white with hint of mint
+          50:  '#CCFBF1',  // very light
+          100: '#99F6E4',  // light
+          200: '#6EDCD1',  // PRIMARY - Scout AI color
+          300: '#5EEAD4',  // bright
+          400: '#2DD4BF',  // medium
+          500: '#14B8A6',  // darker
+          600: '#0D9488',  // dark
+          700: '#0F766E',  // very dark
+          800: '#115E59',  // darker
+          900: '#134E4A',  // darkest
+        },
+
+        // Legacy alpine-blue scale (kept for compatibility during migration)
         'alpine-blue': {
           25: 'rgb(243, 248, 255)',
           50: 'rgb(230, 240, 255)',

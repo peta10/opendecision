@@ -1,5 +1,5 @@
 import { cn } from "@/ppm-tool/shared/lib/utils"
-import { Slider } from "@/ppm-tool/components/ui/slider"
+import { Slider } from "@/ppm-tool/components/ui/Slider"
 
 type SliderProps = React.ComponentProps<typeof Slider>
 

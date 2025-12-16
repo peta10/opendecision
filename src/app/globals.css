@@ -41,27 +41,43 @@
     --card-foreground: 11 30 45;
     --popover: 255 255 255;
     --popover-foreground: 11 30 45;
-    --primary: 0 87 183;
-    --primary-foreground: 245 249 252;
+    --primary: 202 250 237;
+    --primary-foreground: 11 30 45;
     --secondary: 46 139 87;
     --secondary-foreground: 245 249 252;
     --muted: 241 245 249;
     --muted-foreground: 100 116 139;
-    --accent: 0 87 183;
+    --accent: 110 220 209;
     --accent-foreground: 11 30 45;
     --destructive: 239 68 68;
     --destructive-foreground: 248 250 252;
     --border: 226 232 240;
     --input: 226 232 240;
-    --ring: 0 87 183;
+    --ring: 110 220 209;
     --radius: 0.5rem;
     --chart-1: 221 83% 53%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 262 83% 58%;
     --chart-5: 142 71% 45%;
-    
-    /* Alpine Blue colors for PPM Tool compatibility */
+
+    /* Scout AI primary color - ONLY #6EDCD1, no brighter variants */
+    --scout: 110 220 209;
+
+    /* Mint Green colors - based on Scout AI #6EDCD1 */
+    --mint-green-25: 240 253 250;
+    --mint-green-50: 204 251 241;
+    --mint-green-100: 153 246 228;
+    --mint-green-200: 110 220 209;
+    --mint-green-300: 94 234 212;
+    --mint-green-400: 45 212 191;
+    --mint-green-500: 20 184 166;
+    --mint-green-600: 13 148 136;
+    --mint-green-700: 15 118 110;
+    --mint-green-800: 17 94 89;
+    --mint-green-900: 19 78 74;
+
+    /* Alpine Blue colors (legacy - kept for migration compatibility) */
     --alpine-blue-25: 243 248 255;
     --alpine-blue-50: 230 240 255;
     --alpine-blue-100: 179 212 255;
@@ -126,8 +142,8 @@
     --ai-content-gap: 24px;                            /* Between AI panel and content: fixed 24px */
     --section-padding: clamp(12px, 1.5vw, 24px);       /* Inside sections: 12-24px */
 
-    /* Header height (for AI panel positioning) */
-    --header-height: 68px;                             /* Actual measured header height */
+    /* Header height (for content positioning) */
+    --header-height: 56px;                             /* h-14 = 56px (Open Decision header) */
 
     /* Derived values for component positioning */
     --ai-rail-half: calc(var(--ai-rail-width) / 2);    /* Navigation centering offset */
@@ -177,21 +193,34 @@
     --card-foreground: 245 249 252;
     --popover: 15 35 50;
     --popover-foreground: 245 249 252;
-    --primary: 0 87 183;
-    --primary-foreground: 245 249 252;
+    --primary: 110 220 209;
+    --primary-foreground: 11 30 45;
     --secondary: 46 139 87;
     --secondary-foreground: 245 249 252;
     --muted: 30 45 60;
     --muted-foreground: 148 163 184;
-    --accent: 0 87 183;
+    --accent: 148 196 190;
     --accent-foreground: 11 30 45;
     --destructive: 220 38 38;
     --destructive-foreground: 248 250 252;
     --border: 30 45 60;
     --input: 30 45 60;
-    --ring: 0 87 183;
-    
-    /* Alpine Blue colors for PPM Tool compatibility (same as light mode) */
+    --ring: 148 196 190;
+
+    /* Mint Green colors - subtle, muted, professional palette (same as light mode) */
+    --mint-green-25: 247 250 250;
+    --mint-green-50: 238 246 245;
+    --mint-green-100: 226 239 238;
+    --mint-green-200: 212 232 230;
+    --mint-green-300: 184 217 213;
+    --mint-green-400: 148 196 190;
+    --mint-green-500: 112 173 165;
+    --mint-green-600: 90 153 144;
+    --mint-green-700: 74 129 122;
+    --mint-green-800: 59 105 99;
+    --mint-green-900: 45 81 76;
+
+    /* Alpine Blue colors (legacy - kept for migration compatibility) */
     --alpine-blue-25: 243 248 255;
     --alpine-blue-50: 230 240 255;
     --alpine-blue-100: 179 212 255;
@@ -253,6 +282,53 @@
   .hover\:text-alpine-blue-400:hover { color: rgb(var(--alpine-blue-400)); }
   .hover\:text-alpine-blue-500:hover { color: rgb(var(--alpine-blue-500)); }
   .hover\:text-alpine-blue-600:hover { color: rgb(var(--alpine-blue-600)); }
+
+  /* Mint Green utility classes for Open Decision theme */
+  .bg-mint-green-25 { background-color: rgb(var(--mint-green-25)); }
+  .bg-mint-green-50 { background-color: rgb(var(--mint-green-50)); }
+  .bg-mint-green-100 { background-color: rgb(var(--mint-green-100)); }
+  .bg-mint-green-200 { background-color: rgb(var(--mint-green-200)); }
+  .bg-mint-green-300 { background-color: rgb(var(--mint-green-300)); }
+  .bg-mint-green-400 { background-color: rgb(var(--mint-green-400)); }
+  .bg-mint-green-500 { background-color: rgb(var(--mint-green-500)); }
+  .bg-mint-green-600 { background-color: rgb(var(--mint-green-600)); }
+  .bg-mint-green-700 { background-color: rgb(var(--mint-green-700)); }
+  .bg-mint-green-800 { background-color: rgb(var(--mint-green-800)); }
+  .bg-mint-green-900 { background-color: rgb(var(--mint-green-900)); }
+
+  .text-mint-green-25 { color: rgb(var(--mint-green-25)); }
+  .text-mint-green-50 { color: rgb(var(--mint-green-50)); }
+  .text-mint-green-100 { color: rgb(var(--mint-green-100)); }
+  .text-mint-green-200 { color: rgb(var(--mint-green-200)); }
+  .text-mint-green-300 { color: rgb(var(--mint-green-300)); }
+  .text-mint-green-400 { color: rgb(var(--mint-green-400)); }
+  .text-mint-green-500 { color: rgb(var(--mint-green-500)); }
+  .text-mint-green-600 { color: rgb(var(--mint-green-600)); }
+  .text-mint-green-700 { color: rgb(var(--mint-green-700)); }
+  .text-mint-green-800 { color: rgb(var(--mint-green-800)); }
+  .text-mint-green-900 { color: rgb(var(--mint-green-900)); }
+
+  .border-mint-green-25 { border-color: rgb(var(--mint-green-25)); }
+  .border-mint-green-50 { border-color: rgb(var(--mint-green-50)); }
+  .border-mint-green-100 { border-color: rgb(var(--mint-green-100)); }
+  .border-mint-green-200 { border-color: rgb(var(--mint-green-200)); }
+  .border-mint-green-300 { border-color: rgb(var(--mint-green-300)); }
+  .border-mint-green-400 { border-color: rgb(var(--mint-green-400)); }
+  .border-mint-green-500 { border-color: rgb(var(--mint-green-500)); }
+  .border-mint-green-600 { border-color: rgb(var(--mint-green-600)); }
+  .border-mint-green-700 { border-color: rgb(var(--mint-green-700)); }
+  .border-mint-green-800 { border-color: rgb(var(--mint-green-800)); }
+  .border-mint-green-900 { border-color: rgb(var(--mint-green-900)); }
+
+  /* Mint Green hover states */
+  .hover\:bg-mint-green-300:hover { background-color: rgb(var(--mint-green-300)); }
+  .hover\:bg-mint-green-400:hover { background-color: rgb(var(--mint-green-400)); }
+  .hover\:bg-mint-green-500:hover { background-color: rgb(var(--mint-green-500)); }
+  .hover\:text-mint-green-400:hover { color: rgb(var(--mint-green-400)); }
+  .hover\:text-mint-green-500:hover { color: rgb(var(--mint-green-500)); }
+  .hover\:text-mint-green-600:hover { color: rgb(var(--mint-green-600)); }
+  .hover\:border-mint-green-300:hover { border-color: rgb(var(--mint-green-300)); }
+  .hover\:border-mint-green-400:hover { border-color: rgb(var(--mint-green-400)); }
   
   /* Force correct border colors for PPM tool cards */
   .border { border-color: rgb(226, 232, 240) !important; }
@@ -429,10 +505,15 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
-  /* Premium button styles */
+  /* Premium button styles - using exact Scout AI color #6EDCD1 */
   .btn-premium {
-    @apply relative overflow-hidden bg-gradient-to-r from-alpine to-summit text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5;
+    @apply relative overflow-hidden text-midnight font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5;
+    background-color: #6EDCD1;
     background-size: 200% 200%;
+  }
+
+  .btn-premium:hover {
+    background-color: #5BC8BD; /* slightly darker for hover, not brighter */
   }
 
   .card-premium {
@@ -569,9 +650,10 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
-  /* Premium button styles */
+  /* Premium button styles - using Scout AI color #6EDCD1 */
   .btn-premium {
-    @apply relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5;
+    @apply relative overflow-hidden text-midnight font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5;
+    background-color: #6EDCD1;
     background-size: 200% 200%;
   }
 
@@ -880,9 +962,10 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Premium button styles */
+/* Premium button styles - using Scout AI color #6EDCD1 */
 .btn-premium {
-  @apply relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5;
+  @apply relative overflow-hidden text-midnight font-medium py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5;
+  background-color: #6EDCD1;
   background-size: 200% 200%;
 }
 

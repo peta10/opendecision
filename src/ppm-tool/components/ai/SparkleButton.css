@@ -2,332 +2,180 @@
 .sp {
   position: relative;
   --transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --spark: 1.5s;
-  --cut: 3px;
-  --active: 0;
   z-index: 100;
+  cursor: pointer;
 }
 
 /* --- SIZE VARIANTS --- */
 .sp.sp-large {
   --button-size: 80px;
+  --eye-size: 8px;
+  --eye-offset: 12px;
 }
 
 .sp.sp-small {
   --button-size: 32px;
-  --cut: 1.5px;
+  --eye-size: 3px;
+  --eye-offset: 5px;
 }
 
-/* --- MAIN BUTTON WRAPPER --- */
-.sparkle-button {
+/* --- COMPASS LOGO WRAPPER --- */
+.compass-logo-wrapper {
   position: relative;
-  z-index: 10;
-  width: var(--button-size, 140px);
-  height: var(--button-size, 140px);
+  width: var(--button-size);
+  height: var(--button-size);
   border-radius: 50%;
-  border: 0;
-  cursor: pointer;
-  padding: 0;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  scale: calc(1 + (var(--active) * 0.03));
   transition: all var(--transition);
-  /* Match alpine-blue-400 glow */
-  box-shadow:
-    0 0 0 calc(var(--active) * 4px) rgba(26, 128, 255, 0.4),
-    0 10px 15px -5px rgba(0, 0, 0, 0.2),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* Subtle glow animation */
+  animation: subtle-glow 3s ease-in-out infinite;
   background: transparent;
 }
 
-/* --- 1. SPARK RING --- */
-.spark {
-  position: absolute;
-  inset: 0;
+/* Remove any box from the image */
+.compass-logo-wrapper img {
   border-radius: 50%;
-  rotate: 0deg;
-  overflow: hidden;
-  mask: linear-gradient(white, transparent 50%);
-  animation: flip calc(var(--spark) * 2) infinite steps(2, end);
+  background: transparent;
 }
 
-@keyframes flip {
-  to {
-    rotate: 360deg;
+@keyframes subtle-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(110, 220, 180, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(110, 220, 180, 0.6));
   }
 }
 
-.spark:before {
-  content: "";
-  position: absolute;
-  width: 200%;
-  aspect-ratio: 1;
-  top: 0%;
-  left: 50%;
-  z-index: -1;
-  translate: -50% -15%;
-  rotate: 0;
-  transform: rotate(-90deg);
-  opacity: calc((var(--active)) + 0.6);
-  background: conic-gradient(from 0deg, transparent 0 330deg, #00e5ff 360deg);
-  transition: opacity var(--transition);
-  animation: rotate var(--spark) linear infinite both;
-}
-
-.spark:after {
-  content: "";
-  position: absolute;
-  inset: var(--cut);
+/* --- COMPASS LOGO IMAGE --- */
+.compass-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 50%;
-  background: #002540;
-}
-
-@keyframes rotate {
-  to {
-    transform: rotate(90deg);
-  }
-}
-
-/* --- 2. BACKDROP SPHERE --- */
-.backdrop {
-  position: absolute;
-  inset: var(--cut);
-  border-radius: 50%;
-  overflow: hidden;
-  /* Match alpine-blue-400 (rgb(26, 128, 255) / #1A80FF) from criteria slider */
-  background: radial-gradient(circle at 30% 30%, #4da3ff, #1A80FF);
-  box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.8),
-    inset 0 0.5rem 1rem rgba(255, 255, 255, 0.4),
-    inset 0 -1rem 1.5rem rgba(0, 0, 0, 0.5),
-    inset 0 0 2rem rgba(26, 128, 255, 0.3);
-  transition: all var(--transition);
-  z-index: 2;
-}
-
-.backdrop::after {
-  content: "";
-  position: absolute;
-  top: 6%;
-  left: 20%;
-  right: 20%;
-  height: 30%;
-  border-radius: 50%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.1) 70%,
-    transparent 100%
-  );
-  filter: blur(2px);
-  transition: all var(--transition);
-}
-
-.backdrop::before {
-  content: "";
-  position: absolute;
-  left: -20%;
-  right: -20%;
-  bottom: -25%;
-  height: 80%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(200, 230, 255, 0.2) 0%,
-    transparent 70%
-  );
-  filter: blur(8px);
-  transition: all var(--transition);
-}
-
-/* --- 3. LOGO CONTAINER --- */
-.logo-container {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-}
-
-/* MOUNTAINS */
-.mountain-logo {
-  position: absolute;
-  width: 80%;
-  height: auto;
-  top: 50%;
-  left: 48%;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.7));
   transition: transform var(--transition);
+  /* Subtle breathing animation */
+  animation: breathe 4s ease-in-out infinite;
 }
 
-/* CLOUD */
-.cloud-icon {
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* --- BLINKING EYES OVERLAY --- */
+.compass-logo-wrapper::before,
+.compass-logo-wrapper::after {
+  content: '';
   position: absolute;
-  width: 15%;
-  height: auto;
-  top: 32%;
-  left: 38%;
-  transform: translate(-50%, -50%);
-  opacity: 1;
-  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
-  transition:
-    transform 0.5s ease-in-out,
-    filter 0.3s;
-  animation: float-cloud 3s ease-in-out infinite;
+  width: var(--eye-size);
+  height: var(--eye-size);
+  background: #6EDCD1;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  animation: blink 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.compass-logo-wrapper::before {
+  left: calc(50% - var(--eye-offset) - var(--eye-size)/2);
+}
+
+.compass-logo-wrapper::after {
+  right: calc(50% - var(--eye-offset) - var(--eye-size)/2);
+}
+
+@keyframes blink {
+  0%, 90%, 100% {
+    opacity: 0;
+    transform: translateY(-50%) scaleY(1);
+  }
+  92%, 98% {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(0.1);
+  }
+  95% {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1);
+  }
 }
 
 /* --- HOVER STATES --- */
-.sparkle-button:hover {
-  /* Match alpine-blue-400 glow on hover */
-  box-shadow:
-    0 0 0 6px rgba(26, 128, 255, 0.5),
-    0 15px 25px -5px rgba(0, 0, 0, 0.3),
-    0 6px 10px -2px rgba(0, 0, 0, 0.1);
+.sp:hover .compass-logo-wrapper {
+  transform: scale(1.08);
+  animation: none;
+  filter: drop-shadow(0 0 12px rgba(110, 220, 180, 0.7));
 }
 
-.sparkle-button:hover .backdrop::after {
-  transform: translateY(-10%);
-  opacity: 1;
+.sp:hover .compass-logo {
+  animation: none;
+  transform: scale(1);
 }
 
-.sparkle-button:hover .backdrop::before {
-  transform: translateY(5%);
-  opacity: 1;
+/* Faster blink on hover */
+.sp:hover .compass-logo-wrapper::before,
+.sp:hover .compass-logo-wrapper::after {
+  animation: blink-fast 1.5s ease-in-out infinite;
 }
 
-.sparkle-button:hover .mountain-logo {
-  transform: translate(-50%, -50%) scale(1.05);
-}
-
-.sparkle-button:hover .cloud-icon {
-  transform: translate(-50%, -60%) scale(1.1);
-  /* Match alpine-blue-400 for hover effect */
-  filter: drop-shadow(0 8px 8px rgba(26, 128, 255, 0.5));
+@keyframes blink-fast {
+  0%, 85%, 100% {
+    opacity: 0;
+    transform: translateY(-50%) scaleY(1);
+  }
+  88%, 96% {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(0.1);
+  }
+  92% {
+    opacity: 1;
+    transform: translateY(-50%) scaleY(1);
+  }
 }
 
 /* --- ACTIVE STATE --- */
-.sparkle-button:active {
-  transform: translateY(3px) scale(0.98);
-  /* Match alpine-blue-400 for active state */
-  box-shadow:
-    0 0 0 2px rgba(26, 128, 255, 0.6),
-    0 5px 10px -2px rgba(0, 0, 0, 0.4);
+.sp:active .compass-logo-wrapper {
+  transform: scale(0.95);
+  filter: drop-shadow(0 0 4px rgba(110, 220, 180, 0.9));
 }
 
-/* --- ANIMATIONS & EXTRAS --- */
-@keyframes float-cloud {
-  0%,
-  100% {
-    margin-top: 0;
+/* --- SPARKLE PARTICLES ON HOVER --- */
+.sp::before {
+  content: '';
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  top: -10%;
+  left: -10%;
+  background: radial-gradient(circle, transparent 30%, rgba(110, 220, 180, 0.1) 70%);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.sp:hover::before {
+  opacity: 1;
+  animation: sparkle-ring 2s ease-in-out infinite;
+}
+
+@keyframes sparkle-ring {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.5;
   }
   50% {
-    margin-top: -3px;
+    transform: scale(1.1) rotate(180deg);
+    opacity: 0.8;
   }
-}
-
-.arrow-up,
-.arrow-down {
-  stroke-dasharray: 20;
-  stroke-dashoffset: 20;
-  animation: flow-arrows 2s linear infinite;
-}
-
-.arrow-down {
-  animation-delay: 1s;
-}
-
-@keyframes flow-arrows {
-  0% {
-    stroke-dashoffset: 20;
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 1;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 0;
-  }
-}
-
-.sparkle {
-  position: absolute;
-  z-index: 6;
-  width: 18px;
-  height: 18px;
-  top: 32%;
-  right: 28%;
-  transform: translate(50%, -50%);
-  opacity: 1;
-  transition: transform var(--transition);
-}
-
-/* Scale sparkle for small variant */
-.sp.sp-small .sparkle {
-  width: 8px;
-  height: 8px;
-}
-
-.sp:hover {
-  --active: 1;
-}
-
-.particle-pen {
-  position: absolute;
-  width: 200%;
-  aspect-ratio: 1;
-  top: 50%;
-  left: 50%;
-  translate: -50% -50%;
-  z-index: -1;
-  opacity: var(--active, 0);
-  transition: opacity var(--transition);
-  -webkit-mask: radial-gradient(white 0%, transparent 70%);
-  mask: radial-gradient(white 0%, transparent 70%);
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15));
-}
-
-.particle {
-  fill: white;
-  width: calc(var(--size, 0.2) * 1rem);
-  aspect-ratio: 1;
-  position: absolute;
-  top: calc(var(--y) * 1%);
-  left: calc(var(--x) * 1%);
-  opacity: var(--alpha, 1);
-  animation: float-out calc(var(--duration, 1) * 1s) calc(var(--delay) * -1s)
-    infinite linear;
-  transform-origin: var(--origin-x, 1000%) var(--origin-y, 1000%);
-  z-index: -1;
-  animation-play-state: paused;
-}
-
-.sp:hover .particle {
-  animation-play-state: running;
-}
-
-@keyframes float-out {
-  to {
-    rotate: 360deg;
-    transform: translate(
-      calc(var(--x-move) * 20px),
-      calc(var(--y-move) * 20px)
-    );
-  }
-}
-
-.particle path {
-  fill: #ffb300;
-}
-
-.particle:nth-child(2n) path {
-  fill: #00e5ff;
-}
-
-.particle:nth-child(3n) path {
-  fill: #00ff66;
 }

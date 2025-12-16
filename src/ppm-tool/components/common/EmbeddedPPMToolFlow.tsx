@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import Image from 'next/image';
 import { NavigationToggle } from '@/ppm-tool/components/layout/NavigationToggle';
 import { SplitView } from '@/ppm-tool/components/layout/SplitView';
 import { ComparisonChart } from '@/ppm-tool/components/charts/ComparisonChart';
@@ -52,6 +51,8 @@ import {
 import { resetGuidedRankingCompletion, markGuidedRankingAsCompleted, getGuidedRankingCriteriaIds } from '@/ppm-tool/shared/utils/guidedRankingState';
 import { checkAndTrackNewActive } from '@/lib/posthog';
 import { analytics } from '@/lib/analytics';
+import Link from 'next/link';
+import { User } from 'lucide-react';
 
 interface EmbeddedPPMToolFlowProps {
   showGuidedRanking?: boolean;
@@ -1601,6 +1602,61 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
           role="application"
           aria-label="PPM Tool Finder"
         >
+          {/* Global Header - fixed at top, starts after AI panel */}
+          {isHydrated && !isMobile && (
+            <header
+              className="fixed top-0 right-0 z-[80] bg-white border-b border-gray-200"
+              style={{
+                left: isAIPanelExpanded
+                  ? 'var(--ai-panel-width, 320px)'
+                  : 'var(--ai-rail-width, 64px)',
+                transition: 'left 0.15s ease-out'
+              }}
+            >
+              <div className="h-16 px-6 font-sans flex items-center justify-between">
+                {/* Left Section - Logo */}
+                <div className="flex items-center">
+                  <Link href="/" className="flex items-center">
+                    <img
+                      src="/opendecision.png"
+                      alt="Open Decision"
+                      className="h-12 w-auto"
+                    />
+                  </Link>
+                </div>
+
+                {/* Center Section - Navigation */}
+                <nav className="flex items-center gap-12">
+                  <Link href="/spaces" className="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors">
+                    Spaces
+                  </Link>
+                  <Link href="/resources" className="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors">
+                    Resources
+                  </Link>
+                  <Link href="/contact" className="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors">
+                    Contact
+                  </Link>
+                  <Link href="/trust" className="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors">
+                    Trust
+                  </Link>
+                </nav>
+
+                {/* Right Section - Profile */}
+                <div className="flex items-center">
+                  <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-900 font-bold hover:text-gray-600 transition-colors">
+                    <User className="w-4 h-4" />
+                    <span>Profile</span>
+                    <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">
+                      <span className="text-white text-xs font-medium">PG</span>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+            </header>
+          )}
+
+          {/* NavigationToggle removed - replaced by global Header */}
+          {/*
           <NavigationToggle
             currentStep={currentStep}
             onStepChange={setCurrentStep}
@@ -1634,14 +1690,14 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
             }}
             isAIPanelExpanded={isAIPanelExpanded}
           />
+          */}
 
-          {/* AI Chat Panel - Fixed position on left, starts below header, above nav toggle (desktop only) */}
+          {/* AI Chat Panel - Fixed position on left, full height from top to bottom (desktop only) */}
           {isHydrated && !isMobile && (
             <div
-              className="fixed left-0 z-[70]"
+              className="fixed left-0 top-0 z-[70]"
               style={{
-                top: "var(--header-height, 68px)",
-                height: "calc(100vh - var(--header-height, 68px))",
+                height: "100vh",
               }}
             >
               <AIChatPanel
@@ -1662,7 +1718,8 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
               isHydrated && isMobile && "pb-32" // Increased padding to accommodate the action buttons
             )}
             style={{
-              paddingTop: "calc(var(--total-fixed-height, 12rem) + 1rem)",
+              // Header height + spacing
+              paddingTop: "calc(var(--header-height, 48px) + 1rem)",
               // Content margin adjusts based on AI panel state
               // Collapsed: rail width + gap | Expanded: panel width + gap
               marginLeft: isHydrated && !isMobile
@@ -1674,22 +1731,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
               transition: 'margin-left 0.15s ease-out',
             }}
           >
-            {/* Mobile Logo - Scrollable, appears above content */}
-            {/* Only render mobile-specific UI after hydration to prevent SSR mismatch */}
-            {isHydrated && isMobile && (
-              <div className="text-center mb-6 pb-4 border-b border-gray-200/50">
-                <div className="flex justify-center px-4">
-                  <Image
-                    src="/images/PPM_Tool_Finder.png"
-                    alt="PPM Tool Finder"
-                    width={220}
-                    height={66}
-                    className="h-10 w-auto object-contain"
-                    priority
-                  />
-                </div>
-              </div>
-            )}
+            {/* Mobile Logo removed - navigation now sits at top */}
             {/* Content container - full width with right padding matching left gap */}
             {/* ppm-content-container enables container queries for compact mode when AI panel expands */}
             <div

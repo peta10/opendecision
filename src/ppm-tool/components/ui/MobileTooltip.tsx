@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useUnifiedMobileDetection } from '@/ppm-tool/shared/hooks/useUnifiedMobileDetection';
 import { BasicHoverTooltip } from './basic-hover-tooltip';
-import './PanoramicTooltip.css';
+import './ScoutTooltip.css';
 
 interface MobileTooltipProps {
   content: React.ReactNode;

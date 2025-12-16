@@ -1,19 +1,19 @@
 /* --- CONTAINER --- */
 .report-pill {
   position: relative;
-  /* Compact padding to match PanoramicPill */
+  /* Compact padding to match ScoutPill */
   padding: 6px 12px 6px 10px;
   border-radius: 100px;
   border: 0;
   cursor: pointer;
   overflow: hidden;
 
-  /* Match alpine-blue-400 (rgb(26, 128, 255) / #1A80FF) from criteria slider */
-  background: linear-gradient(to bottom, #3d94ff, #1A80FF);
+  /* Subtle mint gradient */
+  background: linear-gradient(to bottom, #B8D9D5, #94C4BE);
 
-  /* Tighter, cleaner grounding shadow - match alpine-blue-400 */
+  /* Subtle mint shadow */
   box-shadow:
-    0 2px 8px -2px rgba(26, 128, 255, 0.4),
+    0 2px 8px -2px rgba(148, 196, 190, 0.4),
     0 1px 2px rgba(0, 0, 0, 0.1);
 
   transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -76,11 +76,11 @@
 }
 
 .report-pill-text {
-  color: white;
+  color: #0B1E2D; /* midnight text for better contrast on mint */
   font-size: 0.75rem; /* 12px - matches text-xs */
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.01em;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 @media (min-width: 768px) {
@@ -94,7 +94,7 @@
   width: 12px;
   height: 12px;
   flex-shrink: 0;
-  color: white;
+  color: #0B1E2D;
 }
 
 @media (min-width: 768px) {
@@ -107,10 +107,10 @@
 /* --- HOVER --- */
 .report-pill:hover {
   transform: translateY(-1px);
-  background: linear-gradient(to bottom, #5aa3ff, #1A80FF);
+  background: linear-gradient(to bottom, #D4E8E6, #94C4BE);
   box-shadow:
-    0 4px 10px -2px rgba(26, 128, 255, 0.5),
-    0 0 0 2px rgba(26, 128, 255, 0.3); /* Alpine blue halo */
+    0 4px 10px -2px rgba(148, 196, 190, 0.5),
+    0 0 0 2px rgba(148, 196, 190, 0.3); /* Subtle mint halo */
 }
 
 .report-pill:hover .report-pill-lighting::after {
@@ -121,17 +121,17 @@
 /* --- ACTIVE --- */
 .report-pill:active {
   transform: translateY(1px);
-  background: linear-gradient(to bottom, #1A80FF, #0057B7);
+  background: linear-gradient(to bottom, #94C4BE, #70ADA5);
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.3),
-    inset 0 2px 6px rgba(0, 0, 0, 0.4);
+    inset 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* --- FOCUS STATE --- */
 .report-pill:focus {
   outline: none;
   box-shadow:
-    0 2px 8px -2px rgba(26, 128, 255, 0.4),
+    0 2px 8px -2px rgba(148, 196, 190, 0.4),
     0 1px 2px rgba(0, 0, 0, 0.1),
-    0 0 0 2px rgba(26, 128, 255, 0.5);
+    0 0 0 2px rgba(148, 196, 190, 0.5);
 }

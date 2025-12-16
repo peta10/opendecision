@@ -7,7 +7,7 @@ import { useClickOutside } from '@/ppm-tool/shared/hooks/useClickOutside';
 import { useUnifiedMobileDetection } from '@/ppm-tool/shared/hooks/useUnifiedMobileDetection';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/ppm-tool/components/ui/button';
-import { Slider } from '@/ppm-tool/components/ui/slider';
+import { Slider } from '@/ppm-tool/components/ui/Slider';
 import { checkAndTrackNewActive, checkAndTrackNewPartialRanking, checkAndTrackNewFullRankingSubmittal } from '@/lib/posthog';
 import { markGuidedRankingComplete } from '@/ppm-tool/shared/utils/productBumperState';
 import { markGuidedRankingAsCompleted } from '@/ppm-tool/shared/utils/guidedRankingState';

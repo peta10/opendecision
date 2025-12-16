@@ -20,9 +20,9 @@ import { useAIChat, useInitialPrompts } from '@/ppm-tool/shared/hooks/useAIChat'
 import { submitMessageFeedback, getOrCreateSessionId } from '@/ppm-tool/shared/services/aiChatService';
 import { AIChatContext, Tool, Criterion } from '@/ppm-tool/shared/types';
 import { cn } from '@/ppm-tool/shared/lib/utils';
-import './PanoramicSendButton.css';
+import './ScoutSendButton.css';
 import './AttachmentMenu.css';
-import './PanoramicBackButton.css';
+import './ScoutBackButton.css';
 import './ChatHistoryDropdown.css';
 
 // =============================================================================
@@ -252,11 +252,11 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
             </nav>
           </div>
 
-          {/* Right side - Panoramic Send Button */}
+          {/* Right side - Scout Send Button */}
           <button
             onClick={handleSend}
             disabled={!canSend}
-            className={cn('panoramic-send-btn', isLoading && 'is-loading')}
+            className={cn('scout-send-btn', isLoading && 'is-loading')}
             type="button"
           >
             <div className="air-streaks">
@@ -392,35 +392,38 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         ease: 'easeOut',
       }}
     >
-      {/* Collapsed State - Slim 32px rail */}
+      {/* Collapsed State - Rail with header-aligned top */}
       {!isExpanded && (
-        <div
-          onClick={isAnimationBlocked ? undefined : handleToggle}
-          role="button"
-          tabIndex={isAnimationBlocked ? -1 : 0}
-          onKeyDown={(e) => {
-            if ((e.key === 'Enter' || e.key === ' ') && !isAnimationBlocked) {
-              e.preventDefault();
-              handleToggle();
-            }
-          }}
-          className={cn(
-            'w-full h-full flex flex-col items-center pt-3 cursor-pointer',
-            'hover:bg-gray-50 transition-colors duration-150',
-            'group',
-            isAnimationBlocked && 'opacity-50 cursor-not-allowed'
-          )}
-          title="Open AI Assistant"
-        >
-          <SparkleButton size="small" />
+        <div className="w-full h-full flex flex-col">
+          {/* Header area - h-14 (56px) to match main header */}
+          <div
+            onClick={isAnimationBlocked ? undefined : handleToggle}
+            role="button"
+            tabIndex={isAnimationBlocked ? -1 : 0}
+            onKeyDown={(e) => {
+              if ((e.key === 'Enter' || e.key === ' ') && !isAnimationBlocked) {
+                e.preventDefault();
+                handleToggle();
+              }
+            }}
+            className={cn(
+              'w-full h-14 flex items-center justify-center cursor-pointer border-b border-gray-100',
+              'hover:bg-gray-50 transition-colors duration-150',
+              'group',
+              isAnimationBlocked && 'opacity-50 cursor-not-allowed'
+            )}
+            title="Open AI Assistant"
+          >
+            <SparkleButton size="small" />
+          </div>
         </div>
       )}
 
       {/* Expanded State */}
       {isExpanded && (
         <div className="flex flex-col h-full overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 flex-shrink-0">
+          {/* Header - h-14 (56px) to match main header */}
+          <div className="flex items-center justify-between px-4 h-14 border-b border-gray-100 flex-shrink-0">
             <ChatHistoryDropdown
               chatHistory={chatHistory}
               currentChatId={sessionId}
@@ -432,7 +435,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <button
               onClick={handleToggle}
               disabled={isAnimationBlocked}
-              className="panoramic-back-btn"
+              className="scout-back-btn"
               aria-label="Collapse panel"
               title="Collapse"
             >

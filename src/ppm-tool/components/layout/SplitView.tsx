@@ -1,5 +1,5 @@
 import React from 'react';
-import { CriteriaSection } from '@/ppm-tool/features/criteria/components/CriteriaSection';
+import { ProjectProfileSection } from '@/ppm-tool/features/profile';
 import { ToolSection } from '@/ppm-tool/features/tools/ToolSection';
 import { Tool, Criterion } from '@/ppm-tool/shared/types';
 import { FilterCondition } from '@/ppm-tool/components/filters/FilterSystem';
@@ -73,13 +73,11 @@ export const SplitView: React.FC<SplitViewProps> = ({
         gap: isMobile ? undefined : 'var(--content-gap, 24px)',
       }}
     >
-      {/* Criteria Section */}
+      {/* Project Profile Section */}
       <div className="h-full min-h-0 pointer-events-auto">
-        <CriteriaSection
+        <ProjectProfileSection
           criteria={criteria}
           onCriteriaChange={onCriteriaChange}
-          onFullReset={onFullCriteriaReset}
-          startWithGuidedQuestions={false}
           guidedButtonRef={guidedButtonRef}
           onOpenGuidedRanking={onOpenGuidedRanking}
         />

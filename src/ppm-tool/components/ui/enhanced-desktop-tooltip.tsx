@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useUnifiedMobileDetection } from '@/ppm-tool/shared/hooks/useUnifiedMobileDetection';
 import { cn } from "@/ppm-tool/shared/lib/utils"
-import './PanoramicTooltip.css'
+import './ScoutTooltip.css'
 
 interface EnhancedDesktopTooltipProps {
   content: React.ReactNode;

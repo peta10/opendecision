@@ -4,12 +4,12 @@ import React, { useState, useRef } from 'react';
 import { Criterion } from '@/ppm-tool/shared/types';
 import { Sliders, Sparkles, HelpCircle, X, RotateCcw } from 'lucide-react';
 import '@/ppm-tool/components/ui/GrayGearButton.css';
-import { PanoramicPill } from '@/ppm-tool/components/ai/PanoramicPill';
+import { ScoutPill } from '@/ppm-tool/components/ai/ScoutPill';
 import { DraggableList } from '@/ppm-tool/components/interactive/DraggableList';
 import { defaultCriteria } from '@/ppm-tool/data/criteria';
 
 import { CriteriaGuidance } from '@/ppm-tool/components/overlays/CriteriaGuidance';
-import { Slider } from '@/ppm-tool/components/ui/slider';
+import { Slider } from '@/ppm-tool/components/ui/Slider';
 import { MobileTooltip } from '@/ppm-tool/components/ui/MobileTooltip';
 import { EnhancedDesktopTooltip } from '@/ppm-tool/components/ui/enhanced-desktop-tooltip';
 import { useUnifiedMobileDetection } from '@/ppm-tool/shared/hooks/useUnifiedMobileDetection';
@@ -218,7 +218,7 @@ export const CriteriaSection: React.FC<CriteriaSectionProps> = ({
               </div>
             </div>
             <div className="flex items-center gap-1 md:gap-2">
-              <PanoramicPill
+              <ScoutPill
                 ref={guidedButtonRef}
                 onClick={handleGuidedRankingsClick}
                 highlighted={showProductBumper}

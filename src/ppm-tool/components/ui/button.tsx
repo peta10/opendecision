@@ -9,16 +9,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Using exact Scout AI color #6EDCD1
         default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+          "bg-scout text-midnight shadow hover:bg-scout/90",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+          "border border-scout bg-background shadow-sm hover:bg-scout/10 hover:text-gray-900",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-gray-100 text-gray-700 shadow-sm hover:bg-gray-200",
+        ghost: "hover:bg-scout/10 hover:text-gray-900",
+        link: "text-scout underline-offset-4 hover:underline hover:text-scout/80",
       },
       size: {
         default: "h-9 px-4 py-2",

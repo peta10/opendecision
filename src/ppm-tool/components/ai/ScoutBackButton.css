@@ -1,0 +1,64 @@
+/* =============================================================================
+   SCOUT BACK BUTTON
+   Animated back button for AI panel collapse
+   ============================================================================= */
+
+.scout-back-btn {
+  /* Reset default button styles */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+
+  /* Flexbox for perfect centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Initial Color: Slate Gray (Neutral) */
+  color: #475569;
+
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  /* Circular touch target */
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+
+.scout-back-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* --- HOVER STATE --- */
+.scout-back-btn:hover {
+  /* Change to Mint Green */
+  color: #3ECBBE;
+  background-color: rgba(110, 220, 209, 0.1);
+
+  /* Animate: Move slightly left to indicate "Back" */
+  transform: translateX(-4px);
+}
+
+/* --- ACTIVE (CLICK) STATE --- */
+.scout-back-btn:active {
+  color: #25B5A8;
+  transform: translateX(-6px) scale(0.95);
+  background-color: rgba(110, 220, 209, 0.15);
+}
+
+/* --- DISABLED STATE --- */
+.scout-back-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.scout-back-btn:disabled:hover {
+  color: #475569;
+  background-color: transparent;
+  transform: none;
+}

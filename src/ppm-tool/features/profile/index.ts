@@ -1,5 +1,5 @@
 // Profile Feature - Phase 1
-// Project Profile section for decision-making workflow
+// Decision Profile section for decision-making workflow
 
 export { ProjectProfileSection } from './components/ProjectProfileSection';
 export { GeneralInfoSection } from './components/GeneralInfoSection';

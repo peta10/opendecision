@@ -287,6 +287,8 @@ export interface AIChatRequest {
   message: string;
   /** Current user context for RAG enhancement */
   context?: AIChatContext;
+  /** Decision Space ID for scoping chat to a space (Phase 2) */
+  decision_space_id?: string;
 }
 
 /**
@@ -341,4 +343,104 @@ export interface AIContextBuilderInput {
   personalizationData?: PersonalizationData;
   /** Raw guided ranking answers */
   guidedRankingAnswers?: Record<string, GuidedRankingAnswer>;
+}
+
+// =============================================================================
+// DECISION SPACE TYPES (Phase 2)
+// =============================================================================
+
+/**
+ * Decision Space lifecycle status
+ * - draft: Initial setup, configuring criteria
+ * - evaluating: Actively comparing tools
+ * - decided: Final decision made
+ * - archived: No longer active
+ */
+export type DecisionSpaceStatus = 'draft' | 'evaluating' | 'decided' | 'archived';
+
+/**
+ * Decision Profile stored as JSONB in decision_spaces table.
+ * Contains all the context gathered during setup.
+ */
+export interface DecisionProfile {
+  /** Top-level category (e.g., "Software") */
+  category: string;
+  /** Subcategory (e.g., "PPM Tools") */
+  subcategory: string;
+  /** Criteria with user ratings - stored as array of {id, rating} */
+  criteria: Array<{
+    id: string;
+    name: string;
+    rating: number;
+  }>;
+  /** Additional context from guided ranking */
+  context: {
+    methodology?: string;
+    department?: string;
+    companySize?: string;
+    userCount?: number;
+    projectVolume?: number;
+    tasksPerProject?: number;
+    expertiseLevel?: number;
+  };
+  /** Raw guided ranking answers for future reference */
+  guidedRankingAnswers?: Record<string, GuidedRankingAnswer>;
+}
+
+/**
+ * Decision Space - the core entity for Phase 2.
+ * Each space represents one decision being made.
+ */
+export interface DecisionSpace {
+  /** UUID primary key */
+  id: string;
+  /** User-provided name for the decision */
+  name: string;
+  /** Lifecycle status */
+  status: DecisionSpaceStatus;
+  /** Owner's auth.users ID (works for anonymous + permanent) */
+  owner_id: string;
+  /** Decision profile containing criteria, context, etc. */
+  decision_profile: DecisionProfile;
+  /** Array of tool UUIDs added to this space */
+  selected_tools: string[];
+  /** Creation timestamp */
+  created_at: string;
+  /** Last update timestamp */
+  updated_at: string;
+}
+
+/**
+ * Input for creating a new Decision Space
+ */
+export interface CreateDecisionSpaceInput {
+  name?: string;
+  decision_profile?: Partial<DecisionProfile>;
+  selected_tools?: string[];
+}
+
+/**
+ * Input for updating an existing Decision Space
+ */
+export interface UpdateDecisionSpaceInput {
+  name?: string;
+  status?: DecisionSpaceStatus;
+  decision_profile?: Partial<DecisionProfile>;
+  selected_tools?: string[];
+}
+
+/**
+ * User auth state for anonymous-first flow
+ */
+export interface UserAuthState {
+  /** auth.users ID */
+  userId: string;
+  /** Whether this is an anonymous user */
+  isAnonymous: boolean;
+  /** User's email (null for anonymous) */
+  email: string | null;
+  /** Whether the user is currently authenticated */
+  isAuthenticated: boolean;
+  /** Loading state during auth check */
+  isLoading: boolean;
 }

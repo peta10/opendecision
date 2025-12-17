@@ -47,7 +47,7 @@ export const ProjectProfileSection: React.FC<ProjectProfileSectionProps> = ({
   return (
     <div
       ref={sectionRef}
-      id="project-profile-section"
+      id="decision-profile-section"
       className="bg-white rounded-lg shadow-lg flex flex-col h-full relative border border-gray-200"
       style={{ overflow: 'visible' }}
     >
@@ -59,8 +59,8 @@ export const ProjectProfileSection: React.FC<ProjectProfileSectionProps> = ({
         >
           <div className="flex items-center">
             <FileText className="w-5 h-5 md:w-6 md:h-6 mr-2 text-gray-600" />
-            <h2 className="text-base md:text-lg lg:text-xl font-bold text-gray-900">
-              Project Profile
+            <h2 className="text-base md:text-lg font-bold text-gray-900">
+              Decision Profile
             </h2>
           </div>
 

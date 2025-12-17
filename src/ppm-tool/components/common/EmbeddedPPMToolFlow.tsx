@@ -42,17 +42,20 @@ import { useGuidedSubmitAnimation } from '@/ppm-tool/shared/hooks/useGuidedSubmi
 import { AIChatPanel } from '@/ppm-tool/components/ai';
 import { buildAIContext } from '@/ppm-tool/shared/utils/aiContextBuilder';
 import { GuidedSubmitAnimation } from '@/ppm-tool/components/overlays/GuidedSubmitAnimation';
-import { 
-  loadSavedCriteriaValues, 
-  saveCriteriaValues, 
+import {
+  loadSavedCriteriaValues,
+  saveCriteriaValues,
   mergeCriteriaWithSaved,
   clearSavedCriteriaValues
 } from '@/ppm-tool/shared/utils/criteriaStorage';
+import { useDecisionSpaceSync } from '@/ppm-tool/shared/hooks/useDecisionSpaceSync';
 import { resetGuidedRankingCompletion, markGuidedRankingAsCompleted, getGuidedRankingCriteriaIds } from '@/ppm-tool/shared/utils/guidedRankingState';
 import { checkAndTrackNewActive } from '@/lib/posthog';
 import { analytics } from '@/lib/analytics';
 import Link from 'next/link';
 import { User } from 'lucide-react';
+import { SecondaryNavBar } from '@/ppm-tool/components/navigation/SecondaryNavBar';
+import { SaveButton } from '@/ppm-tool/components/auth';
 
 interface EmbeddedPPMToolFlowProps {
   showGuidedRanking?: boolean;
@@ -258,6 +261,40 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
   const [pendingRankings, setPendingRankings] = useState<{ [key: string]: number } | null>(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
 
+  // Decision Space sync - persists state to Supabase
+  const {
+    syncCriteria,
+    syncSelectedTools,
+    syncGuidedData,
+    spaceId,
+    hasLoaded: hasSpaceLoaded,
+  } = useDecisionSpaceSync({
+    onSpaceLoaded: (state) => {
+      console.log('📥 Space data loaded, hydrating local state:', state);
+      // Hydrate criteria from space (if available)
+      if (state.criteria?.length > 0) {
+        setCriteria(prev => prev.map(c => {
+          const saved = state.criteria.find(s => s.id === c.id);
+          return saved ? { ...c, userRating: saved.rating } : c;
+        }));
+      }
+      // Hydrate guided ranking answers (if available)
+      if (state.guidedRankingAnswers) {
+        setGuidedRankingAnswers(state.guidedRankingAnswers);
+      }
+      // Hydrate personalization from context (if available)
+      if (state.context) {
+        setPersonalizationData(prev => ({
+          ...prev,
+          methodologies: state.context?.methodology ? [state.context.methodology] : prev.methodologies,
+          userCount: state.context?.userCount ?? prev.userCount,
+        }));
+      }
+    },
+    onSaved: () => console.log('✅ Decision Space synced'),
+    onSaveError: (error) => console.error('❌ Decision Space sync failed:', error),
+  });
+
   // AI Panel state (inline panel on left edge, not overlay)
   const [isAIPanelExpanded, setIsAIPanelExpanded] = useState(false);
 
@@ -447,10 +484,13 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
       // Update state
       setGuidedRankingAnswers(formattedAnswers);
       setPersonalizationData(formattedPersonalization);
-      
+
       // Save to localStorage
       localStorage.setItem('guidedRankingAnswers', JSON.stringify(formattedAnswers));
       localStorage.setItem('personalizationData', JSON.stringify(formattedPersonalization));
+
+      // Sync to Decision Space (debounced)
+      syncGuidedData(formattedAnswers, formattedPersonalization);
 
       // Log the data for analytics (you can integrate with your analytics system here)
       console.log('💾 Saved Guided Ranking Answers:', Object.keys(formattedAnswers).length, 'questions');
@@ -781,16 +821,19 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
   // Handlers for criteria
   const handleCriteriaChange = (newCriteria: Criterion[]) => {
     setCriteria(newCriteria);
-    
+
+    // Sync to Decision Space (debounced)
+    syncCriteria(newCriteria);
+
     // Clear any existing timer
     if (emailModalCheckTimerRef.current) {
       clearTimeout(emailModalCheckTimerRef.current);
     }
-    
+
     // Note: Exit Intent Bumper is handled automatically by useUnifiedExitIntent hook
     // when timing conditions are met (3+ criteria adjusted, 3s mouse stopped, 23s delay)
     // No manual trigger needed here - let the hook handle it based on its internal timing logic
-    
+
     // Debounce: Wait 500ms after last slider change to check for email modal trigger
     emailModalCheckTimerRef.current = setTimeout(() => {
       checkAndShowEmailModal(newCriteria);
@@ -805,22 +848,27 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
       userRating: 3 // Reset to default middle value
     }));
     setCriteria(resetCriteria);
-    
+
     // 2. Clear guided ranking answers from state
     setGuidedRankingAnswers({});
-    
+
     // 3. Clear personalization data from state (reset to default with just timestamp)
-    setPersonalizationData({
+    const resetPersonalization: PersonalizationData = {
       timestamp: new Date().toISOString()
-    });
-    
-    // 4. Clear guided ranking completion flag (this hides match scores)
+    };
+    setPersonalizationData(resetPersonalization);
+
+    // 4. Sync reset state to Decision Space
+    syncCriteria(resetCriteria);
+    syncGuidedData({}, resetPersonalization);
+
+    // 5. Clear guided ranking completion flag (this hides match scores)
     resetGuidedRankingCompletion();
-    
-    // 5. Clear saved criteria values
+
+    // 6. Clear saved criteria values
     clearSavedCriteriaValues();
-    
-    // 6. Clear from localStorage
+
+    // 7. Clear from localStorage
     try {
       localStorage.removeItem('guidedRankingAnswers');
       localStorage.removeItem('personalizationData');
@@ -828,8 +876,8 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     } catch (error) {
       console.error('Error clearing localStorage during reset:', error);
     }
-    
-    // 7. Track analytics
+
+    // 8. Track analytics
     try {
       checkAndTrackNewActive('Active-reset-criteria-full', {
         component: 'embedded_ppm_tool_flow',
@@ -844,12 +892,18 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
 
   // Handlers for tools
   const handleToolSelect = (tool: Tool) => {
-    setSelectedTools([...selectedTools, tool]);
+    const newTools = [...selectedTools, tool];
+    setSelectedTools(newTools);
+    // Sync tool IDs to Decision Space
+    syncSelectedTools(newTools.map(t => t.id));
   };
 
   const handleRestoreAllTools = () => {
-    setSelectedTools([...selectedTools, ...removedTools]);
+    const newTools = [...selectedTools, ...removedTools];
+    setSelectedTools(newTools);
     setRemovedTools([]);
+    // Sync tool IDs to Decision Space
+    syncSelectedTools(newTools.map(t => t.id));
     // Also clear all filter conditions and reset filter mode
     setFilterConditions([]);
     setFilterMode('AND');
@@ -863,8 +917,11 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
   const handleToolRemove = (toolId: string) => {
     const toolToRemove = selectedTools.find((t) => t.id === toolId);
     if (toolToRemove) {
-      setSelectedTools(selectedTools.filter((t) => t.id !== toolId));
+      const newTools = selectedTools.filter((t) => t.id !== toolId);
+      setSelectedTools(newTools);
       setRemovedTools([...removedTools, toolToRemove]);
+      // Sync tool IDs to Decision Space
+      syncSelectedTools(newTools.map(t => t.id));
     }
   };
 
@@ -1227,6 +1284,8 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
       
       // NOW update criteria - this triggers BOTH slider animations AND tool shuffle simultaneously
       setCriteria(newCriteriaValues);
+      // Sync to Decision Space
+      syncCriteria(newCriteriaValues);
       console.log('📊 Criteria updated - sliders + tools animating together now');
       
       // Wait for BOTH animations to complete (0.5 seconds - they're simultaneous)
@@ -1247,21 +1306,18 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     } else {
       // Mobile: Apply immediately without animation
       console.log('📱 Applying rankings immediately on mobile (no animation)');
-      setCriteria(prevCriteria => 
-        prevCriteria.map(criterion => ({
-          ...criterion,
-          userRating: rankings[criterion.id] !== undefined ? rankings[criterion.id] : criterion.userRating
-        }))
-      );
-      
-      // Mark as completed on mobile too (pass criterionId if individual ranking)
-      markGuidedRankingAsCompleted(guidedRankingCriterionId);
-      
-      // Check email modal on mobile as well
       const mobileCriteriaValues = criteria.map(c => ({
         ...c,
         userRating: rankings[c.id] !== undefined ? rankings[c.id] : c.userRating
       }));
+      setCriteria(mobileCriteriaValues);
+      // Sync to Decision Space
+      syncCriteria(mobileCriteriaValues);
+
+      // Mark as completed on mobile too (pass criterionId if individual ranking)
+      markGuidedRankingAsCompleted(guidedRankingCriterionId);
+
+      // Check email modal on mobile as well
       checkAndShowEmailModal(mobileCriteriaValues);
     }
     
@@ -1613,46 +1669,61 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
                 transition: 'left 0.15s ease-out'
               }}
             >
-              <div className="h-16 px-6 font-sans flex items-center justify-between">
+              <div className="h-12 px-6 font-sans flex items-center justify-between">
                 {/* Left Section - Logo */}
                 <div className="flex items-center">
                   <Link href="/" className="flex items-center">
                     <img
                       src="/opendecision.png"
                       alt="Open Decision"
-                      className="h-12 w-auto"
+                      className="h-8 w-auto"
                     />
                   </Link>
                 </div>
 
                 {/* Center Section - Navigation */}
-                <nav className="flex items-center gap-12">
-                  <Link href="/spaces" className="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors">
+                <nav className="flex items-center gap-8">
+                  <Link href="/spaces" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
                     Spaces
                   </Link>
-                  <Link href="/resources" className="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors">
+                  <Link href="/resources" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
                     Resources
                   </Link>
-                  <Link href="/contact" className="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors">
+                  <Link href="/contact" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
                     Contact
                   </Link>
-                  <Link href="/trust" className="text-sm font-bold text-gray-900 hover:text-gray-600 transition-colors">
+                  <Link href="/trust" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
                     Trust
                   </Link>
                 </nav>
 
                 {/* Right Section - Profile */}
                 <div className="flex items-center">
-                  <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-900 font-bold hover:text-gray-600 transition-colors">
+                  <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-700 font-medium hover:text-gray-900 transition-colors">
                     <User className="w-4 h-4" />
                     <span>Profile</span>
-                    <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">
+                    <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">
                       <span className="text-white text-xs font-medium">PG</span>
                     </div>
                   </Link>
                 </div>
               </div>
             </header>
+          )}
+
+          {/* Secondary Navigation Bar - New Space, My Spaces, How it Works */}
+          {isHydrated && !isMobile && (
+            <div
+              className="fixed top-12 right-0 z-[79]"
+              style={{
+                left: isAIPanelExpanded
+                  ? 'var(--ai-panel-width, 320px)'
+                  : 'var(--ai-rail-width, 64px)',
+                transition: 'left 0.15s ease-out'
+              }}
+            >
+              <SecondaryNavBar onShowHowItWorks={onShowHowItWorks} />
+            </div>
           )}
 
           {/* NavigationToggle removed - replaced by global Header */}
@@ -1707,6 +1778,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
                 tools={filteredTools}
                 criteria={criteria}
                 isAnimationBlocked={isAIPanelAnimationBlocked}
+                decisionSpaceId={spaceId}
               />
             </div>
           )}
@@ -1718,8 +1790,8 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
               isHydrated && isMobile && "pb-32" // Increased padding to accommodate the action buttons
             )}
             style={{
-              // Header height + spacing
-              paddingTop: "calc(var(--header-height, 48px) + 1rem)",
+              // Header (48px) + Secondary Nav (~52px) + spacing
+              paddingTop: isHydrated && !isMobile ? "calc(48px + 52px + 1rem)" : "1rem",
               // Content margin adjusts based on AI panel state
               // Collapsed: rail width + gap | Expanded: panel width + gap
               marginLeft: isHydrated && !isMobile

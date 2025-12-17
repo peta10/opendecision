@@ -109,6 +109,8 @@ export interface AIChatPanelProps {
   criteria?: Criterion[];
   isAnimationBlocked?: boolean;
   className?: string;
+  /** Decision Space ID for scoping chat sessions */
+  decisionSpaceId?: string | null;
 }
 
 
@@ -318,6 +320,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   criteria = [],
   isAnimationBlocked = false,
   className,
+  decisionSpaceId,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialPrompts = useInitialPrompts();
@@ -342,6 +345,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     deleteChatFromHistory,
   } = useAIChat({
     initialContext: context,
+    decisionSpaceId: decisionSpaceId ?? undefined,
     onError: (err) => console.error('AI Chat error:', err),
   });
 

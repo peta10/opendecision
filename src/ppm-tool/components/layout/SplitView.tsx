@@ -66,14 +66,16 @@ export const SplitView: React.FC<SplitViewProps> = ({
 
   return (
     <div
-      className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2'} h-[calc(100dvh-180px)] min-h-[400px] max-h-[800px] overflow-hidden rounded-lg shadow-sm pointer-events-passthrough`}
+      className={`grid ${isMobile ? 'grid-cols-1 gap-4' : ''} h-[calc(100dvh-180px)] min-h-[400px] max-h-[800px] overflow-hidden rounded-lg shadow-sm pointer-events-passthrough`}
       style={{
         backgroundColor: '#F0F4FE',
         // Use CSS variable for gap - defaults to 24px
         gap: isMobile ? undefined : 'var(--content-gap, 24px)',
+        // Narrow left column (Decision Profile), flexible right column (Tools)
+        gridTemplateColumns: isMobile ? undefined : 'minmax(280px, 320px) 1fr',
       }}
     >
-      {/* Project Profile Section */}
+      {/* Decision Profile Section - Narrow sidebar */}
       <div className="h-full min-h-0 pointer-events-auto">
         <ProjectProfileSection
           criteria={criteria}

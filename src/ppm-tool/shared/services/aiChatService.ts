@@ -106,13 +106,15 @@ export const clearSession = (): string => {
  * @param sessionId - Session identifier for conversation continuity
  * @param message - User's message text
  * @param context - Optional context with current user state
+ * @param decisionSpaceId - Optional Decision Space ID for scoping chat (Phase 2)
  * @returns AI response with message, sources, and suggestions
  * @throws Error if the API call fails
  */
 export const sendChatMessage = async (
   sessionId: string,
   message: string,
-  context?: AIChatContext
+  context?: AIChatContext,
+  decisionSpaceId?: string
 ): Promise<AIChatResponse> => {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error('Supabase configuration is missing. Check environment variables.');
@@ -122,6 +124,7 @@ export const sendChatMessage = async (
     session_id: sessionId,
     message,
     context,
+    decision_space_id: decisionSpaceId,
   };
 
   const response = await fetch(AI_CHAT_ENDPOINT, {

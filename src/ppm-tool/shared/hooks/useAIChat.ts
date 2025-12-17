@@ -43,6 +43,8 @@ import { buildExplainScorePrompt, buildCompareToolsPrompt } from '../utils/aiCon
 export interface UseAIChatOptions {
   /** Initial context to use for all messages */
   initialContext?: AIChatContext;
+  /** Decision Space ID for scoping chat (Phase 2) */
+  decisionSpaceId?: string;
   /** Callback when a new message is received */
   onMessageReceived?: (message: AIChatMessage) => void;
   /** Callback when an error occurs */
@@ -108,6 +110,7 @@ export interface UseAIChatReturn {
 export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
   const {
     initialContext,
+    decisionSpaceId,
     onMessageReceived,
     onError,
   } = options;
@@ -232,7 +235,7 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
     setMessages((prev) => [...prev, loadingMessage]);
 
     try {
-      const response = await sendChatMessage(sessionId, content, context);
+      const response = await sendChatMessage(sessionId, content, context, decisionSpaceId);
       const assistantMessage = createAssistantMessage(response);
 
       // Replace loading message with actual response
@@ -259,7 +262,7 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId, context, isLoading]);
+  }, [sessionId, context, decisionSpaceId, isLoading]);
 
   // Explain tool score
   const explainToolScore = useCallback(async (tool: Tool, criteria: Criterion[]) => {

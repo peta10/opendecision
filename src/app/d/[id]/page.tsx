@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { ErrorBoundary } from '@/ppm-tool/components/common/ErrorBoundary';
 import { EmbeddedPPMToolFlow } from '@/ppm-tool/components/common/EmbeddedPPMToolFlow';
 import { GuidanceProvider } from '@/ppm-tool/shared/contexts/GuidanceContext';
@@ -13,9 +13,12 @@ import { setOverlayOpen, setOverlayClosed, OVERLAY_TYPES, addDevelopmentKeyboard
 import { LegalDisclaimer } from '@/ppm-tool/components/common/LegalDisclaimer';
 import { analytics } from '@/lib/analytics';
 
-function HomePageContent() {
+function DecisionSpaceContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
+  const spaceId = params?.id as string;
+
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [showGuidedRanking, setShowGuidedRanking] = useState(false);
   const [guidedRankingCriterionId, setGuidedRankingCriterionId] = useState<string | undefined>(undefined);
@@ -37,7 +40,7 @@ function HomePageContent() {
       utmMedium: searchParams?.get('utm_medium') || undefined,
       utmCampaign: searchParams?.get('utm_campaign') || undefined,
     });
-  }, [searchParams]);
+  }, [searchParams, spaceId]);
 
   // Check URL parameters on mount and when they change
   useEffect(() => {
@@ -98,12 +101,14 @@ function HomePageContent() {
             app_version: '1.0.0',
             environment: process.env.NODE_ENV || 'production',
             page_type: 'ppm_tool',
-            tool_category: 'portfolio_management'
+            tool_category: 'portfolio_management',
+            decision_space_id: spaceId,
           });
 
           checkAndTrackVisitor({
-            page: 'ppm_tool',
-            tool_type: 'portfolio_management'
+            page: 'decision_space',
+            tool_type: 'portfolio_management',
+            decision_space_id: spaceId,
           });
         } else {
           setTimeout(initializeTracking, 500);
@@ -117,8 +122,9 @@ function HomePageContent() {
 
     const handleFirstInteraction = () => {
       checkAndTrackActive('page_interaction', {
-        page: 'ppm_tool',
-        interaction_type: 'page_load'
+        page: 'decision_space',
+        interaction_type: 'page_load',
+        decision_space_id: spaceId,
       });
 
       document.removeEventListener('click', handleFirstInteraction);
@@ -134,16 +140,17 @@ function HomePageContent() {
       document.removeEventListener('click', handleFirstInteraction);
       document.removeEventListener('scroll', handleFirstInteraction);
     };
-  }, [checkAndTrackVisitor, checkAndTrackActive]);
+  }, [checkAndTrackVisitor, checkAndTrackActive, spaceId]);
 
   const handleGetStarted = () => {
-    trackClick('get_started_button', { location: 'how_it_works_overlay' });
-    trackTool('ppm_tool', 'started_guided_flow', { source: 'how_it_works' });
+    trackClick('get_started_button', { location: 'how_it_works_overlay', decision_space_id: spaceId });
+    trackTool('ppm_tool', 'started_guided_flow', { source: 'how_it_works', decision_space_id: spaceId });
 
     checkAndTrackActive('guided_ranking_clicked', {
-      page: 'ppm_tool',
+      page: 'decision_space',
       interaction_type: 'button_click',
-      source: 'how_it_works_overlay'
+      source: 'how_it_works_overlay',
+      decision_space_id: spaceId,
     });
 
     setShowHowItWorks(false);
@@ -157,13 +164,14 @@ function HomePageContent() {
   };
 
   const handleManualRanking = () => {
-    trackClick('manual_ranking_button', { location: 'how_it_works_overlay' });
-    trackTool('ppm_tool', 'started_manual_flow', { source: 'how_it_works' });
+    trackClick('manual_ranking_button', { location: 'how_it_works_overlay', decision_space_id: spaceId });
+    trackTool('ppm_tool', 'started_manual_flow', { source: 'how_it_works', decision_space_id: spaceId });
 
     checkAndTrackActive('manual_ranking_clicked', {
-      page: 'ppm_tool',
+      page: 'decision_space',
       interaction_type: 'button_click',
-      source: 'how_it_works_overlay'
+      source: 'how_it_works_overlay',
+      decision_space_id: spaceId,
     });
 
     setShowHowItWorks(false);
@@ -178,7 +186,8 @@ function HomePageContent() {
     trackTool('ppm_tool', 'guided_ranking_completed', {
       source: 'guided_flow',
       completion_time: Date.now(),
-      criterion_id: guidedRankingCriterionId
+      criterion_id: guidedRankingCriterionId,
+      decision_space_id: spaceId,
     });
     setShowGuidedRanking(false);
     setGuidedRankingCriterionId(undefined);
@@ -188,20 +197,22 @@ function HomePageContent() {
     trackClick('open_guided_ranking', {
       location: 'main_page',
       criterion_id: criterionId,
-      is_single_criterion: !!criterionId
+      is_single_criterion: !!criterionId,
+      decision_space_id: spaceId,
     });
     trackTool('ppm_tool', 'opened_guided_ranking', {
       source: 'main_page',
       criterion_id: criterionId,
-      is_single_criterion: !!criterionId
+      is_single_criterion: !!criterionId,
+      decision_space_id: spaceId,
     });
     setGuidedRankingCriterionId(criterionId);
     setShowGuidedRanking(true);
   };
 
   const handleShowHowItWorks = () => {
-    trackClick('show_how_it_works', { location: 'main_page' });
-    trackTool('ppm_tool', 'viewed_how_it_works', { source: 'main_page' });
+    trackClick('show_how_it_works', { location: 'main_page', decision_space_id: spaceId });
+    trackTool('ppm_tool', 'viewed_how_it_works', { source: 'main_page', decision_space_id: spaceId });
     setShowHowItWorks(true);
     setOverlayOpen(OVERLAY_TYPES.HOW_IT_WORKS);
 
@@ -212,8 +223,9 @@ function HomePageContent() {
 
   const handleCloseHowItWorks = () => {
     checkAndTrackActive('how_it_works_close', {
-      page: 'ppm_tool',
-      interaction_type: 'close_modal'
+      page: 'decision_space',
+      interaction_type: 'close_modal',
+      decision_space_id: spaceId,
     });
 
     setShowHowItWorks(false);
@@ -226,7 +238,7 @@ function HomePageContent() {
 
   return (
     <ErrorBoundary>
-      <SpaceProvider>
+      <SpaceProvider initialSpaceId={spaceId}>
         <GuidanceProvider>
           <UniversalBumperProvider>
             <div className="min-h-screen bg-background ppm-tool-container" role="main">
@@ -258,10 +270,10 @@ function HomePageContent() {
   );
 }
 
-export default function HomePage() {
+export default function DecisionSpacePage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
-      <HomePageContent />
+      <DecisionSpaceContent />
     </Suspense>
   );
 }

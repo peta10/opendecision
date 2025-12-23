@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
 import { ProjectProfileSection } from '@/ppm-tool/features/profile';
-import { ToolSection } from '@/ppm-tool/features/tools/ToolSection';
+import { RecommendedToolsSection } from '@/ppm-tool/features/tools/RecommendedToolsSection';
 import { Tool, Criterion } from '@/ppm-tool/shared/types';
 import { FilterCondition } from '@/ppm-tool/components/filters/FilterSystem';
 import { useMobileDetection } from '@/ppm-tool/shared/hooks/useMobileDetection';
@@ -37,82 +39,65 @@ interface SplitViewProps {
 export const SplitView: React.FC<SplitViewProps> = ({
   criteria,
   selectedTools,
-  removedTools,
-  filterConditions,
-  filterMode,
   onCriteriaChange,
-  onFullCriteriaReset,
   onToolSelect,
-  onToolRemove,
-  onRestoreAllTools,
-  onAddFilterCondition,
-  onRemoveFilterCondition,
-  onUpdateFilterCondition,
-  onToggleFilterMode,
   tools,
   onCompare,
-  comparedTools,
+  comparedTools = new Set(),
   guidedButtonRef,
   onOpenGuidedRanking,
-  chartButtonPosition,
-  onNavigateToCriteria,
-  disableAutoShuffle,
-  shuffleDurationMs = 1000,
-  onShuffleReady,
-  onShuffleControlReady,
-  isAnimatingGuidedRankings
 }) => {
   const isMobile = useMobileDetection();
 
+  // State for bookmarked tools
+  const [bookmarkedTools, setBookmarkedTools] = React.useState<Set<string>>(new Set());
+
+  const handleToolBookmark = (tool: Tool) => {
+    setBookmarkedTools(prev => {
+      const next = new Set(prev);
+      if (next.has(tool.id)) {
+        next.delete(tool.id);
+      } else {
+        next.add(tool.id);
+      }
+      return next;
+    });
+  };
+
+  const handleToolViewDetails = (tool: Tool) => {
+    // Handle viewing tool details - could open a modal or panel
+    console.log('View details for:', tool.name);
+  };
+
   return (
-    <div
-      className={`grid ${isMobile ? 'grid-cols-1 gap-4' : ''} h-[calc(100dvh-180px)] min-h-[400px] max-h-[800px] overflow-hidden rounded-lg shadow-sm pointer-events-passthrough`}
-      style={{
-        backgroundColor: '#F0F4FE',
-        // Use CSS variable for gap - defaults to 24px
-        gap: isMobile ? undefined : 'var(--content-gap, 24px)',
-        // Narrow left column (Decision Profile), flexible right column (Tools)
-        gridTemplateColumns: isMobile ? undefined : 'minmax(280px, 320px) 1fr',
-      }}
-    >
-      {/* Decision Profile Section - Narrow sidebar */}
-      <div className="h-full min-h-0 pointer-events-auto">
+    <div className="flex-1 overflow-y-auto bg-white">
+      <div
+        className={`grid gap-6 p-8 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}
+        style={{
+          minHeight: 'calc(100vh - 120px)',
+        }}
+      >
+        {/* Left Column: Project Profile */}
         <ProjectProfileSection
           criteria={criteria}
           onCriteriaChange={onCriteriaChange}
           guidedButtonRef={guidedButtonRef}
           onOpenGuidedRanking={onOpenGuidedRanking}
         />
-      </div>
 
-      {/* Tools and Recommendations Section */}
-      <div className="h-full min-h-0 pointer-events-auto">
-        <ToolSection
+        {/* Right Column: Recommended Tools */}
+        <RecommendedToolsSection
           tools={tools}
-          selectedTools={selectedTools}
-          removedTools={removedTools}
           selectedCriteria={criteria}
-          filterConditions={filterConditions}
-          filterMode={filterMode}
-          onAddFilterCondition={onAddFilterCondition}
-          onRemoveFilterCondition={onRemoveFilterCondition}
-          onUpdateFilterCondition={onUpdateFilterCondition}
-          onToggleFilterMode={onToggleFilterMode}
+          selectedToolIds={comparedTools}
+          bookmarkedToolIds={bookmarkedTools}
           onToolSelect={onToolSelect}
-          onToolRemove={onToolRemove}
-          onRestoreAll={onRestoreAllTools}
-          onCompare={onCompare}
-          comparedTools={comparedTools}
-          chartButtonPosition={chartButtonPosition}
-          onOpenGuidedRanking={onOpenGuidedRanking}
-          onNavigateToCriteria={onNavigateToCriteria}
-          disableAutoShuffle={disableAutoShuffle}
-          shuffleDurationMs={shuffleDurationMs}
-          onShuffleReady={onShuffleReady}
-          onShuffleControlReady={onShuffleControlReady}
-          isAnimatingGuidedRankings={isAnimatingGuidedRankings}
+          onToolBookmark={handleToolBookmark}
+          onToolViewDetails={handleToolViewDetails}
         />
       </div>
     </div>
   );
-}; 
+};
+
+export default SplitView;

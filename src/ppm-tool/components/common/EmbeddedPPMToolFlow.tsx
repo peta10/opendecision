@@ -19,23 +19,8 @@ import { cn } from '@/ppm-tool/shared/lib/utils';
 import { ActionButtons } from '@/ppm-tool/components/layout/ActionButtons';
 import { MobileOptimizedLoader } from '@/components/MobileOptimizedLoader';
 import { GuidedRankingForm } from '@/ppm-tool/components/forms/GuidedRankingForm';
-import { ProductBumper } from '@/ppm-tool/components/overlays/ProductBumper';
-import { ExitIntentBumper } from '@/ppm-tool/components/overlays/ExitIntentBumper';
 import { useGuidance } from '@/ppm-tool/shared/contexts/GuidanceContext';
-import { useUnifiedExitIntent } from '@/ppm-tool/shared/hooks/useUnifiedExitIntent';
-import { useUnifiedMouseTracking } from '@/ppm-tool/shared/hooks/useUnifiedMouseTracking';
-import { useDevelopmentKeyboards } from '@/ppm-tool/shared/hooks/useDevelopmentKeyboards';
-import { 
-  resetUnifiedBumperState, 
-  recordFullGuidedRankingsClick, 
-  recordCriteriaSpecificGuidedRankingsClick,
-  getUnifiedBumperState,
-  shouldShowProductBumper
-} from '@/ppm-tool/shared/utils/unifiedBumperState';
-import { hasCriteriaBeenAdjusted, hasMinimumCriteriaAdjusted } from '@/ppm-tool/shared/utils/criteriaAdjustmentState';
 import { hasCompletedAnyGuidedRanking } from '@/ppm-tool/shared/utils/guidedRankingState';
-import { shouldShowExitIntentBumper } from '@/ppm-tool/shared/utils/unifiedBumperState';
-import '@/ppm-tool/shared/utils/bumperDebugger'; // Import debugger for global functions
 // REMOVED: import { MobileDiagnostics } from './MobileDiagnostics'; - Causes browser compatibility issues
 import { MobileRecoverySystem } from './MobileRecoverySystem';
 import { useGuidedSubmitAnimation } from '@/ppm-tool/shared/hooks/useGuidedSubmitAnimation';
@@ -50,6 +35,7 @@ import {
 } from '@/ppm-tool/shared/utils/criteriaStorage';
 import { useDecisionSpaceSync } from '@/ppm-tool/shared/hooks/useDecisionSpaceSync';
 import { resetGuidedRankingCompletion, markGuidedRankingAsCompleted, getGuidedRankingCriteriaIds } from '@/ppm-tool/shared/utils/guidedRankingState';
+import { hasCriteriaBeenAdjusted } from '@/ppm-tool/shared/utils/criteriaAdjustmentState';
 import { checkAndTrackNewActive } from '@/lib/posthog';
 import { analytics } from '@/lib/analytics';
 import Link from 'next/link';
@@ -129,16 +115,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     isMobile: isMobile
   });
   
-  const { 
-    showProductBumper, 
-    closeProductBumper, 
-    triggerProductBumper,
-    hasShownProductBumper,
-    showExitIntentBumper,
-    closeExitIntentBumper,
-    triggerExitIntentBumper,
-    hasShownExitIntentBumper,
-    exitIntentTriggerType,
+  const {
     onGuidedRankingStart,
     onGuidedRankingComplete,
     onGuidedRankingClick,
@@ -146,69 +123,6 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     onComparisonReportOpen,
     onComparisonReportClose
   } = useGuidance();
-
-  // Debug logging for guidance state (only log when state changes)
-  useEffect(() => {
-    console.log('🔍 EmbeddedPPMToolFlow guidance state changed:', {
-      showProductBumper,
-      hasShownProductBumper
-    });
-  }, [showProductBumper, hasShownProductBumper]);
-
-  // Add global class to body when ProductBumper is visible
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (showProductBumper) {
-        document.body.classList.add('product-bumper-active');
-      } else {
-        document.body.classList.remove('product-bumper-active');
-      }
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (typeof window !== 'undefined') {
-        document.body.classList.remove('product-bumper-active');
-      }
-    };
-  }, [showProductBumper]);
-
-  // Unified mouse tracking for timing-based triggers
-  useUnifiedMouseTracking({
-    enabled: !isTouchDevice, // Changed from !isMobile
-    onInitialTimerComplete: () => {
-      console.log('⏱️ Initial timer complete - checking for Product Bumper');
-    },
-    onMouseMovementTimerComplete: () => {
-      console.log('🖱️ Mouse movement timer complete - checking for Product Bumper');
-    }
-  });
-
-  // State tracking - will be initialized properly after criteria state is defined
-  // MOVED: useUnifiedExitIntent will be called after criteria state is available
-
-  // Development keyboard shortcuts for testing bumpers
-  useDevelopmentKeyboards({
-    onTriggerProductBumper: () => {
-      console.log('🔥 Development Keyboard: Triggering ProductBumper (Ctrl+Shift+Q) - BYPASSING RULES');
-      console.log('📊 Pre-trigger state check:');
-      console.log('  - Product Bumper visible:', showProductBumper);
-      console.log('  - Has shown Product Bumper:', hasShownProductBumper);
-      triggerProductBumper(true); // Bypass rules for testing
-    },
-    onTriggerExitIntentBumper: () => {
-      console.log('🔥 Development Keyboard: Triggering ExitIntentBumper (Ctrl+Shift+X) - BYPASSING RULES');
-      console.log('📊 Pre-trigger state check:');
-      console.log('  - Exit Intent visible:', showExitIntentBumper);
-      console.log('  - Has shown Exit Intent:', hasShownExitIntentBumper);
-      triggerExitIntentBumper('mouse-leave', true); // Bypass rules for testing
-    },
-    onResetState: () => {
-      console.log('🔥 Development: Resetting unified bumper state');
-      resetUnifiedBumperState();
-    },
-    enabled: true
-  });
   // Set initial step - wait for hydration to determine correct starting page
   const [currentStep, setCurrentStep] = useState<string>('');
   
@@ -247,7 +161,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
   const [comparedTools, setComparedTools] = useState<Set<string>>(new Set());
   const [chartButtonPosition, setChartButtonPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   
-  // Get Report button ref for ExitIntentBumper unblur cutout
+  // Get Report button ref
   const getReportButtonRef = useRef<HTMLButtonElement>(null);
 
   // Add state for guided ranking answers and personalization data
@@ -307,43 +221,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
   
   // Imperative shuffle control (immediate, synchronous)
   const shuffleControlRef = useRef<{ disable: () => void; enable: () => void } | null>(null);
-  
-  // Check if 3+ criteria have been adjusted (for Exit Intent Bumper)
-  const adjustedCriteriaCount = criteria.filter(c => c.userRating !== 3).length;
-  const hasMinimumAdjusted = adjustedCriteriaCount >= 3;
-  
-  // Debug log for Exit Intent eligibility (only when adjusted count changes)
-  useEffect(() => {
-    console.log(`🎯 Exit Intent Eligibility: ${adjustedCriteriaCount}/7 criteria adjusted - ${hasMinimumAdjusted ? '✅ ELIGIBLE' : '❌ NOT ELIGIBLE (need 3+)'}`);
-  }, [adjustedCriteriaCount, hasMinimumAdjusted]);
-  
-  // Unified exit intent detection (shows after 1 minute regardless of criteria count)
-  const { hasTriggeredProductBumper, hasTriggeredExitIntent } = useUnifiedExitIntent({
-    enabled: !isTouchDevice,
-    isTouchDevice,
-    hasMinimumCriteriaAdjusted: true, // Always true - Exit Intent shows after 1 minute regardless of criteria
-    onTriggerProductBumper: triggerProductBumper,
-    onTriggerExitIntentBumper: triggerExitIntentBumper
-  });
-  
-  // Debug ProductBumper eligibility
-  useEffect(() => {
-    if (!isTouchDevice && !hasTriggeredProductBumper) {
-      const state = getUnifiedBumperState();
-      const canShow = shouldShowProductBumper();
-      console.log('🔍 ProductBumper eligibility check:', {
-        canShow,
-        dismissed: state.productBumperDismissed,
-        shown: state.productBumperShown,
-        clickedIntoGuided: state.hasClickedIntoGuidedRankings,
-        initialTimerComplete: state.initialTimerComplete,
-        mouseMovementTimerComplete: state.mouseMovementTimerComplete,
-        anyBumperOpen: state.isAnyBumperCurrentlyOpen,
-        guidedRankingsOpen: state.isGuidedRankingsCurrentlyOpen
-      });
-    }
-  }, [isTouchDevice, hasTriggeredProductBumper]);
-  
+
   // Flag to keep tools in alphabetical order during guided animation sequence
   const [isAnimatingGuidedRankings, setIsAnimatingGuidedRankings] = useState(false);
 
@@ -746,34 +624,12 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     return () => clearTimeout(timeoutId);
   }, []);
 
-  // Note: ProductBumper timing logic is now handled by useUnifiedMouseTracking and useUnifiedExitIntent hooks
-
   // Track guided ranking state for coordination
   useEffect(() => {
     if (showGuidedRanking) {
       onGuidedRankingStart();
     }
   }, [showGuidedRanking, onGuidedRankingStart]);
-
-  // Development keybind for testing ExitIntentBumper appearance (Ctrl+Shift+E)
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      console.log('🔧 Key pressed:', e.key, 'Ctrl:', e.ctrlKey, 'Shift:', e.shiftKey);
-      
-      if (e.ctrlKey && e.shiftKey && (e.key === 'E' || e.key === 'e')) {
-        e.preventDefault();
-        console.log('🎯 Testing ExitIntentBumper appearance via keybind');
-        triggerExitIntentBumper('mouse-leave');
-      }
-    };
-
-    console.log('🔧 Adding keybind listener for ExitIntentBumper test');
-    document.addEventListener('keydown', handleKeyPress);
-    return () => {
-      console.log('🔧 Removing keybind listener');
-      document.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [triggerExitIntentBumper]);
 
   const filteredTools = filterTools(selectedTools, filterConditions, filterMode);
   
@@ -829,10 +685,6 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     if (emailModalCheckTimerRef.current) {
       clearTimeout(emailModalCheckTimerRef.current);
     }
-
-    // Note: Exit Intent Bumper is handled automatically by useUnifiedExitIntent hook
-    // when timing conditions are met (3+ criteria adjusted, 3s mouse stopped, 23s delay)
-    // No manual trigger needed here - let the hook handle it based on its internal timing logic
 
     // Debounce: Wait 500ms after last slider change to check for email modal trigger
     emailModalCheckTimerRef.current = setTimeout(() => {
@@ -1652,60 +1504,47 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     <ErrorBoundary>
       <MobileOptimizedLoader isHydrated={isHydrated}>
         {/* PPM Tool Embedded Application */}
-        <div 
-          className="min-h-screen rounded-lg"
-          style={{ backgroundColor: '#F0F4FE' }}
+        <div
+          className="min-h-screen"
+          style={{ backgroundColor: '#FFFFFF' }}
           role="application"
           aria-label="PPM Tool Finder"
         >
-          {/* Global Header - fixed at top, starts after AI panel */}
+          {/* Global Header - fixed at top, spans full width */}
           {isHydrated && !isMobile && (
             <header
-              className="fixed top-0 right-0 z-[80] bg-white border-b border-gray-200"
-              style={{
-                left: isAIPanelExpanded
-                  ? 'var(--ai-panel-width, 320px)'
-                  : 'var(--ai-rail-width, 64px)',
-                transition: 'left 0.15s ease-out'
-              }}
+              className="fixed top-0 left-0 right-0 z-[90] bg-white border-b border-neutral-200"
             >
-              <div className="h-12 px-6 font-sans flex items-center justify-between">
-                {/* Left Section - Logo */}
-                <div className="flex items-center">
-                  <Link href="/" className="flex items-center">
-                    <img
-                      src="/opendecision.png"
-                      alt="Open Decision"
-                      className="h-8 w-auto"
-                    />
-                  </Link>
+              <div className="h-14 px-8 font-sans flex items-center justify-between">
+                {/* Left Section - Logo and Navigation */}
+                <div className="flex items-center gap-8">
+                  <span className="text-xl font-medium text-neutral-900">OpenDecision</span>
+                  <nav className="flex items-center gap-1 text-sm text-neutral-600">
+                    <a href="#" className="px-3 py-2 hover:text-neutral-900 transition-colors">Spaces</a>
+                    <span className="text-neutral-300">|</span>
+                    <a href="#" className="px-3 py-2 hover:text-neutral-900 transition-colors">Resources</a>
+                    <span className="text-neutral-300">|</span>
+                    <a href="#" className="px-3 py-2 hover:text-neutral-900 transition-colors">Contact</a>
+                    <span className="text-neutral-300">|</span>
+                    <a href="#" className="px-3 py-2 hover:text-neutral-900 transition-colors">Trust</a>
+                  </nav>
                 </div>
 
-                {/* Center Section - Navigation */}
-                <nav className="flex items-center gap-8">
-                  <Link href="/spaces" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                    Spaces
-                  </Link>
-                  <Link href="/resources" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                    Resources
-                  </Link>
-                  <Link href="/contact" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                    Contact
-                  </Link>
-                  <Link href="/trust" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-                    Trust
-                  </Link>
-                </nav>
-
-                {/* Right Section - Profile */}
-                <div className="flex items-center">
-                  <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-700 font-medium hover:text-gray-900 transition-colors">
-                    <User className="w-4 h-4" />
-                    <span>Profile</span>
-                    <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">
-                      <span className="text-white text-xs font-medium">PG</span>
-                    </div>
-                  </Link>
+                {/* Right Section - Profile and Avatar */}
+                <div className="flex items-center gap-3">
+                  <a href="#" className="flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                    Profile
+                  </a>
+                  <div className="w-9 h-9 rounded-full overflow-hidden border border-neutral-200">
+                    <img
+                      src="https://api.dicebear.com/7.x/notionists/svg?scale=200&seed=192847"
+                      alt="User"
+                      className="w-full h-full"
+                    />
+                  </div>
                 </div>
               </div>
             </header>
@@ -1714,7 +1553,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
           {/* Secondary Navigation Bar - New Space, My Spaces, How it Works */}
           {isHydrated && !isMobile && (
             <div
-              className="fixed top-12 right-0 z-[79]"
+              className="fixed top-14 right-0 z-[79] bg-white border-b border-neutral-200"
               style={{
                 left: isAIPanelExpanded
                   ? 'var(--ai-panel-width, 320px)'
@@ -1722,7 +1561,25 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
                 transition: 'left 0.15s ease-out'
               }}
             >
-              <SecondaryNavBar onShowHowItWorks={onShowHowItWorks} />
+              <div className="h-14 px-8 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <button className="px-4 py-2 bg-neutral-900 text-white text-sm rounded-lg hover:bg-neutral-800 transition-colors flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    New Space
+                  </button>
+                  <button className="px-4 py-2 border border-neutral-300 text-neutral-700 text-sm rounded-lg hover:bg-neutral-50 transition-colors">
+                    My Spaces
+                  </button>
+                </div>
+                <a href="#" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors flex items-center gap-1">
+                  How it Works
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </div>
             </div>
           )}
 
@@ -1736,10 +1593,8 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
             selectedCriteria={criteria}
             filteredTools={filteredTools}
             onShowHowItWorks={onShowHowItWorks}
-            isProductBumperVisible={showProductBumper}
             getReportButtonRef={getReportButtonRef}
             onChartButtonPosition={setChartButtonPosition}
-            onCloseExitIntentBumper={closeExitIntentBumper}
             showEmailModal={showEmailModal}
             onOpenEmailModal={() => setShowEmailModal(true)}
             onCloseEmailModal={() => {
@@ -1787,25 +1642,35 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
           <main
             className={cn(
               'min-h-screen',
-              isHydrated && isMobile && "pb-32" // Increased padding to accommodate the action buttons
+              isHydrated && isMobile && "pb-32"
             )}
             style={{
-              // Header (48px) + Secondary Nav (~52px) + spacing
-              paddingTop: isHydrated && !isMobile ? "calc(48px + 52px + 1rem)" : "1rem",
-              // Content margin adjusts based on AI panel state
-              // Collapsed: rail width + gap | Expanded: panel width + gap
+              // Header (56px) + Secondary Nav (56px) + spacing
+              paddingTop: isHydrated && !isMobile ? "calc(112px + 1rem)" : "1rem",
               marginLeft: isHydrated && !isMobile
                 ? isAIPanelExpanded
                   ? 'calc(var(--ai-panel-width, 320px) + var(--ai-content-gap, 24px))'
                   : 'var(--content-margin, 56px)'
                 : '0',
-              // Smooth transition when panel expands/collapses
               transition: 'margin-left 0.15s ease-out',
             }}
           >
-            {/* Mobile Logo removed - navigation now sits at top */}
-            {/* Content container - full width with right padding matching left gap */}
-            {/* ppm-content-container enables container queries for compact mode when AI panel expands */}
+            {/* Page Title and Tabs */}
+            {isHydrated && !isMobile && (
+              <div className="px-8 mb-6">
+                <h1 className="text-2xl font-medium text-neutral-900 mb-4">Q4 Enterprise Software Overhaul</h1>
+                <div className="flex gap-6 border-b border-neutral-200">
+                  <button className="pb-3 text-sm font-medium text-neutral-900 border-b-2 border-neutral-900">
+                    Setup
+                  </button>
+                  <button className="pb-3 text-sm text-neutral-500 hover:text-neutral-700 transition-colors">
+                    DecisionHub
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Content container */}
             <div
               className="ppm-content-container w-full pb-8"
               style={{ paddingRight: 'var(--ai-content-gap, 24px)' }}
@@ -1838,31 +1703,6 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
           onSaveAnswers={handleSaveAnswers}
           onMethodologyFilter={handleMethodologyFilter}
           initialAnswers={convertSavedAnswersToFormFormat(guidedRankingAnswers)}
-        />
-
-        {/* Product Bumper - guides users to guided ranking */}
-        <ProductBumper
-          isVisible={showProductBumper}
-          onClose={closeProductBumper}
-          onUseGuided={() => {
-            // Product bumper only opens full guided rankings
-            onGuidedRankingClick();
-            recordFullGuidedRankingsClick();
-            closeProductBumper('cta');
-            onOpenGuidedRanking && onOpenGuidedRanking();
-          }}
-          guidedButtonRef={guidedButtonRef}
-        />
-
-        {/* Exit Intent Bumper - captures users leaving the site */}
-        <ExitIntentBumper
-          isVisible={showExitIntentBumper}
-          onClose={closeExitIntentBumper}
-          triggerType={exitIntentTriggerType || 'mouse-leave'}
-          toolCount={filteredTools.length}
-          hasFilters={filterConditions.length > 0}
-          emailButtonRef={getReportButtonRef}
-          criteriaAdjusted={criteriaAdjusted}
         />
 
         {/* Guided Submit Animation Overlay (Desktop Only) */}

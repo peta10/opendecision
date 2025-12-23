@@ -2,34 +2,23 @@
 
 import React, { useState, useRef } from 'react';
 import { ChevronDown, Check, Eye, EyeOff } from 'lucide-react';
-import { Tool, Criterion } from '@/ppm-tool/shared/types';
+import { Tool } from '@/ppm-tool/shared/types';
 import { getToolColor } from '@/ppm-tool/shared/utils/chartColors';
-import { hasCriteriaBeenAdjusted } from '@/ppm-tool/shared/utils/criteriaAdjustmentState';
-import { NotYetRankedTooltip } from '@/ppm-tool/components/ui/NotYetRankedTooltip';
 import { useClickOutside } from '@/ppm-tool/shared/hooks/useClickOutside';
 
 interface MobileToolSelectorProps {
   tools: Tool[];
   visibleTools: Set<string>;
   onToggleTool: (toolId: string) => void;
-  criteria?: Criterion[];
-  onGuidedRankingClick?: () => void;
-  onNavigateToCriteria?: () => void;
 }
 
 export const MobileToolSelector: React.FC<MobileToolSelectorProps> = ({
   tools,
   visibleTools,
   onToggleTool,
-  criteria,
-  onGuidedRankingClick,
-  onNavigateToCriteria
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
-  // Check if criteria have been adjusted from defaults
-  const criteriaAdjusted = criteria ? hasCriteriaBeenAdjusted(criteria) : true;
 
   const totalVisibleCount = visibleTools.size;
   const toolsVisibleCount = tools.filter(tool => visibleTools.has(tool.id)).length;
@@ -107,18 +96,7 @@ export const MobileToolSelector: React.FC<MobileToolSelectorProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="w-5 h-5 border-3 border-dashed border-green-600 bg-green-200 rounded-sm mr-3" />
-                {criteriaAdjusted ? (
-                  <span className="text-sm font-medium text-gray-900">Your Tool</span>
-                ) : (
-                  <NotYetRankedTooltip 
-                    inline={true}
-                    wrapYourTool={true}
-                    isVisible={visibleTools.has('requirements')}
-                    className="text-gray-900"
-                    onGuidedRankingClick={onGuidedRankingClick}
-                    onNavigateToCriteria={onNavigateToCriteria}
-                  />
-                )}
+                <span className="text-sm font-medium text-gray-900">Your Tool</span>
               </div>
               <div className="flex items-center">
                 {visibleTools.has('requirements') ? (

@@ -53,10 +53,9 @@ export const CriteriaSection: React.FC<CriteriaSectionProps> = ({
   const sectionRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const { isTouchDevice } = useUnifiedMobileDetection();
-  const { 
-    showManualGuidance, 
+  const {
+    showManualGuidance,
     closeManualGuidance,
-    showProductBumper,
     onGuidedRankingClick
   } = useGuidance();
 
@@ -221,8 +220,7 @@ export const CriteriaSection: React.FC<CriteriaSectionProps> = ({
               <ScoutPill
                 ref={guidedButtonRef}
                 onClick={handleGuidedRankingsClick}
-                highlighted={showProductBumper}
-                className={showProductBumper ? 'relative z-50' : 'relative z-10'}
+                className="relative z-10"
               />
 
               <div className="relative" ref={settingsRef}>

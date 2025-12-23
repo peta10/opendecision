@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/ppm-tool/components/ui/button';
 import { Slider } from '@/ppm-tool/components/ui/Slider';
 import { checkAndTrackNewActive, checkAndTrackNewPartialRanking, checkAndTrackNewFullRankingSubmittal } from '@/lib/posthog';
-import { markGuidedRankingComplete } from '@/ppm-tool/shared/utils/productBumperState';
 import { markGuidedRankingAsCompleted } from '@/ppm-tool/shared/utils/guidedRankingState';
 import { analytics } from '@/lib/analytics';
 import '@/ppm-tool/components/ui/ModernPill.css';
@@ -747,12 +746,9 @@ export const GuidedRankingForm: React.FC<GuidedRankingFormProps> = ({
     
     const rankings = calculateRankings();
     const personalizationData = extractPersonalizationData(answers);
-    
-    // Mark that user has completed guided ranking (prevents ProductBumper from showing again)
-    markGuidedRankingComplete();
+
     // NOTE: markGuidedRankingAsCompleted() is now called AFTER animation completes in handleUpdateRankings
-    console.log('✅ Guided ranking completed - ProductBumper will no longer show');
-    
+
     // Track PostHog New_Full_Ranking_Submittal event (once per session)
     try {
       checkAndTrackNewFullRankingSubmittal({

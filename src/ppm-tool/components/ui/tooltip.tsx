@@ -3,7 +3,6 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/ppm-tool/shared/lib/utils"
 import { useUnifiedMobileDetection } from "@/ppm-tool/shared/hooks/useUnifiedMobileDetection"
-import './ScoutTooltip.css'
 
 // Enhanced TooltipProvider with mobile-optimized settings
 const TooltipProvider = ({ children, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) => {

@@ -115,54 +115,52 @@ export interface AIChatPanelProps {
 
 
 // =============================================================================
-// ANIMATED DOTS COMPONENT
+// SCOUT AI MASCOT COMPONENT
 // =============================================================================
 
-const AnimatedDots: React.FC = () => {
-  // Matches reference: larger dots, 2 rows (3 top, 2 bottom offset)
+const ScoutMascot: React.FC<{ size?: 'small' | 'large' }> = ({ size = 'large' }) => {
+  const sizeClasses = size === 'large' ? 'w-16 h-16' : 'w-10 h-10';
+
   return (
-    <div className="flex flex-col items-center gap-2">
-      {/* Top row - 3 dots */}
-      <div className="flex items-center gap-2">
-        {[0, 1, 2].map((i) => (
-          <motion.div
-            key={`top-${i}`}
-            className="w-2.5 h-2.5 rounded-full bg-gray-300"
-            animate={{
-              opacity: [0.4, 0.8, 0.4],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 2.5,
-              repeat: Infinity,
-              delay: i * 0.2,
-              ease: [0.4, 0, 0.6, 1],
-            }}
-          />
-        ))}
-      </div>
-      {/* Bottom row - 2 dots */}
-      <div className="flex items-center gap-2">
-        {[3, 4].map((i) => (
-          <motion.div
-            key={`bottom-${i}`}
-            className="w-2.5 h-2.5 rounded-full bg-gray-300"
-            animate={{
-              opacity: [0.4, 0.8, 0.4],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              duration: 2.5,
-              repeat: Infinity,
-              delay: i * 0.2,
-              ease: [0.4, 0, 0.6, 1],
-            }}
-          />
-        ))}
-      </div>
-    </div>
+    <motion.div
+      className={cn(sizeClasses, 'relative')}
+      animate={{
+        y: [0, -4, 0],
+      }}
+      transition={{
+        duration: 3,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }}
+    >
+      <img
+        src="/scout.ai.png"
+        alt="Scout AI"
+        className="w-full h-full object-contain"
+      />
+    </motion.div>
   );
 };
+
+// =============================================================================
+// ACTION BUTTON COMPONENT
+// =============================================================================
+
+interface ActionButtonProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick?: () => void;
+}
+
+const ActionButton: React.FC<ActionButtonProps> = ({ icon, label, onClick }) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition-colors text-left"
+  >
+    <span className="text-[#5BDFC2]">{icon}</span>
+    <span className="text-sm text-neutral-700">{label}</span>
+  </button>
+);
 
 // =============================================================================
 // STYLED CHAT INPUT COMPONENT
@@ -382,9 +380,9 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   return (
     <motion.div
       className={cn(
-        'fixed top-0 left-0 h-screen bg-white border-r border-gray-200 flex flex-col z-40',
+        'fixed top-0 left-0 h-screen bg-[#F0FDFB] border-r border-[#5BDFC2]/30 flex flex-col z-40',
         // Add shadow when expanded (overlay effect)
-        isExpanded && 'shadow-2xl shadow-gray-400/30',
+        isExpanded && 'shadow-2xl shadow-[#5BDFC2]/20',
         className
       )}
       initial={false}
@@ -398,7 +396,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     >
       {/* Collapsed State - Rail with header-aligned top */}
       {!isExpanded && (
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col bg-[#F0FDFB]">
           {/* Header area - h-14 (56px) to match main header */}
           <div
             onClick={isAnimationBlocked ? undefined : handleToggle}
@@ -411,61 +409,105 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               }
             }}
             className={cn(
-              'w-full h-14 flex items-center justify-center cursor-pointer border-b border-gray-100',
-              'hover:bg-gray-50 transition-colors duration-150',
+              'w-full h-14 flex items-center justify-center cursor-pointer border-b border-[#5BDFC2]/20',
+              'hover:bg-[#5BDFC2]/10 transition-colors duration-150',
               'group',
               isAnimationBlocked && 'opacity-50 cursor-not-allowed'
             )}
-            title="Open AI Assistant"
+            title="Open Scout AI"
           >
-            <SparkleButton size="small" />
+            <ScoutMascot size="small" />
           </div>
         </div>
       )}
 
       {/* Expanded State */}
       {isExpanded && (
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden bg-[#F0FDFB]">
           {/* Header - h-14 (56px) to match main header */}
-          <div className="flex items-center justify-between px-4 h-14 border-b border-gray-100 flex-shrink-0">
-            <ChatHistoryDropdown
-              chatHistory={chatHistory}
-              currentChatId={sessionId}
-              onNewChat={startNewChat}
-              onLoadChat={loadChatFromHistory}
-              onDeleteChat={deleteChatFromHistory}
-              isLoading={isLoading}
-            />
-            <button
-              onClick={handleToggle}
-              disabled={isAnimationBlocked}
-              className="scout-back-btn"
-              aria-label="Collapse panel"
-              title="Collapse"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          <div className="flex items-center justify-between px-4 h-14 border-b border-[#5BDFC2]/20 flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <ScoutMascot size="small" />
+              <span className="text-sm font-semibold text-neutral-900">Scout AI</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ChatHistoryDropdown
+                chatHistory={chatHistory}
+                currentChatId={sessionId}
+                onNewChat={startNewChat}
+                onLoadChat={loadChatFromHistory}
+                onDeleteChat={deleteChatFromHistory}
+                isLoading={isLoading}
+              />
+              <button
+                onClick={handleToggle}
+                disabled={isAnimationBlocked}
+                className="p-1.5 text-neutral-500 hover:text-neutral-700 hover:bg-[#5BDFC2]/10 rounded transition-colors"
+                aria-label="Collapse panel"
+                title="Collapse"
               >
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </button>
+                <svg
+                  className="w-5 h-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* Content Area - Scrollable */}
           <div className="flex-1 overflow-y-auto px-4 min-h-0">
             {messages.length === 0 ? (
-              /* Empty State - Compact, flows into input */
-              <div className="pt-8 pb-4 flex flex-col items-center">
-                <SparkleButton size="large" />
-                <h2 className="mt-4 text-lg font-medium text-gray-900">
-                  How can I help?
-                </h2>
+              /* Empty State - Scout AI branded */
+              <div className="pt-6 pb-4">
+                {/* Scout Mascot and Greeting */}
+                <div className="flex flex-col items-center mb-6">
+                  <ScoutMascot size="large" />
+                  <h2 className="mt-3 text-lg font-medium text-neutral-900">
+                    Hi! I&apos;m Scout
+                  </h2>
+                  <p className="text-sm text-neutral-500 text-center mt-1">
+                    Your AI assistant for finding the perfect tools
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-2 mb-4">
+                  <ActionButton
+                    icon={
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                      </svg>
+                    }
+                    label="Compare selected tools"
+                    onClick={() => handleSuggestionClick('Compare my selected tools')}
+                  />
+                  <ActionButton
+                    icon={
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                      </svg>
+                    }
+                    label="View my profile"
+                    onClick={() => handleSuggestionClick('Show me my project profile summary')}
+                  />
+                  <ActionButton
+                    icon={
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                      </svg>
+                    }
+                    label="Ask a question"
+                    onClick={() => {/* Focus the input */}}
+                  />
+                </div>
               </div>
             ) : (
               <div className="py-4">
@@ -492,14 +534,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 isLoading={isLoading}
               />
 
-              {/* Suggestions as gray/white pills */}
-              {promptsToShow.length > 0 && !isLoading && (
+              {/* Suggestions as pills - only show after conversation started */}
+              {messages.length > 0 && promptsToShow.length > 0 && !isLoading && (
                 <div className="flex flex-col gap-2 mt-2">
                   {promptsToShow.map((prompt, index) => (
                     <button
                       key={index}
                       onClick={() => handleSuggestionClick(prompt)}
-                      className="text-left px-4 py-2.5 rounded-full bg-gray-50 border border-gray-200 text-sm text-gray-700 hover:bg-gray-100 hover:border-gray-300 transition-colors"
+                      className="text-left px-4 py-2.5 rounded-xl bg-white border border-neutral-200 text-sm text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-colors"
                     >
                       {prompt}
                     </button>

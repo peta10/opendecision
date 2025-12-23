@@ -6,9 +6,10 @@ import { useEffect, ReactNode } from 'react';
 
 export function PostHogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
-    // Only initialize on client side
-    if (typeof window !== 'undefined') {
-      posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+    // Only initialize on client side and if token exists
+    const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+    if (typeof window !== 'undefined' && posthogKey) {
+      posthog.init(posthogKey, {
         api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
         ui_host: 'https://us.posthog.com',
         
@@ -78,6 +79,11 @@ export function PostHogProvider({ children }: { children: ReactNode }) {
           (window as any).posthog = posthog;
         }
       });
+    } else if (typeof window !== 'undefined' && !posthogKey) {
+      // PostHog not configured - skip silently in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📊 PostHog: No API key configured, analytics disabled');
+      }
     }
   }, []);
 

@@ -18,7 +18,6 @@ interface ActionButtonsProps {
   filteredTools?: Tool[];
   onShowHowItWorks?: () => void;
   getReportButtonRef?: React.RefObject<HTMLButtonElement>;
-  onCloseExitIntentBumper?: () => void;
   // External control for email modal (optional - for animation integration)
   showEmailModal?: boolean;
   onOpenEmailModal?: () => void;
@@ -282,7 +281,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   filteredTools = [],
   onShowHowItWorks,
   getReportButtonRef,
-  onCloseExitIntentBumper,
   showEmailModal: externalShowEmailModal,
   onOpenEmailModal,
   onCloseEmailModal,
@@ -316,8 +314,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     // Record that user clicked into Comparison Report
     onComparisonReportClick();
     onComparisonReportOpen();
-    // Dismiss exit intent bumper when user clicks the report button
-    onCloseExitIntentBumper?.();
     setShowEmailModal(true);
   };
 

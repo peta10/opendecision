@@ -14,7 +14,6 @@ import { getToolColor } from '@/ppm-tool/shared/utils/chartColors';
 import { useMobileDetection } from '@/ppm-tool/shared/hooks/useMobileDetection';
 import { useClickOutside } from '@/ppm-tool/shared/hooks/useClickOutside';
 import { hasCriteriaBeenAdjusted } from '@/ppm-tool/shared/utils/criteriaAdjustmentState';
-import { NotYetRankedTooltip } from '@/ppm-tool/components/ui/NotYetRankedTooltip';
 import { TouchDetectionDebug } from '@/ppm-tool/components/debug/TouchDetectionDebug';
 
 interface EmbeddableComparisonChartProps {
@@ -355,15 +354,7 @@ export const EmbeddableComparisonChart: React.FC<EmbeddableComparisonChartProps>
               ) : (
                 <EyeOff className="w-3 h-3 md:w-4 md:h-4 mr-2 text-gray-400" />
               )}
-              {criteriaAdjusted ? (
-                <span className="font-medium">Your Tool</span>
-              ) : (
-                <NotYetRankedTooltip 
-                  inline={true}
-                  wrapYourTool={true}
-                  isVisible={visibleTools.has('requirements')}
-                />
-              )}
+              <span className="font-medium">Your Tool</span>
             </button>
             {selectedTools.map((tool) => (
               <button
@@ -426,16 +417,7 @@ export const EmbeddableComparisonChart: React.FC<EmbeddableComparisonChartProps>
             ? 'border-green-600 bg-green-200 border-dashed' 
             : 'border-gray-400 border-dashed'
         } rounded-sm`} />
-        {criteriaAdjusted ? (
-          <span className="text-xs font-semibold">Your Tool</span>
-        ) : (
-          <NotYetRankedTooltip 
-            inline={true}
-            wrapYourTool={true}
-            isVisible={visibleTools.has('requirements')}
-            className="text-xs"
-          />
-        )}
+        <span className="text-xs font-semibold">Your Tool</span>
       </button>
       
       {selectedTools.slice(0, 4).map((tool, index) => {

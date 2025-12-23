@@ -6,11 +6,9 @@ import { ErrorBoundary } from '@/ppm-tool/components/common/ErrorBoundary';
 import { EmbeddedPPMToolFlow } from '@/ppm-tool/components/common/EmbeddedPPMToolFlow';
 import { GuidanceProvider } from '@/ppm-tool/shared/contexts/GuidanceContext';
 import { SpaceProvider } from '@/ppm-tool/shared/contexts/SpaceContext';
-import { UniversalBumperProvider } from '@/ppm-tool/components/UniversalBumperProvider';
 import { HowItWorksOverlay } from '@/ppm-tool/components/overlays/HowItWorksOverlay';
 import { usePostHog } from '@/hooks/usePostHog';
-import { setOverlayOpen, setOverlayClosed, OVERLAY_TYPES, addDevelopmentKeyboardShortcuts } from '@/ppm-tool/shared/utils/homeState';
-import { LegalDisclaimer } from '@/ppm-tool/components/common/LegalDisclaimer';
+import { setOverlayOpen, setOverlayClosed, OVERLAY_TYPES, addDevelopmentKeyboardShortcuts } from '@/ppm-tool/shared/utils/overlayState';
 import { analytics } from '@/lib/analytics';
 
 function DecisionSpaceContent() {
@@ -240,30 +238,24 @@ function DecisionSpaceContent() {
     <ErrorBoundary>
       <SpaceProvider initialSpaceId={spaceId}>
         <GuidanceProvider>
-          <UniversalBumperProvider>
-            <div className="min-h-screen bg-background ppm-tool-container" role="main">
-              <EmbeddedPPMToolFlow
-                showGuidedRanking={showGuidedRanking}
-                guidedRankingCriterionId={guidedRankingCriterionId}
-                onGuidedRankingComplete={handleGuidedRankingComplete}
-                onOpenGuidedRanking={handleOpenGuidedRanking}
-                onShowHowItWorks={handleShowHowItWorks}
-                guidedButtonRef={guidedButtonRef}
-                initialView={initialView}
-              />
+          <div className="min-h-screen bg-background ppm-tool-container" role="main">
+            <EmbeddedPPMToolFlow
+              showGuidedRanking={showGuidedRanking}
+              guidedRankingCriterionId={guidedRankingCriterionId}
+              onGuidedRankingComplete={handleGuidedRankingComplete}
+              onOpenGuidedRanking={handleOpenGuidedRanking}
+              onShowHowItWorks={handleShowHowItWorks}
+              guidedButtonRef={guidedButtonRef}
+              initialView={initialView}
+            />
 
-              <HowItWorksOverlay
-                isVisible={showHowItWorks}
-                onClose={handleCloseHowItWorks}
-                onGetStarted={handleGetStarted}
-                onManualRanking={handleManualRanking}
-              />
-
-              <div className="container mx-auto px-4 pb-6">
-                <LegalDisclaimer />
-              </div>
-            </div>
-          </UniversalBumperProvider>
+            <HowItWorksOverlay
+              isVisible={showHowItWorks}
+              onClose={handleCloseHowItWorks}
+              onGetStarted={handleGetStarted}
+              onManualRanking={handleManualRanking}
+            />
+          </div>
         </GuidanceProvider>
       </SpaceProvider>
     </ErrorBoundary>

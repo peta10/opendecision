@@ -23,7 +23,6 @@ import { getToolColor } from '@/ppm-tool/shared/utils/chartColors';
 import { useMobileDetection } from '@/ppm-tool/shared/hooks/useMobileDetection';
 import { checkAndTrackNewActive } from '@/lib/posthog';
 import { hasCriteriaBeenAdjusted } from '@/ppm-tool/shared/utils/criteriaAdjustmentState';
-import { NotYetRankedTooltip } from '@/ppm-tool/components/ui/NotYetRankedTooltip';
 import { analytics } from '@/lib/analytics';
 
 
@@ -470,9 +469,6 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
               tools={selectedTools}
               visibleTools={visibleTools}
               onToggleTool={handleToggleTool}
-              criteria={selectedCriteria}
-              onGuidedRankingClick={onOpenGuidedRanking}
-              onNavigateToCriteria={onNavigateToCriteria}
             />
           </div>
         ) : (
@@ -492,21 +488,11 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
               ) : (
                 <EyeOff className="w-5 h-5 text-gray-400" />
               )}
-              {criteriaAdjusted ? (
-                <span className={`inline-flex items-center text-sm font-semibold ${
-                  visibleTools.has('requirements') ? 'text-green-800' : 'text-gray-600'
-                }`}>
-                  Your Tool
-                </span>
-              ) : (
-                <NotYetRankedTooltip 
-                  onGuidedRankingClick={onOpenGuidedRanking}
-                  onNavigateToCriteria={onNavigateToCriteria}
-                  inline={true}
-                  wrapYourTool={true}
-                  isVisible={visibleTools.has('requirements')}
-                />
-              )}
+              <span className={`inline-flex items-center text-sm font-semibold ${
+                visibleTools.has('requirements') ? 'text-green-800' : 'text-gray-600'
+              }`}>
+                Your Tool
+              </span>
             </button>
             {selectedTools.map((tool, index) => {
               const [backgroundColor, borderColor] = getToolColor(index);

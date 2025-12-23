@@ -8,7 +8,6 @@ import { cn } from '@/ppm-tool/shared/lib/utils';
 import { formatMatchScorePercentage } from '@/ppm-tool/shared/utils/toolRating';
 import { MethodologyTags } from '@/ppm-tool/components/common/MethodologyTags';
 import { MobileTooltip } from '@/ppm-tool/components/ui/MobileTooltip';
-import { getMatchScoreTooltipContent } from '@/ppm-tool/shared/utils/criteriaAdjustmentState';
 import '@/ppm-tool/components/ui/ModernPill.css';
 import { useUnifiedMobileDetection } from '@/ppm-tool/shared/hooks/useUnifiedMobileDetection';
 import { analytics } from '@/lib/analytics';
@@ -270,7 +269,7 @@ export const EnhancedCompactToolCard: React.FC<EnhancedCompactToolCardProps> = (
                   <MobileTooltip
                   content={
                     <div className="break-words">
-                      <p className="text-sm leading-relaxed">{getMatchScoreTooltipContent()}</p>
+                      <p className="text-sm leading-relaxed">Complete the guided rankings or adjust the Criteria sliders to see your match score.</p>
                       {onOpenGuidedRanking && (
                         <>
                           <div className="mt-3 pt-3 border-t border-gray-200" />

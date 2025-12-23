@@ -22,10 +22,8 @@ interface NavigationToggleProps {
   filteredTools?: Tool[];
   onAnimationTrigger?: () => void;
   onShowHowItWorks?: () => void;
-  isProductBumperVisible?: boolean;
   getReportButtonRef?: React.RefObject<HTMLButtonElement>;
   onChartButtonPosition?: (position: { x: number; y: number }) => void;
-  onCloseExitIntentBumper?: () => void;
   // Email modal control (for animation integration)
   showEmailModal?: boolean;
   onOpenEmailModal?: () => void;
@@ -47,10 +45,8 @@ export const NavigationToggle: React.FC<NavigationToggleProps> = ({
   filteredTools = [],
   onAnimationTrigger,
   onShowHowItWorks,
-  isProductBumperVisible = false,
   getReportButtonRef,
   onChartButtonPosition,
-  onCloseExitIntentBumper,
   onOpenGuidedRanking,
   isAIPanelExpanded = false,
 }) => {
@@ -202,12 +198,11 @@ export const NavigationToggle: React.FC<NavigationToggleProps> = ({
       ];
 
   return (
-    <nav 
+    <nav
       className={cn(
         "fixed w-full transition-all duration-300",
         // Default to mobile z-index for SSR, update after hydration
         !isHydrated ? "z-[55]" : (isMobile ? "z-[55]" : "z-50"), // z-55 on mobile (below header's z-60), z-50 on desktop
-        isProductBumperVisible && "blur-sm opacity-75",
         isScrolled && "shadow-md shadow-gray-300/70"
       )}
         style={{
@@ -332,7 +327,6 @@ export const NavigationToggle: React.FC<NavigationToggleProps> = ({
               filteredTools={filteredTools}
               onShowHowItWorks={onShowHowItWorks}
               getReportButtonRef={getReportButtonRef}
-              onCloseExitIntentBumper={onCloseExitIntentBumper}
               showEmailModal={showEmailModal}
               onOpenEmailModal={onOpenEmailModal}
               onCloseEmailModal={onCloseEmailModal}

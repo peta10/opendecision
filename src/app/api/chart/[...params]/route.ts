@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { defaultCriteria } from '@/ppm-tool/data/criteria';
-import { getToolRating } from '@/ppm-tool/shared/utils/toolRating';
-import type { Tool, Criterion } from '@/ppm-tool/shared/types';
+import { defaultCriteria } from '@/opendecision/data/criteria';
+import { getToolRating } from '@/opendecision/shared/utils/toolRating';
+import type { Tool, Criterion } from '@/opendecision/shared/types';
 
 // Dynamically import canvas only when needed at runtime
 let createCanvas: any = null;

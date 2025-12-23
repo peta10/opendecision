@@ -7,6 +7,7 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/features/**/*.{js,ts,jsx,tsx,mdx}',
     './src/ppm-tool/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/opendecision/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {

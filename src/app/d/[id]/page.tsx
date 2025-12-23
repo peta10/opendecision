@@ -2,13 +2,13 @@
 
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
-import { ErrorBoundary } from '@/ppm-tool/components/common/ErrorBoundary';
-import { EmbeddedPPMToolFlow } from '@/ppm-tool/components/common/EmbeddedPPMToolFlow';
-import { GuidanceProvider } from '@/ppm-tool/shared/contexts/GuidanceContext';
-import { SpaceProvider } from '@/ppm-tool/shared/contexts/SpaceContext';
-import { HowItWorksOverlay } from '@/ppm-tool/components/overlays/HowItWorksOverlay';
+import { ErrorBoundary } from '@/opendecision/shared/components/common/ErrorBoundary';
+import { EmbeddedPPMToolFlow } from '@/opendecision/app/flows/DecisionFlow';
+import { GuidanceProvider } from '@/opendecision/shared/contexts/GuidanceContext';
+import { SpaceProvider } from '@/opendecision/shared/contexts/SpaceContext';
+import { HowItWorksOverlay } from '@/opendecision/shared/components/overlays/HowItWorksOverlay';
 import { usePostHog } from '@/hooks/usePostHog';
-import { setOverlayOpen, setOverlayClosed, OVERLAY_TYPES, addDevelopmentKeyboardShortcuts } from '@/ppm-tool/shared/utils/overlayState';
+import { setOverlayOpen, setOverlayClosed, OVERLAY_TYPES, addDevelopmentKeyboardShortcuts } from '@/opendecision/shared/utils/overlayState';
 import { analytics } from '@/lib/analytics';
 
 function DecisionSpaceContent() {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Tool, Criterion } from '@/ppm-tool/shared/types';
+import { Tool, Criterion } from '@/opendecision/shared/types';
 
 /**
  * PPM Report Email Template

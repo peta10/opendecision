@@ -131,9 +131,9 @@
      * 1100px  : Rail 56px, Panel 260px, Content Gap 16px
      * ================================================================= */
 
-    /* AI Panel dimensions - wider and more prominent */
+    /* AI Panel dimensions - wider for sidebar layout */
     --ai-rail-width: clamp(56px, 4vw, 64px);           /* Collapsed rail: 56-64px (prominent) */
-    --ai-panel-width: clamp(220px, 20vw, 320px);       /* Expanded panel: 220-320px */
+    --ai-panel-width: clamp(320px, 24vw, 400px);       /* Expanded panel: 320-400px (includes sidebar) */
 
     /* Content spacing - fixed 24px for consistent gaps */
     --content-gap: 24px;                               /* Between Criteria & Tools: fixed 24px */
@@ -176,7 +176,7 @@
   @media (max-width: 1279px) and (min-width: 1100px) {
     :root {
       --ai-rail-width: 52px;                           /* Slightly smaller rail */
-      --ai-panel-width: clamp(220px, 22vw, 260px);     /* 220-260px */
+      --ai-panel-width: clamp(280px, 28vw, 340px);     /* 280-340px (includes sidebar) */
       --content-gap: 16px;                             /* Tighter gap */
       --ai-content-gap: 16px;                          /* Match content-gap */
       --section-padding: clamp(10px, 1.2vw, 16px);     /* Tighter padding */

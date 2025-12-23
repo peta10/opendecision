@@ -5,7 +5,17 @@ import { PPMReportEmailTemplate } from '@/components/email/PPMReportEmailTemplat
 import { render } from '@react-email/render';
 import crypto from 'crypto';
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+// Lazy-load Resend client to avoid build-time errors when API key is missing
+let resendClient: Resend | null = null;
+const getResend = () => {
+  if (!resendClient) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    resendClient = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resendClient;
+};
 
 // Initialize Supabase client (with fallback for missing env vars)
 const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && 
@@ -981,7 +991,7 @@ Create a unique, varied description for ${tool.name} that stands out from other 
   const generateAIInsights = async (topRecommendations: any[], selectedCriteria: any[], userEmail?: string) => {
     try {
       // Import the AIAnalysisService
-      const { AIAnalysisService } = await import('@/ppm-tool/shared/services/aiAnalysisService');
+      const { AIAnalysisService } = await import('@/opendecision/shared/services/aiAnalysisService');
       
       // Prepare data for AI analysis
       const criteriaWeights: Record<string, number> = {};
@@ -1216,7 +1226,7 @@ Create a unique, varied description for ${tool.name} that stands out from other 
     `;
 
     // Send email via Resend
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'Matt Wagner <matt.wagner@panoramic-solutions.com>', // Use Matt's verified email
       to: [userEmail],
       subject: 'Your PPM Tool Analysis Report',
@@ -1375,7 +1385,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Send email via Resend
-    const data = await resend.emails.send({
+    const data = await getResend().emails.send({
       from: from || 'Matt Wagner <matt.wagner@panoramic-solutions.com>',
       to: [to],
       subject,

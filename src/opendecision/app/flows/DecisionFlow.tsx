@@ -6,7 +6,7 @@ import { SplitView } from '@/opendecision/shared/components/layout/SplitView';
 import { ComparisonChart } from '@/opendecision/features/comparison/components/ComparisonChart';
 import { defaultCriteria } from '@/opendecision/data/criteria';
 import { defaultTools } from '@/opendecision/data/tools';
-import { Tool, Criterion, CriteriaRating, Tag } from '@/opendecision/shared/types';
+import { Tool, Criterion } from '@/opendecision/shared/types';
 import { FilterCondition } from '@/opendecision/features/tools/components/FilterSystem';
 import { filterTools } from '@/opendecision/shared/utils/filterTools';
 import { supabase } from '@/lib/supabase';
@@ -24,6 +24,7 @@ import { hasCompletedAnyGuidedRanking } from '@/opendecision/shared/utils/guided
 import { MobileRecoverySystem } from '@/opendecision/shared/components/common/MobileRecoverySystem';
 import { useGuidedSubmitAnimation } from '@/opendecision/shared/hooks/useGuidedSubmitAnimation';
 import { AIChatPanel } from '@/opendecision/features/ai-chat/components/AIChatPanel';
+import { DecisionHub } from '@/opendecision/features/decision-hub/components/DecisionHub';
 import { buildAIContext } from '@/opendecision/shared/utils/aiContextBuilder';
 import { GuidedSubmitAnimation } from '@/opendecision/features/ranking/components/GuidedSubmitAnimation';
 import {
@@ -33,6 +34,8 @@ import {
   clearSavedCriteriaValues
 } from '@/opendecision/shared/utils/criteriaStorage';
 import { useDecisionSpaceSync } from '@/opendecision/shared/hooks/useDecisionSpaceSync';
+import { useDecisionSpaceProducts } from '@/opendecision/shared/hooks/useDecisionSpaceProducts';
+import { useTools } from '@/opendecision/shared/hooks/useTools';
 import { resetGuidedRankingCompletion, markGuidedRankingAsCompleted, getGuidedRankingCriteriaIds } from '@/opendecision/shared/utils/guidedRankingState';
 import { hasCriteriaBeenAdjusted } from '@/opendecision/shared/utils/criteriaAdjustmentState';
 import { checkAndTrackNewActive } from '@/lib/posthog';
@@ -50,31 +53,6 @@ interface EmbeddedPPMToolFlowProps {
   onShowHowItWorks?: () => void;
   guidedButtonRef?: React.RefObject<HTMLButtonElement>;
   initialView?: string;
-}
-
-interface DbCriterion {
-  id: string;
-  ranking: number;
-  description?: string;
-}
-
-interface DbTag {
-  name: string;
-  type: string;
-}
-
-interface DbTool {
-  id: string;
-  name: string;
-  type: string;
-  created_by: string;
-  criteria: DbCriterion[];
-  tags: DbTag[];
-  created_on: string;
-  updated_at: string;
-  submitted_at?: string;
-  approved_at?: string;
-  submission_status?: string;
 }
 
 interface GuidedRankingAnswer {
@@ -157,6 +135,9 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
   const [filterConditions, setFilterConditions] = useState<FilterCondition[]>([]);
   const [filterMode, setFilterMode] = useState<'AND' | 'OR'>('AND');
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  // Fetch tools from Supabase with automatic fallback to defaults
+  const { tools: fetchedTools, isLoading: isLoadingTools, error: toolsError, isUsingFallback } = useTools();
   const [comparedTools, setComparedTools] = useState<Set<string>>(new Set());
   const [chartButtonPosition, setChartButtonPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   
@@ -207,6 +188,17 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     onSaved: () => console.log('✅ Decision Space synced'),
     onSaveError: (error) => console.error('❌ Decision Space sync failed:', error),
   });
+
+  // Decision Space Products - manages products in the decision hub via junction table
+  const {
+    products: decisionSpaceProducts,
+    isLoading: isProductsLoading,
+    addProduct: addProductToSpace,
+    removeProduct: removeProductFromSpace,
+    isProductAdded: isProductInSpace,
+    productIds: decisionSpaceProductIds,
+    counts: productCounts,
+  } = useDecisionSpaceProducts(spaceId);
 
   // AI Panel state (inline panel on left edge, not overlay)
   const [isAIPanelExpanded, setIsAIPanelExpanded] = useState(false);
@@ -391,63 +383,6 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     }
   }, [isMobile, currentStep]);
 
-  // Transform database tool to match Tool type
-  const transformDatabaseTool = (dbTool: DbTool): Tool => {
-    const ratings: Record<string, number> = {};
-    const ratingExplanations: Record<string, string> = {};
-    const methodologies: string[] = [];
-    const functions: string[] = [];
-
-    try {
-      // Process criteria ratings and explanations
-      if (Array.isArray(dbTool.criteria)) {
-        dbTool.criteria.forEach((criterion: DbCriterion) => {
-          if (criterion && criterion.id && typeof criterion.ranking === 'number') {
-            ratings[criterion.id] = criterion.ranking;
-            if (criterion.description) {
-              ratingExplanations[criterion.id] = criterion.description;
-            }
-          }
-        });
-      }
-
-      // Process tags for methodologies and functions
-      if (Array.isArray(dbTool.tags)) {
-        dbTool.tags.forEach((tag: DbTag) => {
-          if (tag && tag.name && tag.type) {
-            if (tag.type === 'Methodology') {
-              methodologies.push(tag.name);
-            } else if (tag.type === 'Function') {
-              functions.push(tag.name);
-            }
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error processing tool data:', error);
-    }
-
-    return {
-      id: dbTool.id,
-      name: dbTool.name,
-      logo: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=64&h=64&fit=crop',
-      useCases: Array.from(new Set([...methodologies, ...functions])),
-      methodologies,
-      functions,
-      ratings,
-      ratingExplanations,
-      type: dbTool.type,
-      created_by: dbTool.created_by,
-      criteria: (dbTool.criteria || []) as unknown as CriteriaRating[],
-      tags: (dbTool.tags || []) as unknown as Tag[],
-      created_on: dbTool.created_on,
-      updated_at: dbTool.updated_at,
-      submitted_at: dbTool.submitted_at,
-      approved_at: dbTool.approved_at,
-      submission_status: dbTool.submission_status || 'approved',
-    };
-  };
-
   // Enhanced criteria fetching with mobile-friendly error handling
   // Combined fetch + load to eliminate race condition
   useEffect(() => {
@@ -552,76 +487,14 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     return () => clearTimeout(timeoutId);
   }, []);
 
-  // Enhanced tools fetching with mobile-friendly error handling
+  // Sync fetched tools to selectedTools state (from useTools hook)
   useEffect(() => {
-    const fetchTools = async () => {
-      try {
-        setFetchError(null);
-
-        // Check if supabase is available
-        if (!supabase) {
-          console.warn('Supabase not available, using default tools');
-          setSelectedTools(defaultTools);
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from('tools_view')
-          .select('*')
-          .eq('type', 'application')
-          .eq('submission_status', 'approved');
-
-        if (error) {
-          throw error;
-        }
-
-        if (data && Array.isArray(data)) {
-          console.log('✅ Fetched approved tools:', data.length, 'tools');
-          
-          if (data.length > 0) {
-            try {
-              const transformedTools = data.map(transformDatabaseTool).filter(tool => tool && tool.id);
-              
-              if (transformedTools.length > 0) {
-                console.log('✅ Using database tools:', transformedTools.length, 'items');
-                setSelectedTools(transformedTools);
-              } else {
-                throw new Error('No valid tools after transformation');
-              }
-            } catch (transformError) {
-              console.error('Error transforming tools, using defaults:', transformError);
-              setSelectedTools(defaultTools);
-            }
-          } else {
-            console.warn('No tools found in database, using defaults');
-            setSelectedTools(defaultTools);
-          }
-        } else {
-          throw new Error('No tools data received from database');
-        }
-      } catch (err) {
-        console.error('Error fetching tools, using defaults:', err);
-        
-        // Always have fallback tools available
-        try {
-          if (defaultTools && defaultTools.length > 0) {
-            console.log('✅ Using default tools:', defaultTools.length, 'items');
-            setSelectedTools(defaultTools);
-            setFetchError(null); // Don't show error if we have fallback data
-          } else {
-            throw new Error('No default tools available');
-          }
-        } catch (fallbackError) {
-          console.error('Critical error: No tools available:', fallbackError);
-          setFetchError('Unable to load tools. Please check your connection and refresh the page.');
-        }
-      }
-    };
-
-    // Delay execution to allow mobile browsers to settle
-    const timeoutId = setTimeout(fetchTools, 200);
-    return () => clearTimeout(timeoutId);
-  }, []);
+    if (!isLoadingTools && fetchedTools.length > 0) {
+      console.log('✅ Tools loaded:', fetchedTools.length, 'items', isUsingFallback ? '(fallback)' : '(database)');
+      setSelectedTools(fetchedTools);
+      setFetchError(toolsError);
+    }
+  }, [fetchedTools, isLoadingTools, isUsingFallback, toolsError]);
 
   // Track guided ranking state for coordination
   useEffect(() => {
@@ -631,6 +504,15 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
   }, [showGuidedRanking, onGuidedRankingStart]);
 
   const filteredTools = filterTools(selectedTools, filterConditions, filterMode);
+
+  // Derive full Tool objects for Decision Hub from junction table products
+  // This hydrates the minimal product data with full tool ratings/criteria
+  const decisionHubTools = useMemo(() => {
+    if (decisionSpaceProductIds.size === 0) return [];
+
+    // Map product IDs to full Tool objects from filteredTools
+    return filteredTools.filter(tool => decisionSpaceProductIds.has(tool.id));
+  }, [filteredTools, decisionSpaceProductIds]);
   
   // Check if criteria have been adjusted from defaults (isolated from bumper logic)
   // NO LONGER force to false during animation - this allows tools to stay in their current sort order
@@ -1357,6 +1239,8 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
               console.log('🔗 Imperative shuffle control registered');
             }}
             isAnimatingGuidedRankings={isAnimatingGuidedRankings}
+            onAddToDecisionHub={addProductToSpace}
+            decisionHubProductIds={decisionSpaceProductIds}
           />
         );
       case 'chart':
@@ -1380,6 +1264,28 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
               }}
             />
           </div>
+        );
+      case 'decision-hub':
+        return (
+          <DecisionHub
+            tools={decisionHubTools}
+            criteria={criteria}
+            onAddProduct={() => {
+              // Switch to Setup tab to add more products
+              setCurrentStep('criteria-tools');
+            }}
+            onRemoveProduct={async (toolId) => {
+              try {
+                await removeProductFromSpace(toolId);
+              } catch (err) {
+                console.error('Failed to remove product:', err);
+              }
+            }}
+            onViewTool={(toolId) => {
+              // Switch to Setup tab and could scroll to the tool
+              setCurrentStep('criteria-tools');
+            }}
+          />
         );
       default:
         return null;
@@ -1522,14 +1428,12 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
             >
               <div className="h-14 px-6 font-sans flex items-center justify-between">
                 {/* Left Section - Logo and Navigation */}
-                <div className="flex items-center gap-6">
-                  <span className="text-lg font-semibold text-neutral-900 tracking-tight">OpenDecision</span>
-                  <nav className="flex items-center gap-1 text-sm text-neutral-500">
-                    <a href="#" className="px-3 py-1.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-100 transition-colors">Spaces</a>
-                    <a href="#" className="px-3 py-1.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-100 transition-colors">Resources</a>
-                    <a href="#" className="px-3 py-1.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-100 transition-colors">Contact</a>
-                    <a href="#" className="px-3 py-1.5 rounded-lg hover:text-neutral-900 hover:bg-neutral-100 transition-colors">Trust</a>
-                  </nav>
+                <div className="flex items-center gap-8">
+                  <span className="text-lg font-semibold text-neutral-900 tracking-tight flex items-center">OpenDecision</span>
+                  <a href="#" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center">Spaces</a>
+                  <a href="#" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center">Resources</a>
+                  <a href="#" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center">Contact</a>
+                  <a href="#" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center">Trust</a>
                 </div>
 
                 {/* Right Section - Actions and Profile */}
@@ -1654,59 +1558,31 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
                   </div>
                 </div>
 
-                {/* Progress Indicator */}
-                <div className="flex items-center gap-2 mb-5">
-                  {/* Step 1: Profile */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[#5BDFC2] flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                      </svg>
-                    </div>
-                    <span className="text-sm font-medium text-neutral-900">Profile</span>
-                  </div>
-
-                  {/* Connector */}
-                  <div className="flex-1 h-0.5 bg-[#5BDFC2] max-w-[60px]" />
-
-                  {/* Step 2: Products - Current */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-[#5BDFC2]/20 border-2 border-[#5BDFC2] flex items-center justify-center">
-                      <span className="text-xs font-bold text-[#0D9488]">2</span>
-                    </div>
-                    <span className="text-sm font-medium text-[#0D9488]">Products</span>
-                  </div>
-
-                  {/* Connector */}
-                  <div className="flex-1 h-0.5 bg-neutral-200 max-w-[60px]" />
-
-                  {/* Step 3: Compare */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center">
-                      <span className="text-xs font-medium text-neutral-400">3</span>
-                    </div>
-                    <span className="text-sm text-neutral-400">Compare</span>
-                  </div>
-
-                  {/* Connector */}
-                  <div className="flex-1 h-0.5 bg-neutral-200 max-w-[60px]" />
-
-                  {/* Step 4: Decide */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center">
-                      <span className="text-xs font-medium text-neutral-400">4</span>
-                    </div>
-                    <span className="text-sm text-neutral-400">Decide</span>
-                  </div>
-                </div>
+                {/* Progress Indicator - Moved to ProgressStepper component */}
 
                 {/* Tabs */}
                 <div className="flex gap-1 border-b border-neutral-200/60">
-                  <button className="px-4 pb-3 text-sm font-medium text-neutral-900 border-b-2 border-neutral-900 -mb-px">
+                  <button
+                    onClick={() => setCurrentStep('criteria-tools')}
+                    className={cn(
+                      "px-4 pb-3 text-sm transition-colors",
+                      currentStep !== 'decision-hub'
+                        ? "font-medium text-neutral-900 border-b-2 border-neutral-900 -mb-px"
+                        : "text-neutral-500 hover:text-neutral-700"
+                    )}
+                  >
                     Setup
                   </button>
-                  <button className="px-4 pb-3 text-sm text-neutral-500 hover:text-neutral-700 transition-colors">
-                    DecisionHub
+                  <button
+                    onClick={() => setCurrentStep('decision-hub')}
+                    className={cn(
+                      "px-4 pb-3 text-sm transition-colors",
+                      currentStep === 'decision-hub'
+                        ? "font-medium text-neutral-900 border-b-2 border-neutral-900 -mb-px"
+                        : "text-neutral-500 hover:text-neutral-700"
+                    )}
+                  >
+                    Decision Hub
                   </button>
                 </div>
               </div>

@@ -11,8 +11,10 @@ import React, { useEffect, useRef, useState, KeyboardEvent, useCallback } from '
 import { motion } from 'framer-motion';
 import {
   Paperclip,
-  Camera,
+  Mic,
 } from 'lucide-react';
+import { AudioVisualizerBar } from './AudioVisualizerBar';
+import { useVoiceRecording } from '@/opendecision/shared/hooks/useVoiceRecording';
 import { SparkleButton } from './SparkleButton';
 import { AIChatMessages } from './AIChatMessages';
 import { ChatHistoryDropdown } from './ChatHistoryDropdown';
@@ -170,14 +172,49 @@ interface StyledChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   placeholder?: string;
+  // Voice recording props
+  isRecording?: boolean;
+  onStartRecording?: () => void;
+  onStopRecording?: () => void;
+  /** New finalized transcript segment to append */
+  voiceTranscript?: string;
+  /** Real-time interim transcript (while speaking) */
+  interimTranscript?: string;
+  /** Clear the transcript after consuming */
+  onClearTranscript?: () => void;
+  /** Voice recording error */
+  voiceError?: string | null;
 }
 
 const StyledChatInput: React.FC<StyledChatInputProps> = ({
   onSend,
   isLoading,
   placeholder = 'Ask or build anything...',
+  isRecording = false,
+  onStartRecording,
+  onStopRecording,
+  voiceTranscript = '',
+  interimTranscript = '',
+  onClearTranscript,
+  voiceError,
 }) => {
   const [value, setValue] = useState('');
+  const lastTranscriptRef = useRef('');
+
+  // Append NEW voice transcript segments when they arrive
+  useEffect(() => {
+    if (voiceTranscript && voiceTranscript !== lastTranscriptRef.current) {
+      console.log('[Input] Appending transcript:', voiceTranscript);
+      setValue(prev => {
+        const newValue = prev + (prev ? ' ' : '') + voiceTranscript.trim();
+        return newValue;
+      });
+      lastTranscriptRef.current = voiceTranscript;
+      // Clear the transcript so we don't re-append it
+      onClearTranscript?.();
+    }
+  }, [voiceTranscript, onClearTranscript]);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -218,18 +255,23 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={placeholder}
+            placeholder={isRecording && interimTranscript ? interimTranscript : placeholder}
             disabled={isLoading}
             rows={3}
             className={cn(
               'w-full bg-transparent border-none resize-none outline-none',
               'text-gray-900 text-sm',
               'placeholder:text-gray-400',
+              isRecording && interimTranscript && 'placeholder:text-[#5BDFC2] placeholder:italic',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'min-h-[60px]'
             )}
             style={{ maxHeight: '150px' }}
           />
+          {/* Voice error display */}
+          {voiceError && (
+            <p className="text-xs text-red-500 mt-1">{voiceError}</p>
+          )}
         </div>
 
         {/* Bottom toolbar */}
@@ -243,11 +285,17 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
                 <span className="lines line-2"></span>
                 <span className="lines line-3"></span>
               </label>
-              <button type="button" className="menu-item item-orange" title="Add image">
-                <Camera />
-              </button>
               <button type="button" className="menu-item item-green" title="Attach file">
                 <Paperclip />
+              </button>
+              <button
+                type="button"
+                className={cn('menu-item item-orange', isRecording && 'recording-active')}
+                title={isRecording ? 'Recording...' : 'Voice input'}
+                onClick={onStartRecording}
+                disabled={isRecording}
+              >
+                <Mic />
               </button>
             </nav>
           </div>
@@ -275,23 +323,19 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
                   >
                     <defs>
                       <linearGradient
-                        id="tricolor-horizontal"
+                        id="mint-gradient"
                         x1="0%"
-                        y1="50%"
+                        y1="0%"
                         x2="100%"
-                        y2="50%"
+                        y2="100%"
                       >
-                        <stop offset="0%" stopColor="#FFB300"></stop>
-                        <stop offset="33%" stopColor="#FFB300"></stop>
-                        <stop offset="33%" stopColor="#0072bc"></stop>
-                        <stop offset="66%" stopColor="#0072bc"></stop>
-                        <stop offset="66%" stopColor="#00C853"></stop>
-                        <stop offset="100%" stopColor="#00C853"></stop>
+                        <stop offset="0%" stopColor="#5BDFC2"></stop>
+                        <stop offset="100%" stopColor="#0D9488"></stop>
                       </linearGradient>
                     </defs>
                     <path fill="none" d="M0 0h24v24H0z"></path>
                     <path
-                      fill="url(#tricolor-horizontal)"
+                      fill="url(#mint-gradient)"
                       d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
                     ></path>
                   </svg>
@@ -301,6 +345,14 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
             </div>
           </button>
         </div>
+
+        {/* Audio Visualizer Bar - shown when recording */}
+        {isRecording && onStopRecording && (
+          <AudioVisualizerBar
+            isRecording={isRecording}
+            onStopRecording={onStopRecording}
+          />
+        )}
       </div>
     </div>
   );
@@ -350,6 +402,17 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     decisionSpaceId: decisionSpaceId ?? undefined,
     onError: (err) => console.error('AI Chat error:', err),
   });
+
+  // Voice recording for dictation
+  const {
+    isRecording,
+    transcript: voiceTranscript,
+    interimTranscript,
+    startRecording,
+    stopRecording,
+    clearTranscript,
+    error: voiceError,
+  } = useVoiceRecording();
 
   useEffect(() => {
     if (context) {
@@ -457,11 +520,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       {isExpanded && (
         <div className="flex h-full overflow-hidden">
           {/* Icon Sidebar - 56px wide */}
-          <div className="w-14 flex-shrink-0 bg-white border-r border-neutral-100 flex flex-col items-center py-3">
-            {/* Scout Logo */}
-            <div className="mb-4">
+          <div className="w-14 flex-shrink-0 bg-white border-r border-neutral-100 flex flex-col items-center">
+            {/* Scout Logo - h-14 to match header */}
+            <div className="h-14 flex items-center justify-center border-b border-neutral-100 w-full">
               <ScoutMascot size="small" />
             </div>
+
+            {/* Sidebar buttons */}
+            <div className="flex flex-col items-center py-2 gap-1 flex-1">
 
             {/* New Chat Button */}
             <button
@@ -471,28 +537,20 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               }}
               disabled={isLoading}
               className={cn(
-                'w-10 h-10 rounded-xl flex items-center justify-center transition-all mb-2',
-                'text-[#5BDFC2] hover:bg-[#5BDFC2]/10',
+                'w-11 h-9 rounded-lg flex items-center justify-center transition-all',
+                'bg-[#5BDFC2]/10 text-[#5BDFC2] hover:bg-[#5BDFC2]/20 border border-[#5BDFC2]/30',
                 isLoading && 'opacity-50 cursor-not-allowed'
               )}
               title="New chat"
             >
-              {/* Sparkle dots icon */}
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="6" r="1.5" />
-                <circle cx="6" cy="12" r="1.5" />
-                <circle cx="18" cy="12" r="1.5" />
-                <circle cx="12" cy="18" r="1.5" />
-                <circle cx="8" cy="8" r="1" />
-                <circle cx="16" cy="8" r="1" />
-                <circle cx="8" cy="16" r="1" />
-                <circle cx="16" cy="16" r="1" />
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </button>
 
             {/* Edit/Compose */}
             <button
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-all mb-2"
+              className="w-11 h-9 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border border-transparent hover:border-neutral-200 transition-all"
               title="Compose"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -504,10 +562,10 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <button
               onClick={() => setShowHistory(!showHistory)}
               className={cn(
-                'w-10 h-10 rounded-xl flex items-center justify-center transition-all mb-2',
+                'w-11 h-9 rounded-lg flex items-center justify-center transition-all border',
                 showHistory
-                  ? 'bg-[#5BDFC2]/20 text-[#0D9488] ring-2 ring-[#5BDFC2]/30'
-                  : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100'
+                  ? 'bg-[#5BDFC2]/20 text-[#0D9488] border-[#5BDFC2]/40'
+                  : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border-transparent hover:border-neutral-200'
               )}
               title="Chat history"
             >
@@ -518,7 +576,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Settings */}
             <button
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-all"
+              className="w-11 h-9 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border border-transparent hover:border-neutral-200 transition-all"
               title="Settings"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -531,7 +589,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Help */}
             <button
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-all mb-2"
+              className="w-11 h-9 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border border-transparent hover:border-neutral-200 transition-all"
               title="Help"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -540,15 +598,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             </button>
 
             {/* User Avatar */}
-            <div className="w-8 h-8 rounded-full bg-[#5BDFC2] flex items-center justify-center text-white text-sm font-medium">
+            <div className="w-11 h-9 rounded-lg bg-[#5BDFC2] flex items-center justify-center text-white text-sm font-medium">
               U
+            </div>
             </div>
           </div>
 
           {/* Main Panel */}
           <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F0FDFB]">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 h-12 border-b border-[#5BDFC2]/20 flex-shrink-0">
+            {/* Header - h-14 (56px) to match main app header */}
+            <div className="flex items-center justify-between px-4 h-14 border-b border-[#5BDFC2]/20 flex-shrink-0">
               <span className="text-sm font-medium text-neutral-900">
                 {showHistory ? 'Chats' : 'New chat'}
               </span>
@@ -581,8 +640,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               </div>
             </div>
 
-          {/* Content Area - Scrollable */}
-          <div className="flex-1 overflow-y-auto min-h-0">
+            {/* Content Area - Scrollable */}
+            <div className="flex-1 overflow-y-auto min-h-0">
             {showHistory ? (
               /* History View */
               <div className="p-4">
@@ -654,39 +713,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               <div className="px-4">
                 {messages.length === 0 ? (
                   /* Empty State - Scout AI branded */
-                  <div className="pt-8 pb-4 flex flex-col items-center">
-                    {/* Sparkle animation dots */}
-                    <div className="relative w-20 h-20 mb-4">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-3 h-3 rounded-full bg-[#5BDFC2] animate-pulse" />
-                      </div>
-                      <div className="absolute top-1 left-1/2 -translate-x-1/2">
-                        <div className="w-2 h-2 rounded-full bg-[#5BDFC2]/60" />
-                      </div>
-                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-                        <div className="w-2 h-2 rounded-full bg-[#5BDFC2]/60" />
-                      </div>
-                      <div className="absolute left-1 top-1/2 -translate-y-1/2">
-                        <div className="w-2 h-2 rounded-full bg-[#5BDFC2]/60" />
-                      </div>
-                      <div className="absolute right-1 top-1/2 -translate-y-1/2">
-                        <div className="w-2 h-2 rounded-full bg-[#5BDFC2]/60" />
-                      </div>
-                      <div className="absolute top-3 left-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#5BDFC2]/40" />
-                      </div>
-                      <div className="absolute top-3 right-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#5BDFC2]/40" />
-                      </div>
-                      <div className="absolute bottom-3 left-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#5BDFC2]/40" />
-                      </div>
-                      <div className="absolute bottom-3 right-3">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#5BDFC2]/40" />
-                      </div>
-                    </div>
+                  <div className="pt-6 pb-4 flex flex-col items-center">
+                    {/* Scout Mascot */}
+                    <ScoutMascot size="large" />
 
-                    <h2 className="text-lg font-medium text-neutral-900 mb-1">
+                    <h2 className="text-lg font-medium text-neutral-900 mt-3 mb-1">
                       How can I help?
                     </h2>
                   </div>
@@ -713,16 +744,23 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   <StyledChatInput
                     onSend={sendMessage}
                     isLoading={isLoading}
+                    isRecording={isRecording}
+                    onStartRecording={startRecording}
+                    onStopRecording={stopRecording}
+                    voiceTranscript={voiceTranscript}
+                    interimTranscript={interimTranscript}
+                    onClearTranscript={clearTranscript}
+                    voiceError={voiceError}
                   />
 
-                  {/* Suggestions as pills - only show after conversation started */}
-                  {messages.length > 0 && promptsToShow.length > 0 && !isLoading && (
+                  {/* Suggestion prompts - show starter prompts on empty state OR dynamic prompts after AI responses */}
+                  {promptsToShow.length > 0 && !isLoading && (
                     <div className="flex flex-col gap-2 mt-2">
                       {promptsToShow.map((prompt, index) => (
                         <button
                           key={index}
                           onClick={() => handleSuggestionClick(prompt)}
-                          className="text-left px-4 py-2.5 rounded-xl bg-white border border-neutral-200 text-sm text-neutral-700 hover:bg-neutral-50 hover:border-neutral-300 transition-colors"
+                          className="text-left px-4 py-2.5 rounded-lg bg-white border border-[#5BDFC2]/20 text-sm text-neutral-700 hover:bg-[#5BDFC2]/5 hover:border-[#5BDFC2]/40 transition-colors"
                         >
                           {prompt}
                         </button>
@@ -732,7 +770,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 </div>
               </div>
             )}
-          </div>
+            </div>
           </div>
         </div>
       )}

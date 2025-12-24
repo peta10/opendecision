@@ -34,6 +34,10 @@ interface SplitViewProps {
   onShuffleReady?: (shuffleFn: () => void) => void;
   onShuffleControlReady?: (disableFn: () => void, enableFn: () => void) => void;
   isAnimatingGuidedRankings?: boolean;
+  /** Callback to add a product to the Decision Hub */
+  onAddToDecisionHub?: (toolId: string) => void;
+  /** Set of product IDs currently in the Decision Hub */
+  decisionHubProductIds?: Set<string>;
 }
 
 export const SplitView: React.FC<SplitViewProps> = ({
@@ -46,6 +50,8 @@ export const SplitView: React.FC<SplitViewProps> = ({
   comparedTools = new Set(),
   guidedButtonRef,
   onOpenGuidedRanking,
+  onAddToDecisionHub,
+  decisionHubProductIds = new Set(),
 }) => {
   const isMobile = useMobileDetection();
 
@@ -94,6 +100,8 @@ export const SplitView: React.FC<SplitViewProps> = ({
           onToolSelect={onToolSelect}
           onToolBookmark={handleToolBookmark}
           onToolViewDetails={handleToolViewDetails}
+          onAddToDecisionHub={onAddToDecisionHub}
+          decisionHubProductIds={decisionHubProductIds}
         />
       </div>
     </div>

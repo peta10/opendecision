@@ -1,0 +1,57 @@
+/* =============================================================================
+   AUDIO VISUALIZER BAR
+   Full-width waveform with small circular stop button
+   ============================================================================= */
+
+.audio-visualizer-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: transparent;
+  border-top: 1px solid rgba(91, 223, 194, 0.12);
+  height: 40px;
+  box-sizing: border-box;
+}
+
+/* --- WAVEFORM WRAPPER --- */
+.waveform-wrapper {
+  flex: 1;
+  height: 28px;
+  min-width: 0;
+}
+
+/* --- STOP CIRCLE BUTTON --- */
+.stop-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(107, 114, 128, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.stop-circle:hover {
+  background: rgba(107, 114, 128, 0.2);
+}
+
+.stop-circle:active {
+  transform: scale(0.95);
+}
+
+/* Small square stop icon inside circle */
+.stop-icon {
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: #6B7280;
+}
+
+.stop-circle:hover .stop-icon {
+  background: #4B5563;
+}

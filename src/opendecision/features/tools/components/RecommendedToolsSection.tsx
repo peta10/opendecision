@@ -12,6 +12,10 @@ interface RecommendedToolsSectionProps {
   onToolSelect: (tool: Tool) => void;
   onToolBookmark: (tool: Tool) => void;
   onToolViewDetails: (tool: Tool) => void;
+  /** Callback to add a product to the Decision Hub */
+  onAddToDecisionHub?: (toolId: string) => void;
+  /** Set of product IDs currently in the Decision Hub */
+  decisionHubProductIds?: Set<string>;
 }
 
 // Helper to get match score for a tool
@@ -58,17 +62,19 @@ export const RecommendedToolsSection: React.FC<RecommendedToolsSectionProps> = (
   onToolSelect,
   onToolBookmark,
   onToolViewDetails,
+  onAddToDecisionHub,
+  decisionHubProductIds = new Set(),
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Get added tools (selected ones)
+  // Get added tools (from Decision Hub)
   const addedTools = useMemo(() => {
-    return tools.filter(tool => selectedToolIds.has(tool.id));
-  }, [tools, selectedToolIds]);
+    return tools.filter(tool => decisionHubProductIds.has(tool.id));
+  }, [tools, decisionHubProductIds]);
 
   // Filter recommended tools based on search query (excluding added ones)
   const recommendedTools = useMemo(() => {
-    let result = tools.filter(tool => !selectedToolIds.has(tool.id));
+    let result = tools.filter(tool => !decisionHubProductIds.has(tool.id));
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -79,7 +85,7 @@ export const RecommendedToolsSection: React.FC<RecommendedToolsSectionProps> = (
 
     // Sort by match score
     return result.sort((a, b) => getMatchScore(b.name) - getMatchScore(a.name));
-  }, [tools, searchQuery, selectedToolIds]);
+  }, [tools, searchQuery, decisionHubProductIds]);
 
   const removeAddedTool = (tool: Tool) => {
     onToolSelect(tool); // Toggle selection off
@@ -230,8 +236,14 @@ export const RecommendedToolsSection: React.FC<RecommendedToolsSectionProps> = (
                             </svg>
                           </button>
                           <button
-                            onClick={() => onToolSelect(tool)}
-                            className="px-3 py-1.5 bg-neutral-900 text-white text-xs font-medium rounded-lg hover:bg-neutral-800 transition-colors flex items-center gap-1.5 shadow-sm"
+                            onClick={() => onAddToDecisionHub?.(tool.id)}
+                            disabled={!onAddToDecisionHub}
+                            className={cn(
+                              "px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 shadow-sm",
+                              onAddToDecisionHub
+                                ? "bg-neutral-900 text-white hover:bg-neutral-800"
+                                : "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+                            )}
                           >
                             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

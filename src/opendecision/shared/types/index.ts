@@ -462,3 +462,37 @@ export interface UserAuthState {
   /** Loading state during auth check */
   isLoading: boolean;
 }
+
+// =============================================================================
+// DECISION SPACE PRODUCTS TYPES (Junction Table)
+// =============================================================================
+
+/**
+ * How a product was added to a decision space
+ */
+export type ProductSource = 'recommended' | 'added' | 'imported';
+
+/**
+ * Summary of tool data from the junction table join
+ */
+export interface ToolSummary {
+  id: string;
+  name: string;
+  type: string;
+  created_on: string;
+  submission_status: string;
+}
+
+/**
+ * A product entry in a decision space (from junction table)
+ */
+export interface DecisionSpaceProduct {
+  id: string;
+  decision_space_id: string;
+  product_id: string;
+  source: ProductSource;
+  added_by: string | null;
+  added_at: string;
+  is_active: boolean;
+  tool?: ToolSummary;
+}

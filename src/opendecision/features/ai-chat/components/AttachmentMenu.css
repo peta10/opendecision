@@ -6,28 +6,28 @@
 /* --- BASE CONTAINER --- */
 .attachment-menu {
   position: relative;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 32px;
   box-sizing: border-box;
 }
 
 /* --- MAIN BUTTON & ITEM SHARED STYLES --- */
 .attachment-menu .menu-item,
 .attachment-menu .menu-open-button {
-  background: linear-gradient(180deg, #0080d4 0%, #0072bc 100%);
-  border-radius: 100%;
-  width: 28px;
-  height: 28px;
+  background: linear-gradient(180deg, #6EDCD1 0%, #5BDFC2 100%);
+  border-radius: 8px;
+  width: 36px;
+  height: 32px;
   position: absolute;
   top: 0;
   left: 0;
   color: #FFFFFF;
   text-align: center;
-  line-height: 28px;
+  line-height: 32px;
   font-size: 12px;
   transform: translate3d(0, 0, 0);
   transition: transform ease-out 200ms;
-  box-shadow: 0 2px 6px rgba(0, 114, 188, 0.25);
+  box-shadow: 0 2px 6px rgba(91, 223, 194, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,31 +36,33 @@
 /* --- SUB-BUTTON SPECIFIC STYLES --- */
 .attachment-menu .menu-item {
   background: #FFFFFF;
+  border: 1px solid rgba(91, 223, 194, 0.3);
   transition: all 0.3s ease;
   z-index: 1;
   cursor: pointer;
-  border: none;
   padding: 0;
-  width: 28px;
-  height: 28px;
-  line-height: 28px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  width: 36px;
+  height: 32px;
+  line-height: 32px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* Orange (Camera/Image) */
-.attachment-menu .item-orange { color: #FFB300; }
+/* Camera/Image - Mint accent */
+.attachment-menu .item-orange { color: #5BDFC2; }
 .attachment-menu .item-orange:hover {
-  background: #FFB300;
-  color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(255, 179, 0, 0.4);
+  background: rgba(91, 223, 194, 0.15);
+  color: #0D9488;
+  border-color: #5BDFC2;
+  box-shadow: 0 2px 8px rgba(91, 223, 194, 0.3);
 }
 
-/* Green (Paperclip/File) */
-.attachment-menu .item-green { color: #00C853; }
+/* Paperclip/File - Mint accent */
+.attachment-menu .item-green { color: #5BDFC2; }
 .attachment-menu .item-green:hover {
-  background: #00C853;
-  color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(0, 200, 83, 0.4);
+  background: rgba(91, 223, 194, 0.15);
+  color: #0D9488;
+  border-color: #5BDFC2;
+  box-shadow: 0 2px 8px rgba(91, 223, 194, 0.3);
 }
 
 /* --- HAMBURGER ICON --- */
@@ -106,8 +108,8 @@
 }
 
 .attachment-menu .menu-open-button:hover {
-  transform: scale(1.1, 1.1) translate3d(0, 0, 0);
-  box-shadow: 0 4px 10px rgba(0, 114, 188, 0.4);
+  transform: scale(1.05, 1.05) translate3d(0, 0, 0);
+  box-shadow: 0 4px 10px rgba(91, 223, 194, 0.4);
 }
 
 .attachment-menu .menu-open:checked + .menu-open-button {
@@ -124,13 +126,13 @@
 /* Item 1 (Image): Moves Right */
 .attachment-menu .menu-open:checked ~ .menu-item:nth-child(3) {
   transition-duration: 200ms;
-  transform: translate3d(34px, 0, 0);
+  transform: translate3d(42px, 0, 0);
 }
 
 /* Item 2 (File): Moves Further Right */
 .attachment-menu .menu-open:checked ~ .menu-item:nth-child(4) {
   transition-duration: 300ms;
-  transform: translate3d(68px, 0, 0);
+  transform: translate3d(84px, 0, 0);
 }
 
 /* Icon sizing inside buttons */
@@ -143,8 +145,29 @@
 /* Ensure consistent button sizing */
 .attachment-menu .menu-item,
 .attachment-menu .menu-open-button {
-  min-width: 28px;
-  min-height: 28px;
-  max-width: 28px;
-  max-height: 28px;
+  min-width: 36px;
+  min-height: 32px;
+  max-width: 36px;
+  max-height: 32px;
+}
+
+/* --- RECORDING ACTIVE STATE --- */
+.attachment-menu .menu-item.recording-active {
+  background: linear-gradient(180deg, #6EDCD1 0%, #5BDFC2 100%);
+  color: #FFFFFF;
+  border-color: #5BDFC2;
+  animation: mic-pulse 1.5s ease-in-out infinite;
+}
+
+.attachment-menu .menu-item.recording-active:hover {
+  background: linear-gradient(180deg, #7FE8DD 0%, #6EDCD1 100%);
+}
+
+@keyframes mic-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(91, 223, 194, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(91, 223, 194, 0);
+  }
 }

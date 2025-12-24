@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronUp, ExternalLink, Star, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink, Star, HelpCircle, Plus, Check } from 'lucide-react';
 import { Tool, Criterion } from '@/opendecision/shared/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/opendecision/shared/components/ui/card';
 import { Button } from '@/opendecision/shared/components/ui/button';
@@ -25,6 +25,10 @@ interface EnhancedCompactToolCardProps {
   onOpenGuidedRanking?: () => void;
   onNavigateToCriteria?: () => void;
   position?: number; // Position in results for analytics
+  /** Add/remove product from Decision Hub */
+  onAddToDecisionHub?: () => void;
+  /** Whether this product is already in the Decision Hub */
+  isInDecisionHub?: boolean;
 }
 
 // Helper function to get tool rating for a criterion
@@ -129,7 +133,9 @@ export const EnhancedCompactToolCard: React.FC<EnhancedCompactToolCardProps> = (
   criteriaAdjusted = true,
   onOpenGuidedRanking,
   onNavigateToCriteria,
-  position
+  position,
+  onAddToDecisionHub,
+  isInDecisionHub = false,
 }) => {
   const matchDisplay = getMatchScoreDisplay(matchScore);
   const { isTouchDevice } = useUnifiedMobileDetection();
@@ -369,6 +375,34 @@ export const EnhancedCompactToolCard: React.FC<EnhancedCompactToolCardProps> = (
                   <ExternalLink className="w-3 h-3" />
                   Try Free
                 </a>
+              </Button>
+            )}
+            {onAddToDecisionHub && (
+              <Button
+                size="sm"
+                variant="secondary"
+                className={cn(
+                  "h-8 px-3 text-xs",
+                  isInDecisionHub
+                    ? "bg-teal-100 text-teal-700 hover:bg-teal-200"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddToDecisionHub();
+                }}
+              >
+                {isInDecisionHub ? (
+                  <>
+                    <Check className="w-3 h-3 mr-1" />
+                    In Hub
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-3 h-3 mr-1" />
+                    Add to Hub
+                  </>
+                )}
               </Button>
             )}
             <Button

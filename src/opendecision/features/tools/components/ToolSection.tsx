@@ -50,6 +50,10 @@ interface ToolSectionProps {
   onShuffleReady?: (shuffleFn: () => void) => void;
   onShuffleControlReady?: (disableFn: () => void, enableFn: () => void) => void;
   isAnimatingGuidedRankings?: boolean;
+  /** Callback to add a product to the Decision Hub */
+  onAddToDecisionHub?: (toolId: string) => void;
+  /** Set of product IDs currently in the Decision Hub */
+  decisionHubProductIds?: Set<string>;
 }
 
 // Use the unified calculateScore function
@@ -80,7 +84,9 @@ export const ToolSection: React.FC<ToolSectionProps> = ({
   shuffleDurationMs = 1000,
   onShuffleReady,
   onShuffleControlReady,
-  isAnimatingGuidedRankings = false
+  isAnimatingGuidedRankings = false,
+  onAddToDecisionHub,
+  decisionHubProductIds = new Set(),
 }) => {
   const isMobile = useMobileDetection();
 
@@ -296,6 +302,8 @@ export const ToolSection: React.FC<ToolSectionProps> = ({
         onOpenGuidedRanking={onOpenGuidedRanking}
         onNavigateToCriteria={onNavigateToCriteria}
         position={index + 1} // Add position for analytics (1-based indexing)
+        onAddToDecisionHub={onAddToDecisionHub ? () => onAddToDecisionHub(tool.id) : undefined}
+        isInDecisionHub={decisionHubProductIds.has(tool.id)}
       />
     </AnimatedToolCard>
   );

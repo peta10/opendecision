@@ -256,7 +256,7 @@ export function SpaceProvider({ children, initialSpaceId }: SpaceProviderProps) 
     if (!currentSpace) {
       // Silently skip if no current space (demo/unauthenticated mode)
       console.log('⏭️ Skipping space update - no current space (demo mode)');
-      return currentSpace as DecisionSpace;
+      throw new Error('No current space to update');
     }
 
     try {

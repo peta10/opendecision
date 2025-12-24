@@ -725,10 +725,25 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                   <div className="py-4">
                     <AIChatMessages messages={messages} onFeedback={handleFeedback} />
                     <div ref={messagesEndRef} />
+
+                    {/* Follow-up prompts - shown below AI response */}
+                    {promptsToShow.length > 0 && !isLoading && hasStarted && (
+                      <div className="flex flex-wrap gap-1.5 mt-3 pl-11">
+                        {promptsToShow.map((prompt, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleSuggestionClick(prompt)}
+                            className="text-left px-2.5 py-1.5 rounded-full bg-neutral-100 text-xs text-neutral-600 hover:bg-[#5BDFC2]/10 hover:text-neutral-800 transition-colors border border-neutral-200 hover:border-[#5BDFC2]/30"
+                          >
+                            {prompt}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* Input & Suggestions */}
+                {/* Input & Error */}
                 <div className="pb-4 space-y-3">
                   {/* Error Display */}
                   {error && (
@@ -737,6 +752,21 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                       <button onClick={clearError} className="ml-2 underline">
                         Dismiss
                       </button>
+                    </div>
+                  )}
+
+                  {/* Initial suggestion prompts - only show on empty state */}
+                  {messages.length === 0 && promptsToShow.length > 0 && !isLoading && (
+                    <div className="flex flex-col gap-2 mb-3">
+                      {promptsToShow.map((prompt, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSuggestionClick(prompt)}
+                          className="text-left px-4 py-2.5 rounded-lg bg-white border border-[#5BDFC2]/20 text-sm text-neutral-700 hover:bg-[#5BDFC2]/5 hover:border-[#5BDFC2]/40 transition-colors"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
                     </div>
                   )}
 
@@ -752,21 +782,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                     onClearTranscript={clearTranscript}
                     voiceError={voiceError}
                   />
-
-                  {/* Suggestion prompts - show starter prompts on empty state OR dynamic prompts after AI responses */}
-                  {promptsToShow.length > 0 && !isLoading && (
-                    <div className="flex flex-col gap-2 mt-2">
-                      {promptsToShow.map((prompt, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSuggestionClick(prompt)}
-                          className="text-left px-4 py-2.5 rounded-lg bg-white border border-[#5BDFC2]/20 text-sm text-neutral-700 hover:bg-[#5BDFC2]/5 hover:border-[#5BDFC2]/40 transition-colors"
-                        >
-                          {prompt}
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             )}

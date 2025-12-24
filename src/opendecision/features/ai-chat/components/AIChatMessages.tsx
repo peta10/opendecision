@@ -147,8 +147,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onFeedback }) =>
             'rounded-2xl px-4 py-3',
             isUser
               ? 'bg-alpine-blue text-white rounded-tr-md'
-              : 'bg-gray-100 text-midnight rounded-tl-md',
-            hasError && 'bg-red-50 border border-red-200'
+              : 'bg-neutral-100 text-neutral-800 rounded-tl-md',
+            hasError && 'bg-red-50 border border-red-200 text-red-800'
           )}
         >
           {isLoading ? (

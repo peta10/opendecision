@@ -1,3 +1,5 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -12,6 +14,12 @@ const nextConfig = {
     ignoreBuildErrors: false
   },
   webpack: (config, { dev, isServer }) => {
+    // Explicit path aliases for Netlify/Linux compatibility
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+    };
+
     if (dev) {
       config.infrastructureLogging = {
         level: 'error',

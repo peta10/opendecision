@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenDecision - App Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       CSS VARIABLES - FROM LANDING PAGE
+       ============================================ */
+    :root {
+      --scout: #6EDCD1;
+      --scout-light: #8FE8DF;
+      --scout-dark: #4BBEB3;
+      --scout-deep: #2D8A80;
+      --scout-dim: rgba(110, 220, 209, 0.12);
+      --scout-glow: rgba(110, 220, 209, 0.5);
+      --midnight: #0B1E2D;
+      --mint: #D4E8E6;
+      --summit: #3D7A72;
+      --text-primary: #0B1E2D;
+      --text-secondary: #4A5E6D;
+      --text-muted: #7A8D9C;
+      --surface: #ffffff;
+      --border: rgba(110, 220, 209, 0.3);
+      --border-subtle: rgba(11, 30, 45, 0.08);
+      --bg-light: #f5f7f7;
+
+      /* Robot Materials */
+      --mat-white: #F8FAFA;
+      --mat-white-shadow: #C8D4D2;
+      --mat-teal: #6EDCD1;
+      --mat-teal-shadow: #3BA99E;
+      --mat-metal-light: #E6EDEC;
+      --mat-metal-mid: #9AB0AD;
+      --mat-metal-dark: #5D7573;
+      --screen-bg: #0B1E2D;
+      --glow-white: #FFFFFF;
+      --glow-teal: #6EDCD1;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-light);
+      color: var(--midnight);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ============================================
+       HEADER - WHITE BACKGROUND
+       ============================================ */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #ffffff;
+      border-bottom: 1px solid rgba(11, 30, 45, 0.08);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(11, 30, 45, 0.04);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--scout) 0%, var(--scout-dark) 100%);
+      border-radius: 8px;
+    }
+
+    .logo-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--midnight);
+    }
+
+    /* Decision Space Selector */
+    .space-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 32px;
+      padding-left: 32px;
+      border-left: 1px solid rgba(11, 30, 45, 0.1);
+    }
+
+    .space-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .space-name:hover {
+      border-color: var(--scout);
+    }
+
+    .space-name-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--midnight);
+    }
+
+    .space-name svg {
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+    }
+
+    .space-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .space-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid rgba(11, 30, 45, 0.1);
+      background: #ffffff;
+      color: var(--text-secondary);
+    }
+
+    .space-btn:hover {
+      border-color: var(--scout);
+      color: var(--scout-dark);
+    }
+
+    .space-btn.new-space {
+      background: var(--scout);
+      border-color: var(--scout);
+      color: var(--midnight);
+    }
+
+    .space-btn.new-space:hover {
+      background: var(--scout-dark);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+      margin-right: 24px;
+    }
+
+    .nav-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover {
+      color: var(--midnight);
+      background: var(--bg-light);
+    }
+
+    .nav-tab.active {
+      background: var(--scout);
+      color: var(--midnight);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .header-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .header-btn.secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid rgba(11, 30, 45, 0.15);
+    }
+
+    .header-btn.secondary:hover {
+      border-color: var(--scout);
+      color: var(--scout-dark);
+    }
+
+    .header-btn.primary {
+      background: var(--scout);
+      color: var(--midnight);
+      border: none;
+    }
+
+    .header-btn.primary:hover {
+      background: var(--scout-dark);
+    }
+
+    /* ============================================
+       MAIN LAYOUT
+       ============================================ */
+    .app-container {
+      display: flex;
+      margin-top: 56px;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* ============================================
+       SIDE PANE (CHAT) - WHITE BACKGROUND
+       ============================================ */
+    .side-pane {
+      width: 64px;
+      background: #ffffff;
+      border-right: 1px solid rgba(11, 30, 45, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+      transition: width 0.3s ease;
+    }
+
+    .side-pane.expanded {
+      width: 320px;
+      align-items: stretch;
+    }
+
+    .side-pane-toggle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.1);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+      color: var(--text-muted);
+    }
+
+    .side-pane.expanded .side-pane-toggle {
+      margin: 0 auto 20px;
+    }
+
+    .side-pane-toggle:hover {
+      background: var(--scout-dim);
+      border-color: var(--scout);
+      color: var(--scout-dark);
+    }
+
+    .side-pane-toggle svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.3s;
+    }
+
+    .side-pane.expanded .side-pane-toggle svg {
+      transform: rotate(180deg);
+    }
+
+    .scout-avatar-container {
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .side-pane.expanded .scout-avatar-container {
+      margin: 0 auto 16px;
+    }
+
+    .scout-avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--scout);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scout-avatar svg {
+      width: 28px;
+      height: 28px;
+      color: var(--midnight);
+    }
+
+    .side-pane-content {
+      display: none;
+      width: 100%;
+      padding: 0 16px;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .side-pane.expanded .side-pane-content {
+      display: flex;
+    }
+
+    .chat-header {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--midnight);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .chat-message {
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .chat-message.scout {
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.08);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--midnight);
+    }
+
+    .chat-message.user {
+      background: var(--scout);
+      border-radius: 12px;
+      padding: 14px;
+      color: var(--midnight);
+      margin-left: 24px;
+    }
+
+    .chat-input-area {
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.1);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .chat-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--midnight);
+      font-size: 14px;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+    }
+
+    .chat-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* ============================================
+       MAIN CONTENT
+       ============================================ */
+    .main-content {
+      flex: 1;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      position: relative;
+    }
+
+    /* ============================================
+       CARDS - WHITE BACKGROUND
+       ============================================ */
+    .card {
+      background: #ffffff;
+      border: 1px solid rgba(11, 30, 45, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 24px rgba(11, 30, 45, 0.08);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--midnight);
+    }
+
+    .btn-teal {
+      background: var(--scout);
+      color: var(--midnight);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-teal:hover {
+      background: var(--scout-dark);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--scout-dark);
+      border: 1px solid var(--scout);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+      background: var(--scout);
+      color: var(--midnight);
+    }
+
+    /* ============================================
+       FORM ELEMENTS
+       ============================================ */
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-select, .form-input {
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.12);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: var(--midnight);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s;
+      appearance: none;
+    }
+
+    .form-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234A5E6D'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      background-color: var(--bg-light);
+      padding-right: 40px;
+    }
+
+    .form-select:focus, .form-input:focus {
+      border-color: var(--scout);
+      background: #ffffff;
+    }
+
+    .form-select option {
+      background: #ffffff;
+      color: var(--midnight);
+    }
+
+    .form-textarea {
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.12);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: var(--midnight);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      resize: none;
+      min-height: 100px;
+      transition: all 0.2s;
+    }
+
+    .form-textarea:focus {
+      border-color: var(--scout);
+      background: #ffffff;
+    }
+
+    .form-textarea::placeholder,
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .section-divider {
+      height: 1px;
+      background: rgba(11, 30, 45, 0.08);
+      margin: 24px 0;
+    }
+
+    /* ============================================
+       PRODUCTS PANEL
+       ============================================ */
+    .products-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.12);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--midnight);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 24px;
+    }
+
+    .search-input:focus {
+      border-color: var(--scout);
+      background: #ffffff;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .product-card {
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+
+    .product-card:hover {
+      border-color: var(--scout);
+      background: #ffffff;
+    }
+
+    .product-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .product-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .product-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+    }
+
+    .product-logo.monday { background: linear-gradient(135deg, #FF6B6B, #FFE66D); }
+    .product-logo.asana { background: linear-gradient(135deg, #F06A6A, #FFB7B7); }
+    .product-logo.clickup { background: linear-gradient(135deg, #7B68EE, #9B8FFF); }
+
+    .product-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--midnight);
+    }
+
+    .match-score {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--scout-dark);
+    }
+
+    .add-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px dashed rgba(11, 30, 45, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      border-color: var(--scout);
+      color: var(--scout-dark);
+      border-style: solid;
+    }
+
+    /* ============================================
+       SCOUT ROBOT - INLINE POSITIONED
+       ============================================ */
+    .inline-scout-container {
+      position: absolute;
+      top: 80px;
+      right: 395px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      z-index: 50;
+    }
+
+    .scout-speech-bubble {
+      background: #ffffff;
+      color: var(--midnight);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border-bottom-right-radius: 4px;
+      font-size: 13px;
+      line-height: 1.4;
+      max-width: 160px;
+      box-shadow: 0 4px 16px rgba(11, 30, 45, 0.12);
+      border: 1px solid rgba(11, 30, 45, 0.08);
+    }
+
+    /* Mini Scout Robot */
+    .mini-robot-container {
+      transform: scale(0.15);
+      transform-origin: top left;
+      width: 320px;
+      height: 400px;
+      animation: mini-float 3s ease-in-out infinite;
+    }
+
+    @keyframes mini-float {
+      0%, 100% { transform: scale(0.15) translateY(0); }
+      50% { transform: scale(0.15) translateY(-10px); }
+    }
+
+    .mini-robot {
+      width: 320px;
+      height: 450px;
+      position: relative;
+    }
+
+    .mat-white {
+      background: var(--mat-white);
+      box-shadow:
+        inset 10px 10px 30px white,
+        inset -15px -15px 50px var(--mat-white-shadow),
+        0 25px 50px rgba(11, 30, 45, 0.1);
+    }
+
+    .mat-teal {
+      background: radial-gradient(circle at 35% 25%, var(--mat-teal), var(--mat-teal-shadow));
+      box-shadow:
+        inset 3px 3px 6px rgba(255,255,255,0.6),
+        inset 8px 8px 20px rgba(255,255,255,0.4),
+        0 15px 30px rgba(59, 169, 158, 0.25);
+    }
+
+    .mat-metal {
+      background: linear-gradient(115deg, var(--mat-metal-mid) 10%, var(--mat-metal-light) 30%, var(--mat-metal-mid) 60%, var(--mat-metal-dark) 90%);
+      box-shadow: inset 1px 1px 2px rgba(255,255,255,0.7);
+    }
+
+    .head {
+      position: absolute;
+      top: 35px; left: 50%;
+      transform: translateX(-50%);
+      width: 270px; height: 220px;
+      border-radius: 85px;
+      z-index: 10;
+    }
+
+    .face-screen {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -45%);
+      width: 220px; height: 170px;
+      background: var(--screen-bg);
+      border-radius: 60px;
+      box-shadow: inset 0 0 40px black;
+      overflow: hidden;
+    }
+
+    .eye {
+      position: absolute;
+      top: 48px;
+      width: 52px; height: 52px;
+      background: var(--glow-white);
+      border-radius: 50%;
+      box-shadow:
+        0 0 20px var(--glow-white),
+        0 0 50px var(--glow-teal),
+        0 0 80px var(--mat-teal);
+      animation: blink 5s infinite;
+    }
+    .eye.left { left: 48px; }
+    .eye.right { right: 48px; }
+
+    .smile {
+      position: absolute;
+      bottom: 42px; left: 50%;
+      transform: translateX(-50%);
+      width: 100px; height: 50px;
+      border-bottom: 10px solid var(--glow-white);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 10px var(--glow-teal));
+    }
+    .smile::before, .smile::after {
+      content: ''; position: absolute; bottom: -5px;
+      width: 10px; height: 10px; background: var(--glow-white); border-radius: 50%;
+    }
+    .smile::before { left: -3px; }
+    .smile::after { right: -3px; }
+
+    .ear {
+      position: absolute;
+      top: 100px;
+      width: 55px; height: 85px;
+      border-radius: 28px;
+      z-index: 1;
+    }
+    .ear.left { left: 0px; }
+    .ear.right { right: 0px; }
+
+    .antenna-base {
+      position: absolute;
+      top: 15px; left: 50%; transform: translateX(-50%);
+      width: 16px; height: 40px;
+      z-index: 1; border-radius: 10px;
+    }
+    .antenna-ball {
+      position: absolute;
+      top: 0px; left: 50%; transform: translateX(-50%);
+      width: 38px; height: 38px;
+      border-radius: 50%; z-index: 2;
+    }
+
+    .body {
+      position: absolute;
+      top: 250px; left: 50%; transform: translateX(-50%);
+      width: 190px; height: 170px;
+      border-radius: 65px 65px 85px 85px;
+      z-index: 5;
+    }
+
+    .arm-group {
+      position: absolute;
+      top: 285px;
+      z-index: 4;
+      transform-origin: top center;
+    }
+    .arm-group.left { left: 35px; transform: rotate(20deg); }
+    .arm-group.right { right: 35px; transform: scaleX(-1) rotate(20deg); }
+
+    .shoulder {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      position: absolute; top: 0; left: -8px;
+      z-index: 2;
+    }
+
+    .segment {
+      width: 34px; height: 24px;
+      border-radius: 9px;
+      position: absolute;
+      left: -4px;
+    }
+    .segment.s1 { top: 28px; transform: rotate(-5deg); z-index: 3;}
+    .segment.s2 { top: 46px; transform: rotate(-15deg) translateX(3px); z-index: 4;}
+    .segment.s3 { top: 64px; transform: rotate(-25deg) translateX(8px); z-index: 5;}
+
+    .wrist-cuff {
+      width: 68px; height: 58px;
+      border-radius: 28px;
+      position: absolute;
+      top: 82px; left: 5px;
+      transform: rotate(-35deg);
+      z-index: 6;
+    }
+
+    .claw {
+      width: 52px; height: 52px;
+      border: 13px solid var(--mat-metal-mid);
+      border-radius: 50%;
+      border-top-color: transparent;
+      transform: rotate(-60deg);
+      position: absolute;
+      top: 130px; left: 20px;
+      z-index: 5;
+    }
+    .claw::before, .claw::after {
+      content: ''; position: absolute;
+      width: 13px; height: 13px;
+      background: var(--mat-metal-mid);
+      border-radius: 50%;
+    }
+    .claw::before { top: 3px; left: 3px; }
+    .claw::after { bottom: 3px; right: 3px; }
+
+    @keyframes blink {
+      0%, 48%, 52%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.1); }
+    }
+
+    /* ============================================
+       FLOATING SCOUT BUTTON
+       ============================================ */
+    .scout-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      background: var(--scout);
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(110, 220, 209, 0.4);
+      z-index: 200;
+      transition: all 0.2s;
+    }
+
+    .scout-fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(110, 220, 209, 0.5);
+    }
+
+    .scout-fab svg {
+      width: 24px;
+      height: 24px;
+      color: var(--midnight);
+    }
+
+    /* ============================================
+       VIEW TOGGLE (BOTTOM CENTER) - WHITE
+       ============================================ */
+    .view-toggle {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      border: 1px solid rgba(11, 30, 45, 0.1);
+      border-radius: 12px;
+      padding: 4px;
+      display: flex;
+      gap: 4px;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(11, 30, 45, 0.1);
+    }
+
+    .view-toggle-btn {
+      padding: 10px 24px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .view-toggle-btn:hover {
+      background: var(--bg-light);
+    }
+
+    .view-toggle-btn.active {
+      background: var(--scout);
+      color: var(--midnight);
+    }
+
+    /* ============================================
+       DECISION HUB VIEW
+       ============================================ */
+    .decision-hub-view {
+      display: none;
+    }
+
+    .decision-hub-view.active {
+      display: block;
+    }
+
+    .matrix-card {
+      grid-column: span 2;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .matrix-table th,
+    .matrix-table td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(11, 30, 45, 0.08);
+    }
+
+    .matrix-table th {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .matrix-table th:first-child {
+      font-weight: 600;
+      color: var(--midnight);
+    }
+
+    .matrix-table td {
+      color: var(--midnight);
+    }
+
+    .matrix-tool-header {
+      text-align: center;
+    }
+
+    .matrix-tool-name {
+      font-weight: 600;
+      color: var(--midnight);
+      margin-bottom: 4px;
+    }
+
+    .matrix-tool-score {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .matrix-cell {
+      text-align: center;
+      font-size: 14px;
+      color: var(--midnight);
+    }
+
+    .matrix-cell.gold {
+      color: #B8860B;
+      background: rgba(212, 168, 75, 0.15);
+    }
+
+    .matrix-cell.red {
+      color: #C94A4A;
+      background: rgba(229, 115, 115, 0.12);
+    }
+
+    .matrix-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.12);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .matrix-btn:hover {
+      background: var(--scout);
+      color: var(--midnight);
+      border-color: var(--scout);
+    }
+
+    /* Scout Synthesis */
+    .synthesis-card {
+      background: rgba(110, 220, 209, 0.1);
+      border: 1px solid var(--scout);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+
+    .synthesis-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: var(--scout-dark);
+      margin-bottom: 12px;
+    }
+
+    .synthesis-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--midnight);
+    }
+
+    /* ============================================
+       SCOUT OVERLAY
+       ============================================ */
+    .scout-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(11, 30, 45, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scout-overlay.active {
+      display: flex;
+    }
+
+    .scout-overlay-content {
+      width: 90%;
+      max-width: 600px;
+      height: 80vh;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(11, 30, 45, 0.3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .scout-overlay-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(11, 30, 45, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .scout-overlay-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--midnight);
+    }
+
+    .scout-overlay-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-light);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+
+    .scout-overlay-close:hover {
+      background: var(--scout-dim);
+      color: var(--scout-dark);
+    }
+
+    .scout-overlay-messages {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .scout-overlay-input {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(11, 30, 45, 0.08);
+    }
+
+    .scout-overlay-input-area {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .scout-overlay-textarea {
+      flex: 1;
+      background: var(--bg-light);
+      border: 1px solid rgba(11, 30, 45, 0.12);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--midnight);
+      resize: none;
+      outline: none;
+      min-height: 48px;
+      max-height: 120px;
+    }
+
+    .scout-overlay-textarea:focus {
+      border-color: var(--scout);
+    }
+
+    .scout-overlay-send {
+      width: 48px;
+      height: 48px;
+      background: var(--scout);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--midnight);
+      transition: all 0.2s;
+    }
+
+    .scout-overlay-send:hover {
+      background: var(--scout-dark);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon"></div>
+      <span class="logo-text">OpenDecision</span>
+    </div>
+
+    <!-- Decision Space Selector -->
+    <div class="space-selector">
+      <div class="space-name" onclick="editSpaceName()">
+        <span class="space-name-text" id="spaceName">Project Management Tool</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </div>
+      <div class="space-actions">
+        <button class="space-btn" onclick="viewSpaces()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          My Spaces
+        </button>
+        <button class="space-btn new-space" onclick="newSpace()">+ New Space</button>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="nav-tab active" onclick="switchView('setup')">Setup</button>
+      <button class="nav-tab" onclick="switchView('decision-hub')">Decision Hub</button>
+    </nav>
+    <div class="header-actions">
+      <button class="header-btn secondary">Share Comparison</button>
+      <button class="header-btn primary">Export Report</button>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- Side Pane (Chat) -->
+    <aside class="side-pane expanded" id="sidepane">
+      <button class="side-pane-toggle" onclick="toggleSidePane()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+
+      <div class="scout-avatar-container">
+        <div class="scout-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="5"/>
+            <path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="side-pane-content">
+        <div class="chat-header">Chat with Scout</div>
+        <div class="chat-messages">
+          <div class="chat-message scout">
+            Hi! I'm Scout, your AI decision partner. How can I help you today?
+          </div>
+          <div class="chat-message user">
+            I need to find a project management tool for my team of 200 people.
+          </div>
+          <div class="chat-message scout">
+            Got it! Based on your team size, I'd recommend looking at enterprise-grade solutions. What's your primary methodology - Agile, Waterfall, or Hybrid?
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea class="chat-input" placeholder="Ask Scout anything..." rows="2"></textarea>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content - Setup View -->
+    <main class="main-content" id="setup-view">
+      <!-- Project Profile -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Project Profile</h2>
+          <button class="btn-teal">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+            Guided profile creation
+          </button>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">User Count</label>
+            <select class="form-select">
+              <option>51-100 users</option>
+              <option>101-500 users</option>
+              <option selected>500+ users</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Project Methodology</label>
+            <select class="form-select">
+              <option selected>Agile</option>
+              <option>Waterfall</option>
+              <option>Hybrid</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Categories</label>
+            <select class="form-select">
+              <option selected>Technology</option>
+              <option>Financial Services</option>
+              <option>Healthcare</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="form-label">What Products Are No Longer Needed?</label>
+          <input type="text" class="form-input" placeholder="Search and select tools to replace...">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="form-label">Improvement Objectives</label>
+          <textarea class="form-textarea" placeholder="Describe your key improvement objectives and goals..."></textarea>
+        </div>
+
+        <div class="form-row" style="grid-template-columns: 1fr 1fr;">
+          <div class="form-group">
+            <label class="form-label">Deadline</label>
+            <input type="text" class="form-input" placeholder="mm/dd/yyyy">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Budget</label>
+            <input type="text" class="form-input" placeholder="$">
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="card-header" style="margin-bottom: 0;">
+          <span style="font-size: 16px; font-weight: 600; color: var(--midnight);">Rate Your Criteria</span>
+          <button class="btn-outline">+ Add Criteria</button>
+        </div>
+      </div>
+
+      <!-- Products Panel -->
+      <div class="card">
+        <div class="products-header">
+          <h2 class="card-title">Products</h2>
+          <button class="btn-outline">Ask about products</button>
+        </div>
+
+        <input type="text" class="search-input" placeholder="Search products...">
+
+        <div class="section-label">Added (0)</div>
+
+        <div class="section-label" style="margin-top: 24px;">Recommended Products</div>
+
+        <div class="product-card">
+          <div class="product-top">
+            <div class="product-info">
+              <div class="product-logo monday"></div>
+              <span class="product-name">Monday.com</span>
+            </div>
+            <span class="match-score">92% Match</span>
+          </div>
+          <button class="add-btn">+ Add to DecisionHub</button>
+        </div>
+
+        <div class="product-card">
+          <div class="product-top">
+            <div class="product-info">
+              <div class="product-logo asana"></div>
+              <span class="product-name">Asana</span>
+            </div>
+            <span class="match-score">87% Match</span>
+          </div>
+          <button class="add-btn">+ Add to DecisionHub</button>
+        </div>
+
+        <div class="product-card">
+          <div class="product-top">
+            <div class="product-info">
+              <div class="product-logo clickup"></div>
+              <span class="product-name">ClickUp</span>
+            </div>
+            <span class="match-score">85% Match</span>
+          </div>
+          <button class="add-btn">+ Add to DecisionHub</button>
+        </div>
+      </div>
+
+      <!-- Inline Scout Robot -->
+      <div class="inline-scout-container">
+        <div class="scout-speech-bubble">
+          Need help? I can autofill this for you.
+        </div>
+        <div class="mini-robot-container">
+          <div class="mini-robot">
+            <div class="antenna-base mat-teal"></div>
+            <div class="antenna-ball mat-teal"></div>
+            <div class="ear left mat-teal"></div>
+            <div class="ear right mat-teal"></div>
+            <div class="head mat-white">
+              <div class="face-screen">
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="smile"></div>
+              </div>
+            </div>
+            <div class="body mat-white"></div>
+            <div class="arm-group left">
+              <div class="shoulder mat-metal"></div>
+              <div class="segment s1 mat-metal"></div>
+              <div class="segment s2 mat-metal"></div>
+              <div class="segment s3 mat-metal"></div>
+              <div class="wrist-cuff mat-teal"></div>
+              <div class="claw"></div>
+            </div>
+            <div class="arm-group right">
+              <div class="shoulder mat-metal"></div>
+              <div class="segment s1 mat-metal"></div>
+              <div class="segment s2 mat-metal"></div>
+              <div class="segment s3 mat-metal"></div>
+              <div class="wrist-cuff mat-teal"></div>
+              <div class="claw"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Decision Hub View -->
+    <main class="main-content decision-hub-view" id="decision-hub-view">
+      <div class="card matrix-card">
+        <div class="card-header">
+          <h2 class="card-title">Tool Comparison Matrix</h2>
+          <div style="display: flex; gap: 12px;">
+            <button class="header-btn secondary">Share Comparison</button>
+            <button class="header-btn primary">Export Report</button>
+          </div>
+        </div>
+
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Criteria</th>
+              <th class="matrix-tool-header">
+                <div class="matrix-tool-name">Monday.com</div>
+                <div class="matrix-tool-score">(92% Match)</div>
+              </th>
+              <th class="matrix-tool-header">
+                <div class="matrix-tool-name">Asana</div>
+                <div class="matrix-tool-score">(87% Match)</div>
+              </th>
+              <th class="matrix-tool-header">
+                <div class="matrix-tool-name">ClickUp</div>
+                <div class="matrix-tool-score">(85% Match)</div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Overall Match</td>
+              <td class="matrix-cell gold">92%</td>
+              <td class="matrix-cell">87%</td>
+              <td class="matrix-cell">85%</td>
+            </tr>
+            <tr>
+              <td>Scalability (200+ users)</td>
+              <td class="matrix-cell gold">Excellent</td>
+              <td class="matrix-cell gold">Very Good</td>
+              <td class="matrix-cell">Good</td>
+            </tr>
+            <tr>
+              <td>Cost Efficiency</td>
+              <td class="matrix-cell red">$18/user/mo</td>
+              <td class="matrix-cell">$13/user/mo</td>
+              <td class="matrix-cell gold">$9/user/mo</td>
+            </tr>
+            <tr>
+              <td>Integrations</td>
+              <td class="matrix-cell gold">Native + API</td>
+              <td class="matrix-cell gold">Extensive</td>
+              <td class="matrix-cell red">Growing</td>
+            </tr>
+            <tr>
+              <td>Mobile App</td>
+              <td class="matrix-cell">Very Good</td>
+              <td class="matrix-cell gold">Excellent</td>
+              <td class="matrix-cell">Good</td>
+            </tr>
+            <tr>
+              <td>Customer Support</td>
+              <td class="matrix-cell gold">24/7 Chat/Phone</td>
+              <td class="matrix-cell">Priority Support</td>
+              <td class="matrix-cell red">Email/Chat</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td><button class="matrix-btn">View Details</button></td>
+              <td><button class="matrix-btn">View Details</button></td>
+              <td><button class="matrix-btn">View Details</button></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="synthesis-card">
+          <div class="synthesis-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            Scout's Synthesis
+          </div>
+          <div class="synthesis-text">
+            Monday.com leads on scalability, but <strong>Asana offers the best balance</strong> of cost and features for your current team size.
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Floating Scout Button -->
+  <button class="scout-fab" onclick="openScoutOverlay()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  </button>
+
+  <!-- View Toggle -->
+  <div class="view-toggle">
+    <button class="view-toggle-btn active" onclick="switchView('setup')">Setup</button>
+    <button class="view-toggle-btn" onclick="switchView('decision-hub')">Decision Hub</button>
+  </div>
+
+  <!-- Scout Overlay -->
+  <div class="scout-overlay" id="scoutOverlay">
+    <div class="scout-overlay-content">
+      <div class="scout-overlay-header">
+        <div class="scout-overlay-title">
+          <div class="scout-avatar" style="width: 36px; height: 36px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+              <circle cx="12" cy="8" r="5"/>
+              <path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2"/>
+            </svg>
+          </div>
+          Chat with Scout
+        </div>
+        <button class="scout-overlay-close" onclick="closeScoutOverlay()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="scout-overlay-messages">
+        <div class="chat-message scout">
+          Hi! I'm Scout, your AI decision partner. I can help you with:
+          <ul style="margin-top: 8px; margin-left: 20px;">
+            <li>Finding the right tools for your needs</li>
+            <li>Comparing product features</li>
+            <li>Analyzing trade-offs</li>
+            <li>Building your project profile</li>
+          </ul>
+          <br>
+          What would you like help with?
+        </div>
+      </div>
+      <div class="scout-overlay-input">
+        <div class="scout-overlay-input-area">
+          <textarea class="scout-overlay-textarea" placeholder="Ask Scout anything..." rows="1"></textarea>
+          <button class="scout-overlay-send">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidePane() {
+      document.getElementById('sidepane').classList.toggle('expanded');
+    }
+
+    function switchView(view) {
+      const setupView = document.getElementById('setup-view');
+      const hubView = document.getElementById('decision-hub-view');
+      const navTabs = document.querySelectorAll('.nav-tab');
+      const toggleBtns = document.querySelectorAll('.view-toggle-btn');
+      const inlineScout = document.querySelector('.inline-scout-container');
+
+      if (view === 'setup') {
+        setupView.style.display = 'grid';
+        hubView.classList.remove('active');
+        navTabs[0].classList.add('active');
+        navTabs[1].classList.remove('active');
+        toggleBtns[0].classList.add('active');
+        toggleBtns[1].classList.remove('active');
+        if (inlineScout) inlineScout.style.display = 'flex';
+      } else {
+        setupView.style.display = 'none';
+        hubView.classList.add('active');
+        navTabs[0].classList.remove('active');
+        navTabs[1].classList.add('active');
+        toggleBtns[0].classList.remove('active');
+        toggleBtns[1].classList.add('active');
+        if (inlineScout) inlineScout.style.display = 'none';
+      }
+    }
+
+    function openScoutOverlay() {
+      document.getElementById('scoutOverlay').classList.add('active');
+    }
+
+    function closeScoutOverlay() {
+      document.getElementById('scoutOverlay').classList.remove('active');
+    }
+
+    function editSpaceName() {
+      const currentName = document.getElementById('spaceName').textContent;
+      const newName = prompt('Enter a new name for this Decision Space:', currentName);
+      if (newName && newName.trim()) {
+        document.getElementById('spaceName').textContent = newName.trim();
+      }
+    }
+
+    function viewSpaces() {
+      alert('Opening My Spaces panel...\n\nYour Decision Spaces:\n• Project Management Tool (current)\n• CRM Selection Q1 2024\n• Analytics Platform');
+    }
+
+    function newSpace() {
+      const spaceName = prompt('Enter a name for your new Decision Space:');
+      if (spaceName && spaceName.trim()) {
+        alert(`Creating new Decision Space: "${spaceName.trim()}"\n\nThis would navigate to a fresh space.`);
+      }
+    }
+
+    // Close overlay on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeScoutOverlay();
+      }
+    });
+
+    // Close overlay when clicking outside
+    document.getElementById('scoutOverlay').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeScoutOverlay();
+      }
+    });
+  </script>
+</body>
+</html>

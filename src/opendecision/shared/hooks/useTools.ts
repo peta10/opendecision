@@ -32,6 +32,17 @@ interface DbTool {
   submitted_at?: string;
   approved_at?: string;
   submission_status?: string;
+  // Analytics fields from tools_complete view
+  unique_try_free_clicks?: number;
+  unique_compare_clicks?: number;
+  unique_view_details_clicks?: number;
+  unique_impressions?: number;
+  total_actions?: number;
+  last_action_at?: string;
+  // Intel summary
+  intel_chunk_count?: number;
+  avg_intel_quality?: number;
+  total_intel_retrievals?: number;
 }
 
 interface UseToolsOptions {
@@ -119,6 +130,17 @@ function transformDatabaseTool(dbTool: DbTool): Tool {
     submitted_at: dbTool.submitted_at,
     approved_at: dbTool.approved_at,
     submission_status: dbTool.submission_status || 'approved',
+    // Analytics fields
+    unique_try_free_clicks: dbTool.unique_try_free_clicks ?? 0,
+    unique_compare_clicks: dbTool.unique_compare_clicks ?? 0,
+    unique_view_details_clicks: dbTool.unique_view_details_clicks ?? 0,
+    unique_impressions: dbTool.unique_impressions ?? 0,
+    total_actions: dbTool.total_actions ?? 0,
+    last_action_at: dbTool.last_action_at,
+    // Intel summary
+    intel_chunk_count: dbTool.intel_chunk_count ?? 0,
+    avg_intel_quality: dbTool.avg_intel_quality ?? 0,
+    total_intel_retrievals: dbTool.total_intel_retrievals ?? 0,
   };
 }
 
@@ -169,14 +191,16 @@ export function useTools(options: UseToolsOptions = {}): UseToolsReturn {
         return;
       }
 
-      // Build query
-      let query = supabase.from('tools_view').select('*');
+      // Build query - use tools_complete for full data with analytics
+      let query = supabase.from('tools_complete').select('*');
 
       if (type) {
         query = query.eq('type', type);
       }
 
-      if (submissionStatus) {
+      // Note: tools_complete already filters by submission_status='approved'
+      // Only apply filter if a different status is explicitly requested
+      if (submissionStatus && submissionStatus !== 'approved') {
         query = query.eq('submission_status', submissionStatus);
       }
 
@@ -280,13 +304,16 @@ export async function fetchToolsFromDatabase(options: UseToolsOptions = {}): Pro
   }
 
   try {
-    let query = supabase.from('tools_view').select('*');
+    // Use tools_complete for full data with analytics
+    let query = supabase.from('tools_complete').select('*');
 
     if (type) {
       query = query.eq('type', type);
     }
 
-    if (submissionStatus) {
+    // Note: tools_complete already filters by submission_status='approved'
+    // Only apply filter if a different status is requested
+    if (submissionStatus && submissionStatus !== 'approved') {
       query = query.eq('submission_status', submissionStatus);
     }
 

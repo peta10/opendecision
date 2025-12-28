@@ -79,7 +79,10 @@ export function useDecisionSpaceProducts(
     productId: string,
     source: ProductSource = 'added'
   ) => {
-    if (!decisionSpaceId) return;
+    if (!decisionSpaceId) {
+      console.warn('[useDecisionSpaceProducts] No space ID - cannot add product');
+      throw new Error('No decision space selected. Please create or select a space first.');
+    }
 
     // Create optimistic product
     const tempProduct: DecisionSpaceProduct = {
@@ -119,7 +122,10 @@ export function useDecisionSpaceProducts(
 
   // Remove product with optimistic update
   const removeProduct = useCallback(async (productId: string) => {
-    if (!decisionSpaceId) return;
+    if (!decisionSpaceId) {
+      console.warn('[useDecisionSpaceProducts] No space ID - cannot remove product');
+      throw new Error('No decision space selected. Please create or select a space first.');
+    }
 
     // Store for rollback
     const productToRemove = products.find(p => p.product_id === productId);

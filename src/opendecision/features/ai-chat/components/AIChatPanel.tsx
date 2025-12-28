@@ -18,6 +18,7 @@ import { SparkleButton } from './SparkleButton';
 import { AIChatMessages } from './AIChatMessages';
 import { ChatHistoryDropdown } from './ChatHistoryDropdown';
 import { useAIChat, useInitialPrompts } from '@/opendecision/shared/hooks/useAIChat';
+import { useSharedAIChat } from '@/opendecision/shared/contexts/AIChatContext';
 import { submitMessageFeedback, getOrCreateSessionId } from '@/opendecision/shared/services/aiChatService';
 import { AIChatContext, Tool, Criterion } from '@/opendecision/shared/types';
 import { cn } from '@/opendecision/shared/lib/utils';
@@ -381,6 +382,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   // Get responsive widths from CSS custom properties
   const { collapsedWidth, expandedWidth } = useResponsiveLayoutVars();
 
+  // Use shared AI chat context (mirrors ScoutOverlay)
   const {
     messages,
     isLoading,
@@ -396,12 +398,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     sessionId,
     loadChatFromHistory,
     deleteChatFromHistory,
-  } = useAIChat({
-    initialContext: context,
-    decisionSpaceId: decisionSpaceId ?? undefined,
-    onError: (err) => console.error('AI Chat error:', err),
-    onCriteriaUpdate: onCriteriaUpdate,
-  });
+  } = useSharedAIChat();
 
   // Voice recording for dictation
   const {
@@ -515,7 +512,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             )}
             title="Open Scout AI"
           >
-            <ScoutMascot size="small" />
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #6EDCD1 0%, #4BBEB3 100%)',
+              }}
+            >
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
           </div>
 
           {/* Expand button with arrow - centered in rail */}
@@ -558,8 +564,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(248,250,250,0.8) 100%)',
             }}
           >
-            {/* Scout Logo - Simple teal icon */}
-            <div className="py-3 flex items-center justify-center border-b border-white/30 w-full">
+            {/* Scout Logo - h-14 to match main header */}
+            <div className="h-14 flex items-center justify-center border-b border-white/30 w-full">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
                 style={{

@@ -137,7 +137,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         boxShadow: '0 1px 3px rgba(11, 30, 45, 0.04)',
       }}
     >
-      <div className="h-11 px-5 font-sans flex items-center justify-between">
+      <div className="h-14 px-5 font-sans flex items-center justify-between">
         {/* Left Section - Logo and Space Selector */}
         <div className="flex items-center gap-6">
           {/* Logo */}
@@ -309,7 +309,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 : 'text-neutral-600 hover:text-neutral-900'
             )}
           >
-            Setup
+            Decision Framing
           </button>
           <button
             onClick={() => onStepChange('decision-hub')}

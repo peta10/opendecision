@@ -60,6 +60,17 @@ export interface Tool {
   approved_at?: string;
   submission_status: string;
   removed?: boolean;
+  // Analytics fields (from tools_complete view)
+  unique_try_free_clicks?: number;
+  unique_compare_clicks?: number;
+  unique_view_details_clicks?: number;
+  unique_impressions?: number;
+  total_actions?: number;
+  last_action_at?: string;
+  // Intel summary fields
+  intel_chunk_count?: number;
+  avg_intel_quality?: number;
+  total_intel_retrievals?: number;
 }
 
 export interface ComparisonState {
@@ -412,6 +423,14 @@ export interface DecisionProfile {
 }
 
 /**
+ * Decision state machine states
+ * - framing: Setting up criteria and weights
+ * - evaluating: Comparing candidates
+ * - decided: Final decision made
+ */
+export type DecisionState = 'framing' | 'evaluating' | 'decided';
+
+/**
  * Decision Space - the core entity for Phase 2.
  * Each space represents one decision being made.
  */
@@ -422,6 +441,8 @@ export interface DecisionSpace {
   name: string;
   /** Lifecycle status */
   status: DecisionSpaceStatus;
+  /** Decision state machine state */
+  decision_state: DecisionState;
   /** Owner's auth.users ID (works for anonymous + permanent) */
   owner_id: string;
   /** Decision profile containing criteria, context, etc. */
@@ -449,6 +470,7 @@ export interface CreateDecisionSpaceInput {
 export interface UpdateDecisionSpaceInput {
   name?: string;
   status?: DecisionSpaceStatus;
+  decision_state?: DecisionState;
   decision_profile?: Partial<DecisionProfile>;
   selected_tools?: string[];
 }

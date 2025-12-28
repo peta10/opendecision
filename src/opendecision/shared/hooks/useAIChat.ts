@@ -14,7 +14,14 @@ import {
   AIChatMessage,
   Tool,
   Criterion,
+  DecisionState,
 } from '../types';
+import {
+  DecisionAwareContext,
+  SCOUT_BEHAVIORS,
+} from '@/opendecision/features/decision-hub/types/decisionState';
+import { sortToolsByScore, calculateScoreGap } from '@/opendecision/features/decision-hub/utils/scoreCalculation';
+import { detectTradeoffs } from '@/opendecision/features/decision-hub/utils/tradeoffDetection';
 import {
   getOrCreateSessionId,
   clearSession,
@@ -45,6 +52,12 @@ export interface UseAIChatOptions {
   initialContext?: AIChatContext;
   /** Decision Space ID for scoping chat (Phase 2) */
   decisionSpaceId?: string;
+  /** Current decision state (for state-aware Scout behavior) */
+  decisionState?: DecisionState;
+  /** Candidates being compared (for state-aware context) */
+  candidates?: Tool[];
+  /** User's criteria with weights (for state-aware context) */
+  criteria?: Criterion[];
   /** Callback when a new message is received */
   onMessageReceived?: (message: AIChatMessage) => void;
   /** Callback when an error occurs */
@@ -107,6 +120,12 @@ export interface UseAIChatReturn {
   lastAssistantMessage: AIChatMessage | null;
   /** Tools mentioned in the last response */
   lastMentionedTools: string[];
+
+  // Decision State Awareness
+  /** Current Scout behavior based on decision state */
+  scoutBehavior: typeof SCOUT_BEHAVIORS[DecisionState];
+  /** Decision-aware context being sent to AI */
+  decisionAwareContext: DecisionAwareContext | null;
 }
 
 // =============================================================================
@@ -117,6 +136,9 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
   const {
     initialContext,
     decisionSpaceId,
+    decisionState = 'framing',
+    candidates = [],
+    criteria = [],
     onMessageReceived,
     onError,
     onCriteriaUpdate,
@@ -227,6 +249,50 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
     return lastAssistantMessage?.tools_mentioned || [];
   }, [lastAssistantMessage]);
 
+  // Scout behavior based on decision state
+  const scoutBehavior = useMemo(() => {
+    return SCOUT_BEHAVIORS[decisionState];
+  }, [decisionState]);
+
+  // Build decision-aware context for AI
+  const decisionAwareContext = useMemo((): DecisionAwareContext | null => {
+    if (!context) return null;
+
+    // Calculate top candidate and score gap
+    let topCandidate: string | null = null;
+    let scoreGap = 0;
+    let closeTradeoffs: string[] = [];
+
+    if (candidates.length > 0 && criteria.length > 0) {
+      const sortedCandidates = sortToolsByScore(candidates, criteria);
+      if (sortedCandidates.length > 0) {
+        topCandidate = sortedCandidates[0].tool.name;
+      }
+      scoreGap = calculateScoreGap(candidates, criteria);
+
+      // Find close tradeoffs (criteria where rankings flip)
+      const tradeoffs = detectTradeoffs(candidates, criteria);
+      closeTradeoffs = tradeoffs
+        .filter(t => t.significance === 'notable' || t.significance === 'major')
+        .map(t => t.criterion);
+    }
+
+    // Calculate criteria rating stats
+    const criteriaRatedCount = criteria.filter(c => c.userRating !== 3).length;
+    const totalCriteria = criteria.length;
+
+    return {
+      ...context,
+      decision_state: decisionState,
+      candidates_count: candidates.length,
+      top_candidate: topCandidate,
+      score_gap: scoreGap,
+      close_tradeoffs: closeTradeoffs,
+      criteria_rated_count: criteriaRatedCount,
+      total_criteria: totalCriteria,
+    };
+  }, [context, decisionState, candidates, criteria]);
+
   // Send message
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) return;
@@ -244,7 +310,9 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
     setMessages((prev) => [...prev, loadingMessage]);
 
     try {
-      const response = await sendChatMessage(sessionId, content, context, decisionSpaceId);
+      // Send with decision-aware context if available, otherwise use base context
+      const contextToSend = decisionAwareContext || context;
+      const response = await sendChatMessage(sessionId, content, contextToSend, decisionSpaceId);
       const assistantMessage = createAssistantMessage(response);
 
       // Replace loading message with actual response
@@ -278,7 +346,7 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId, context, decisionSpaceId, isLoading]);
+  }, [sessionId, context, decisionAwareContext, decisionSpaceId, isLoading]);
 
   // Explain tool score
   const explainToolScore = useCallback(async (tool: Tool, criteria: Criterion[]) => {
@@ -373,6 +441,10 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
     suggestedPrompts,
     lastAssistantMessage,
     lastMentionedTools,
+
+    // Decision State Awareness
+    scoutBehavior,
+    decisionAwareContext,
   };
 };
 

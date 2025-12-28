@@ -11,6 +11,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import {
   DecisionSpace,
+  DecisionState,
   UserAuthState,
   CreateDecisionSpaceInput,
   UpdateDecisionSpaceInput,
@@ -47,6 +48,9 @@ interface SpaceContextType {
   deleteSpace: (id: string) => Promise<void>;
   switchSpace: (id: string) => Promise<void>;
   refreshSpaces: () => Promise<void>;
+
+  // Decision state machine
+  setDecisionState: (state: DecisionState) => Promise<void>;
 
   // Auth actions
   convertToPermament: (email: string) => Promise<void>;
@@ -348,6 +352,29 @@ export function SpaceProvider({ children, initialSpaceId }: SpaceProviderProps) 
   }, []);
 
   // ==========================================================================
+  // DECISION STATE MACHINE
+  // ==========================================================================
+
+  const setDecisionState = useCallback(async (state: DecisionState): Promise<void> => {
+    if (!currentSpace) {
+      console.warn('[SpaceContext] Cannot set decision state - no current space');
+      return;
+    }
+
+    try {
+      const updated = await updateDecisionSpace(currentSpace.id, { decision_state: state });
+      setCurrentSpace(updated);
+      // Update in local list
+      setSpaces(prev => prev.map(s => s.id === updated.id ? updated : s));
+      console.log('[SpaceContext] Decision state updated to:', state);
+    } catch (error) {
+      console.warn('[SpaceContext] Failed to update decision state:', error);
+      // Update locally anyway for responsiveness
+      setCurrentSpace(prev => prev ? { ...prev, decision_state: state } : prev);
+    }
+  }, [currentSpace]);
+
+  // ==========================================================================
   // RENDER
   // ==========================================================================
 
@@ -363,6 +390,7 @@ export function SpaceProvider({ children, initialSpaceId }: SpaceProviderProps) 
     deleteSpace: deleteSpaceAction,
     switchSpace,
     refreshSpaces,
+    setDecisionState,
     convertToPermament,
     signOut,
   };
@@ -402,6 +430,6 @@ export function useAuthState(): UserAuthState {
  * Hook for current space with loading state
  */
 export function useCurrentSpace() {
-  const { currentSpace, isLoadingSpace, spaceError, updateSpace } = useSpace();
-  return { space: currentSpace, isLoading: isLoadingSpace, error: spaceError, updateSpace };
+  const { currentSpace, isLoadingSpace, spaceError, updateSpace, setDecisionState } = useSpace();
+  return { space: currentSpace, isLoading: isLoadingSpace, error: spaceError, updateSpace, setDecisionState };
 }

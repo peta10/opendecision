@@ -43,6 +43,10 @@ import { SaveButton } from '@/opendecision/shared/components/auth';
 import { AppHeader } from '@/opendecision/shared/components/layout/AppHeader';
 import { ScoutFAB } from '@/opendecision/shared/components/scout/ScoutFAB';
 import { SetupView } from '@/opendecision/features/setup/components';
+import { AIChatProvider } from '@/opendecision/shared/contexts/AIChatContext';
+import { useCurrentSpace } from '@/opendecision/shared/contexts/SpaceContext';
+import { DecisionHubLayout } from '@/opendecision/features/decision-hub/components/DecisionHubLayout';
+import { StateTransition } from '@/opendecision/features/decision-hub/types/decisionState';
 
 // Dynamic imports for heavy components (reduces initial bundle)
 const AIChatPanel = dynamic(
@@ -70,10 +74,7 @@ const GuidedSubmitAnimation = dynamic(
   { ssr: false }
 );
 
-const DecisionHub = dynamic(
-  () => import('@/opendecision/features/decision-hub/components/DecisionHub').then(mod => ({ default: mod.DecisionHub })),
-  { ssr: false, loading: () => <div className="w-full h-full bg-white/50 animate-pulse" /> }
-);
+// DecisionHub is now imported as DecisionHubLayout above (state machine integrated)
 
 interface EmbeddedPPMToolFlowProps {
   showGuidedRanking?: boolean;
@@ -109,6 +110,9 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
 }) => {
   // Unified device detection - correctly identifies true mobile devices vs touchscreen laptops
   const { isMobile, isTouchDevice, hasTouch } = useUnifiedMobileDetection();
+
+  // Decision Space state machine integration
+  const { space, setDecisionState } = useCurrentSpace();
   
   // Track hydration to prevent SSR/client mismatches
   const [isHydrated, setIsHydrated] = useState(false);
@@ -1164,7 +1168,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     setComparedTools(prev => {
       const newSet = new Set(prev);
       const isCurrentlySelected = newSet.has(tool.id);
-      
+
       if (isCurrentlySelected) {
         // Tool is being REMOVED - no glow
         newSet.delete(tool.id);
@@ -1179,6 +1183,23 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
       return newSet;
     });
   };
+
+  // Decision state machine transition handler - syncs to SpaceContext
+  const handleDecisionStateChange = useCallback((transition: StateTransition) => {
+    console.log('📊 Decision state transition:', transition.from, '→', transition.to);
+    setDecisionState(transition.to);
+  }, [setDecisionState]);
+
+  // Handler for criteria weight changes from Decision Hub
+  const handleWeightChange = useCallback((criterionId: string, newWeight: number) => {
+    setCriteria(prev => {
+      const updated = prev.map(c =>
+        c.id === criterionId ? { ...c, userRating: newWeight } : c
+      );
+      syncCriteria(updated);
+      return updated;
+    });
+  }, [syncCriteria]);
 
   // Show loading state
   // if (isLoading) {
@@ -1281,6 +1302,13 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
             tools={filteredTools}
             addedTools={decisionHubTools}
             onAddTool={(tool) => addProductToSpace(tool.id)}
+            onRemoveTool={async (toolId) => {
+              try {
+                await removeProductFromSpace(toolId);
+              } catch (err) {
+                console.error('Failed to remove product:', err);
+              }
+            }}
             onGuidedProfile={() => onOpenGuidedRanking && onOpenGuidedRanking()}
             onAskAboutProducts={() => setIsScoutOverlayOpen(true)}
           />
@@ -1309,25 +1337,28 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
         );
       case 'decision-hub':
         return (
-          <DecisionHub
-            tools={decisionHubTools}
-            criteria={criteria}
-            onAddProduct={() => {
-              // Switch to Setup tab to add more products
-              setCurrentStep('criteria-tools');
-            }}
-            onRemoveProduct={async (toolId) => {
-              try {
-                await removeProductFromSpace(toolId);
-              } catch (err) {
-                console.error('Failed to remove product:', err);
-              }
-            }}
-            onViewTool={(toolId) => {
-              // Switch to Setup tab and could scroll to the tool
-              setCurrentStep('criteria-tools');
-            }}
-          />
+          <div className="h-[calc(100dvh-120px)] min-h-[500px]">
+            <DecisionHubLayout
+              candidates={decisionHubTools}
+              criteria={criteria}
+              onWeightChange={handleWeightChange}
+              onRemoveCandidate={async (toolId) => {
+                try {
+                  await removeProductFromSpace(toolId);
+                } catch (err) {
+                  console.error('Failed to remove product:', err);
+                }
+              }}
+              onAddCandidate={() => {
+                // Switch to Setup tab to add more products
+                setCurrentStep('criteria-tools');
+              }}
+              onStateChange={handleDecisionStateChange}
+              initialState={space?.decision_state || 'framing'}
+              spaceId={spaceId ?? undefined}
+              isScoutPanelVisible={isAIPanelExpanded}
+            />
+          </div>
         );
       default:
         return null;
@@ -1449,6 +1480,13 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
 
   return (
     <ErrorBoundary>
+      <AIChatProvider
+        initialContext={aiContext}
+        decisionSpaceId={spaceId ?? undefined}
+        decisionState={space?.decision_state || 'framing'}
+        candidates={decisionHubTools}
+        criteria={criteria}
+      >
       <MobileOptimizedLoader isHydrated={isHydrated}>
         {/* PPM Tool Embedded Application */}
         <div
@@ -1620,7 +1658,8 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
           decisionSpaceId={spaceId ?? undefined}
         />
 
-      </MobileOptimizedLoader>
+        </MobileOptimizedLoader>
+      </AIChatProvider>
     </ErrorBoundary>
   );
 }; 

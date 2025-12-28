@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState, useCallback, KeyboardEvent } from '
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Paperclip, Mic } from 'lucide-react';
 import { cn } from '@/opendecision/shared/lib/utils';
-import { useAIChat, useInitialPrompts } from '@/opendecision/shared/hooks/useAIChat';
+import { useInitialPrompts } from '@/opendecision/shared/hooks/useAIChat';
+import { useSharedAIChat } from '@/opendecision/shared/contexts/AIChatContext';
 import { AIChatMessages } from './AIChatMessages';
 import { AIChatContext, Tool, Criterion } from '@/opendecision/shared/types';
 import { ScoutHead } from '@/opendecision/shared/components/scout';
@@ -42,6 +43,7 @@ export const ScoutOverlay: React.FC<ScoutOverlayProps> = ({
   const lastTranscriptRef = useRef('');
   const initialPrompts = useInitialPrompts();
 
+  // Use shared AI chat context (mirrors AIChatPanel)
   const {
     messages,
     isLoading,
@@ -51,10 +53,7 @@ export const ScoutOverlay: React.FC<ScoutOverlayProps> = ({
     suggestedPrompts,
     hasStarted,
     clearError,
-  } = useAIChat({
-    initialContext: context,
-    decisionSpaceId,
-  });
+  } = useSharedAIChat();
 
   // Voice recording for dictation
   const {

@@ -125,6 +125,12 @@ export const ProductsPanel: React.FC<ProductsPanelProps> = ({
     );
   };
 
+  // Get IDs of already-added tools
+  const addedToolIds = new Set(addedTools.map(t => t.id));
+
+  // Check if a tool is already added
+  const isToolAdded = (toolId: string) => addedToolIds.has(toolId);
+
   const filteredDemoProducts = filterProducts(demoProducts);
   const filteredTools = filterProducts(tools as ToolWithBrand[]);
 
@@ -137,7 +143,10 @@ export const ProductsPanel: React.FC<ProductsPanelProps> = ({
     >
       {/* Header */}
       <div className="flex justify-between items-center mb-5">
-        <h2 className="text-xl font-semibold text-[#0B1E2D]">Products</h2>
+        <div>
+          <h2 className="text-xl font-semibold text-[#0B1E2D]">Preliminary Matches</h2>
+          <p className="text-sm text-[#7A8D9C]">Based on your inputs so far.</p>
+        </div>
         <button
           onClick={onAskAboutProducts}
           className="btn-press px-4 py-2 bg-transparent text-[#4BBEB3] border border-[#6EDCD1] rounded-xl text-sm font-medium hover:bg-[#6EDCD1] hover:text-[#0B1E2D] transition-all hover:shadow-md"
@@ -244,11 +253,13 @@ export const ProductsPanel: React.FC<ProductsPanelProps> = ({
                 </div>
                 <button className="btn-press w-full flex items-center justify-center gap-2 bg-transparent border border-dashed border-[rgba(11,30,45,0.15)] rounded-lg py-2.5 text-sm text-[#7A8D9C] hover:border-[#6EDCD1] hover:border-solid hover:text-[#4BBEB3] hover:bg-[#6EDCD1]/5 transition-all group">
                   <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  Add to DecisionHub
+                  + Compare in Decision Hub
                 </button>
               </div>
             ))
-          : filteredTools.map((tool, index) => (
+          : filteredTools.map((tool, index) => {
+              const alreadyAdded = isToolAdded(tool.id);
+              return (
               <div
                 key={tool.id}
                 className="glass-product-card p-4 animate-slide-up"
@@ -270,10 +281,15 @@ export const ProductsPanel: React.FC<ProductsPanelProps> = ({
                   </div>
                   <MatchScoreRing score={calculateMatchScore(tool)} size="sm" />
                 </div>
-                {pinningItems.has(tool.id) ? (
+                {alreadyAdded ? (
+                  <div className="w-full flex items-center justify-center gap-2 bg-[#6EDCD1]/10 border border-[#6EDCD1]/30 rounded-lg py-2.5 text-sm text-[#4BBEB3] font-medium">
+                    <Check className="w-4 h-4" />
+                    In Decision Hub
+                  </div>
+                ) : pinningItems.has(tool.id) ? (
                   <div className="w-full flex items-center justify-center gap-2 bg-[#6EDCD1] border border-[#6EDCD1] rounded-lg py-2.5 text-sm text-[#0B1E2D] font-medium animate-pin-success">
                     <Check className="w-4 h-4 animate-pin-check" />
-                    Pinned!
+                    Added!
                   </div>
                 ) : (
                   <button
@@ -281,11 +297,12 @@ export const ProductsPanel: React.FC<ProductsPanelProps> = ({
                     className="btn-press w-full flex items-center justify-center gap-2 bg-transparent border border-dashed border-[rgba(11,30,45,0.15)] rounded-lg py-2.5 text-sm text-[#7A8D9C] hover:border-[#6EDCD1] hover:border-solid hover:text-[#4BBEB3] hover:bg-[#6EDCD1]/5 transition-all group"
                   >
                     <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    Add to DecisionHub
+                    + Compare in Decision Hub
                   </button>
                 )}
               </div>
-            ))}
+            );
+            })}
       </div>
     </div>
   );

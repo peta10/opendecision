@@ -73,7 +73,7 @@ const GooeyLoader = React.forwardRef<HTMLDivElement, GooeyLoaderProps>(
               background-color: var(--gooey-primary-color);
               left: -2em;
               bottom: -18em;
-              animation: gooey-loader-wee1 2s linear infinite;
+              animation: gooey-loader-wee1 1s linear infinite;
             }
 
             .gooey-loader::after {
@@ -82,7 +82,7 @@ const GooeyLoader = React.forwardRef<HTMLDivElement, GooeyLoaderProps>(
               background-color: var(--gooey-secondary-color);
               left: -4em;
               bottom: -12em;
-              animation: gooey-loader-wee2 2s linear infinite 0.75s;
+              animation: gooey-loader-wee2 1s linear infinite 0.4s;
             }
 
             @keyframes gooey-loader-wee1 {

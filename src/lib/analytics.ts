@@ -131,8 +131,10 @@ export const analytics = {
       if (error) throw error;
       return userId;
     } catch (error) {
-      console.warn('Analytics tracking failed (initializeUser):', error);
-      // Never throw - tracking failures don't break the app
+      // Silent fail in production - tracking failures don't break the app
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (initializeUser):', error);
+      }
       return null;
     }
   },
@@ -180,7 +182,9 @@ export const analytics = {
       if (error) throw error;
       return responseId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackCriteriaRanking):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackCriteriaRanking):', error);
+      }
       return null;
     }
   },
@@ -235,7 +239,9 @@ export const analytics = {
       
       return lastResponseId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackGuidedRankingAnswer):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackGuidedRankingAnswer):', error);
+      }
       return null;
     }
   },
@@ -307,7 +313,9 @@ export const analytics = {
       
       return actionId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackToolClick):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackToolClick):', error);
+      }
       return null;
     }
   },
@@ -347,7 +355,9 @@ export const analytics = {
       if (error) throw error;
       return actionId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackFilterAction):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackFilterAction):', error);
+      }
       return null;
     }
   },
@@ -389,7 +399,9 @@ export const analytics = {
       if (error) throw error;
       return eventId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackGuidedFlowEvent):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackGuidedFlowEvent):', error);
+      }
       return null;
     }
   },
@@ -431,7 +443,9 @@ export const analytics = {
       if (error) throw error;
       return interactionId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackChartInteraction):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackChartInteraction):', error);
+      }
       return null;
     }
   },
@@ -467,7 +481,9 @@ export const analytics = {
       if (error) throw error;
       return eventId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackOverlayEvent):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackOverlayEvent):', error);
+      }
       return null;
     }
   },
@@ -507,7 +523,9 @@ export const analytics = {
       if (error) throw error;
       return recommendationId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackReportSent):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackReportSent):', error);
+      }
       return null;
     }
   },
@@ -530,7 +548,9 @@ export const analytics = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.warn('Failed to fetch user analytics data:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to fetch user analytics data:', error);
+      }
       return null;
     }
   },
@@ -544,7 +564,9 @@ export const analytics = {
       const data = await this.getSessionData(sessionId);
       return data?.question_responses || [];
     } catch (error) {
-      console.warn('Failed to fetch question responses:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to fetch question responses:', error);
+      }
       return [];
     }
   },
@@ -558,7 +580,9 @@ export const analytics = {
       const data = await this.getSessionData(sessionId);
       return data?.criteria_responses || [];
     } catch (error) {
-      console.warn('Failed to fetch criteria responses:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to fetch criteria responses:', error);
+      }
       return [];
     }
   },
@@ -572,7 +596,9 @@ export const analytics = {
       const data = await this.getSessionData(sessionId);
       return data?.tool_actions || [];
     } catch (error) {
-      console.warn('Failed to fetch tool actions:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to fetch tool actions:', error);
+      }
       return [];
     }
   },
@@ -600,7 +626,9 @@ export const analytics = {
       if (error) throw error;
       return userId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackDepartment):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackDepartment):', error);
+      }
       return null;
     }
   },
@@ -621,7 +649,9 @@ export const analytics = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.warn('Failed to fetch session status:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to fetch session status:', error);
+      }
       return null;
     }
   },
@@ -665,7 +695,9 @@ export const analytics = {
       if (error) throw error;
       return reportId;
     } catch (error) {
-      console.warn('Analytics tracking failed (trackEmailReportSend):', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Analytics tracking failed (trackEmailReportSend):', error);
+      }
       return null;
     }
   },

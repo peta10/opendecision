@@ -22,6 +22,7 @@ import { useAIChat, useInitialPrompts } from '@/opendecision/shared/hooks/useAIC
 import { submitMessageFeedback, getOrCreateSessionId } from '@/opendecision/shared/services/aiChatService';
 import { AIChatContext, Tool, Criterion } from '@/opendecision/shared/types';
 import { cn } from '@/opendecision/shared/lib/utils';
+import { ScoutHead } from '@/opendecision/shared/components/scout';
 import './ScoutSendButton.css';
 import './AttachmentMenu.css';
 import './ScoutBackButton.css';
@@ -34,7 +35,7 @@ import './ChatHistoryDropdown.css';
 // Fallback values (used during SSR and before CSS vars load)
 const DEFAULT_COLLAPSED_WIDTH = 64;
 const DEFAULT_EXPANDED_WIDTH = 380;
-const ANIMATION_DURATION = 0.15;
+const ANIMATION_DURATION = 0.08; // Fast, snappy animation
 
 // =============================================================================
 // HOOK: Responsive Layout Values (mirrors CSS clamp() logic)
@@ -113,34 +114,31 @@ export interface AIChatPanelProps {
   className?: string;
   /** Decision Space ID for scoping chat sessions */
   decisionSpaceId?: string | null;
+  /** True if any product has a high match score (>85%) - triggers Scout eye pulse */
+  hasHighMatchScore?: boolean;
+  /**
+   * Callback when AI response contains criteria weight updates.
+   * Enables real-time slider/ranking updates when user says things like
+   * "security is more important" in chat.
+   */
+  onCriteriaUpdate?: (updates: Record<string, number>) => void;
 }
 
 
 // =============================================================================
-// SCOUT AI MASCOT COMPONENT
+// SCOUT AI MASCOT COMPONENT (CSS-rendered, no image file)
 // =============================================================================
 
-const ScoutMascot: React.FC<{ size?: 'small' | 'large' }> = ({ size = 'large' }) => {
-  const sizeClasses = size === 'large' ? 'w-16 h-16' : 'w-10 h-10';
+const ScoutMascot: React.FC<{ size?: 'small' | 'large' | 'sidebar'; pulseEyes?: boolean }> = ({ size = 'large', pulseEyes = false }) => {
+  // Map to ScoutHead sizes: small = sm (20px), large = lg (40px), sidebar = xl (56px)
+  const sizeMap = {
+    small: 'sm' as const,
+    large: 'lg' as const,
+    sidebar: 'xl' as const,
+  };
 
   return (
-    <motion.div
-      className={cn(sizeClasses, 'relative')}
-      animate={{
-        y: [0, -4, 0],
-      }}
-      transition={{
-        duration: 3,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
-    >
-      <img
-        src="/scout.ai.png"
-        alt="Scout AI"
-        className="w-full h-full object-contain"
-      />
-    </motion.div>
+    <ScoutHead size={sizeMap[size]} pulseEyes={pulseEyes} />
   );
 };
 
@@ -371,6 +369,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   isAnimationBlocked = false,
   className,
   decisionSpaceId,
+  hasHighMatchScore = false,
+  onCriteriaUpdate,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialPrompts = useInitialPrompts();
@@ -401,6 +401,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     initialContext: context,
     decisionSpaceId: decisionSpaceId ?? undefined,
     onError: (err) => console.error('AI Chat error:', err),
+    onCriteriaUpdate: onCriteriaUpdate,
   });
 
   // Voice recording for dictation
@@ -447,23 +448,29 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   return (
     <motion.div
       className={cn(
-        'fixed top-0 left-0 h-screen bg-[#F0FDFB] border-r border-[#5BDFC2]/30 flex flex-col z-40',
+        'fixed top-0 left-0 h-screen flex flex-col z-40',
+        'border-r border-white/20',
         // Add shadow when expanded (overlay effect)
-        isExpanded && 'shadow-2xl shadow-[#5BDFC2]/20',
+        isExpanded && 'shadow-xl shadow-neutral-900/10',
         className
       )}
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.88) 100%)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      }}
       initial={false}
       animate={{
         width: isExpanded ? expandedWidth : collapsedWidth,
       }}
       transition={{
         duration: ANIMATION_DURATION,
-        ease: 'easeOut',
+        ease: [0.32, 0.72, 0, 1], // Snappy cubic-bezier
       }}
     >
       {/* Collapsed State - Rail with header-aligned top */}
       {!isExpanded && (
-        <div className="w-full h-full flex flex-col bg-[#F0FDFB]">
+        <div className="w-full h-full flex flex-col">
           {/* Header area - h-14 (56px) to match main header */}
           <div
             onClick={isAnimationBlocked ? undefined : handleToggle}
@@ -476,7 +483,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               }
             }}
             className={cn(
-              'w-full h-14 flex items-center justify-center cursor-pointer border-b border-[#5BDFC2]/20',
+              'w-full h-14 flex items-center justify-center cursor-pointer border-b border-white/30',
               'hover:bg-[#5BDFC2]/10 transition-colors duration-150',
               'group',
               isAnimationBlocked && 'opacity-50 cursor-not-allowed'
@@ -519,15 +526,29 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       {/* Expanded State */}
       {isExpanded && (
         <div className="flex h-full overflow-hidden">
-          {/* Icon Sidebar - 56px wide */}
-          <div className="w-14 flex-shrink-0 bg-white border-r border-neutral-100 flex flex-col items-center">
-            {/* Scout Logo - h-14 to match header */}
-            <div className="h-14 flex items-center justify-center border-b border-neutral-100 w-full">
-              <ScoutMascot size="small" />
+          {/* Icon Sidebar - 64px wide with subtle glass effect */}
+          <div
+            className="w-16 flex-shrink-0 border-r border-white/20 flex flex-col items-center"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(248,250,250,0.8) 100%)',
+            }}
+          >
+            {/* Scout Logo - Simple teal icon */}
+            <div className="py-3 flex items-center justify-center border-b border-white/30 w-full">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #6EDCD1 0%, #4BBEB3 100%)',
+                }}
+              >
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+              </div>
             </div>
 
             {/* Sidebar buttons */}
-            <div className="flex flex-col items-center py-2 gap-1 flex-1">
+            <div className="flex flex-col items-center py-2 gap-1.5 flex-1">
 
             {/* New Chat Button */}
             <button
@@ -537,7 +558,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               }}
               disabled={isLoading}
               className={cn(
-                'w-11 h-9 rounded-lg flex items-center justify-center transition-all',
+                'w-12 h-10 rounded-lg flex items-center justify-center transition-all',
                 'bg-[#5BDFC2]/10 text-[#5BDFC2] hover:bg-[#5BDFC2]/20 border border-[#5BDFC2]/30',
                 isLoading && 'opacity-50 cursor-not-allowed'
               )}
@@ -550,7 +571,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Edit/Compose */}
             <button
-              className="w-11 h-9 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border border-transparent hover:border-neutral-200 transition-all"
+              className="w-12 h-10 rounded-lg flex items-center justify-center text-[#6EDCD1]/70 hover:text-[#6EDCD1] hover:bg-[#6EDCD1]/10 border border-transparent hover:border-[#6EDCD1]/20 transition-all"
               title="Compose"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -562,7 +583,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             <button
               onClick={() => setShowHistory(!showHistory)}
               className={cn(
-                'w-11 h-9 rounded-lg flex items-center justify-center transition-all border',
+                'w-12 h-10 rounded-lg flex items-center justify-center transition-all border',
                 showHistory
                   ? 'bg-[#5BDFC2]/20 text-[#0D9488] border-[#5BDFC2]/40'
                   : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border-transparent hover:border-neutral-200'
@@ -576,7 +597,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Settings */}
             <button
-              className="w-11 h-9 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border border-transparent hover:border-neutral-200 transition-all"
+              className="w-12 h-10 rounded-lg flex items-center justify-center text-[#6EDCD1]/70 hover:text-[#6EDCD1] hover:bg-[#6EDCD1]/10 border border-transparent hover:border-[#6EDCD1]/20 transition-all"
               title="Settings"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -589,7 +610,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Help */}
             <button
-              className="w-11 h-9 rounded-lg flex items-center justify-center text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border border-transparent hover:border-neutral-200 transition-all"
+              className="w-12 h-10 rounded-lg flex items-center justify-center text-[#6EDCD1]/70 hover:text-[#6EDCD1] hover:bg-[#6EDCD1]/10 border border-transparent hover:border-[#6EDCD1]/20 transition-all"
               title="Help"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -598,16 +619,16 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             </button>
 
             {/* User Avatar */}
-            <div className="w-11 h-9 rounded-lg bg-[#5BDFC2] flex items-center justify-center text-white text-sm font-medium">
+            <div className="w-12 h-10 rounded-lg bg-[#5BDFC2] flex items-center justify-center text-white text-sm font-medium">
               U
             </div>
             </div>
           </div>
 
           {/* Main Panel */}
-          <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F0FDFB]">
+          <div className="flex-1 flex flex-col h-full overflow-hidden">
             {/* Header - h-14 (56px) to match main app header */}
-            <div className="flex items-center justify-between px-4 h-14 border-b border-[#5BDFC2]/20 flex-shrink-0">
+            <div className="flex items-center justify-between px-4 h-14 border-b border-white/30 flex-shrink-0">
               <span className="text-sm font-medium text-neutral-900">
                 {showHistory ? 'Chats' : 'New chat'}
               </span>
@@ -713,11 +734,8 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               <div className="px-4">
                 {messages.length === 0 ? (
                   /* Empty State - Scout AI branded */
-                  <div className="pt-6 pb-4 flex flex-col items-center">
-                    {/* Scout Mascot */}
-                    <ScoutMascot size="large" />
-
-                    <h2 className="text-lg font-medium text-neutral-900 mt-3 mb-1">
+                  <div className="pt-8 pb-4 flex flex-col items-center">
+                    <h2 className="text-lg font-medium text-neutral-900 mb-1">
                       How can I help?
                     </h2>
                   </div>
@@ -755,21 +773,6 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                     </div>
                   )}
 
-                  {/* Initial suggestion prompts - only show on empty state */}
-                  {messages.length === 0 && promptsToShow.length > 0 && !isLoading && (
-                    <div className="flex flex-col gap-2 mb-3">
-                      {promptsToShow.map((prompt, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSuggestionClick(prompt)}
-                          className="text-left px-4 py-2.5 rounded-lg bg-white border border-[#5BDFC2]/20 text-sm text-neutral-700 hover:bg-[#5BDFC2]/5 hover:border-[#5BDFC2]/40 transition-colors"
-                        >
-                          {prompt}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
                   {/* Chat Input */}
                   <StyledChatInput
                     onSend={sendMessage}
@@ -782,6 +785,21 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                     onClearTranscript={clearTranscript}
                     voiceError={voiceError}
                   />
+
+                  {/* Suggestion prompts - below input */}
+                  {messages.length === 0 && promptsToShow.length > 0 && !isLoading && (
+                    <div className="flex flex-col gap-2 mt-3">
+                      {promptsToShow.map((prompt, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSuggestionClick(prompt)}
+                          className="text-left px-4 py-2.5 rounded-xl bg-white/80 border border-[#6EDCD1]/15 text-sm text-neutral-600 hover:bg-[#6EDCD1]/5 hover:border-[#6EDCD1]/30 hover:text-neutral-800 transition-colors"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

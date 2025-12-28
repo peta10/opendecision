@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { NavigationToggle } from '@/opendecision/shared/components/layout/NavigationToggle';
 import { SplitView } from '@/opendecision/shared/components/layout/SplitView';
-import { ComparisonChart } from '@/opendecision/features/comparison/components/ComparisonChart';
 import { defaultCriteria } from '@/opendecision/data/criteria';
 import { defaultTools } from '@/opendecision/data/tools';
 import { Tool, Criterion } from '@/opendecision/shared/types';
@@ -18,15 +18,11 @@ import { ToolSection } from '@/opendecision/features/tools/components/ToolSectio
 import { cn } from '@/opendecision/shared/lib/utils';
 import { ActionButtons } from '@/opendecision/shared/components/layout/ActionButtons';
 import { MobileOptimizedLoader } from '@/components/MobileOptimizedLoader';
-import { GuidedRankingForm } from '@/opendecision/features/ranking/components/GuidedRankingForm';
 import { useGuidance } from '@/opendecision/shared/contexts/GuidanceContext';
 import { hasCompletedAnyGuidedRanking } from '@/opendecision/shared/utils/guidedRankingState';
 import { MobileRecoverySystem } from '@/opendecision/shared/components/common/MobileRecoverySystem';
 import { useGuidedSubmitAnimation } from '@/opendecision/shared/hooks/useGuidedSubmitAnimation';
-import { AIChatPanel } from '@/opendecision/features/ai-chat/components/AIChatPanel';
-import { DecisionHub } from '@/opendecision/features/decision-hub/components/DecisionHub';
 import { buildAIContext } from '@/opendecision/shared/utils/aiContextBuilder';
-import { GuidedSubmitAnimation } from '@/opendecision/features/ranking/components/GuidedSubmitAnimation';
 import {
   loadSavedCriteriaValues,
   saveCriteriaValues,
@@ -44,6 +40,40 @@ import Link from 'next/link';
 import { User } from 'lucide-react';
 import { SecondaryNavBar } from '@/opendecision/shared/components/navigation/SecondaryNavBar';
 import { SaveButton } from '@/opendecision/shared/components/auth';
+import { AppHeader } from '@/opendecision/shared/components/layout/AppHeader';
+import { ScoutFAB } from '@/opendecision/shared/components/scout/ScoutFAB';
+import { SetupView } from '@/opendecision/features/setup/components';
+
+// Dynamic imports for heavy components (reduces initial bundle)
+const AIChatPanel = dynamic(
+  () => import('@/opendecision/features/ai-chat/components/AIChatPanel').then(mod => ({ default: mod.AIChatPanel })),
+  { ssr: false, loading: () => <div className="w-16 h-full bg-white/50 animate-pulse" /> }
+);
+
+const ScoutOverlay = dynamic(
+  () => import('@/opendecision/features/ai-chat/components/ScoutOverlay').then(mod => ({ default: mod.ScoutOverlay })),
+  { ssr: false }
+);
+
+const ComparisonChart = dynamic(
+  () => import('@/opendecision/features/comparison/components/ComparisonChart').then(mod => ({ default: mod.ComparisonChart })),
+  { ssr: false, loading: () => <div className="w-full h-[400px] bg-white/50 animate-pulse rounded-xl" /> }
+);
+
+const GuidedRankingForm = dynamic(
+  () => import('@/opendecision/features/ranking/components/GuidedRankingForm').then(mod => ({ default: mod.GuidedRankingForm })),
+  { ssr: false }
+);
+
+const GuidedSubmitAnimation = dynamic(
+  () => import('@/opendecision/features/ranking/components/GuidedSubmitAnimation').then(mod => ({ default: mod.GuidedSubmitAnimation })),
+  { ssr: false }
+);
+
+const DecisionHub = dynamic(
+  () => import('@/opendecision/features/decision-hub/components/DecisionHub').then(mod => ({ default: mod.DecisionHub })),
+  { ssr: false, loading: () => <div className="w-full h-full bg-white/50 animate-pulse" /> }
+);
 
 interface EmbeddedPPMToolFlowProps {
   showGuidedRanking?: boolean;
@@ -53,6 +83,7 @@ interface EmbeddedPPMToolFlowProps {
   onShowHowItWorks?: () => void;
   guidedButtonRef?: React.RefObject<HTMLButtonElement>;
   initialView?: string;
+  initialMessage?: string | null;
 }
 
 interface GuidedRankingAnswer {
@@ -154,6 +185,9 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
   const guidedAnimation = useGuidedSubmitAnimation();
   const [pendingRankings, setPendingRankings] = useState<{ [key: string]: number } | null>(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
+
+  // Scout Overlay state
+  const [isScoutOverlayOpen, setIsScoutOverlayOpen] = useState(false);
 
   // Decision Space sync - persists state to Supabase
   const {
@@ -533,6 +567,23 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
     });
   }, [filteredTools, criteria, personalizationData, guidedRankingAnswers]);
 
+  // Check if any product has a high match score (>85%) - triggers Scout eye pulse
+  const hasHighMatchScore = useMemo(() => {
+    // Calculate match score for a tool (same logic as ProductsPanel)
+    const calculateMatchScore = (tool: Tool): number => {
+      const ratings = tool.ratings;
+      if (!ratings) return 50;
+      const ratingValues = Object.values(ratings).filter(
+        (v): v is number => typeof v === 'number'
+      );
+      if (ratingValues.length === 0) return 50;
+      const avg = ratingValues.reduce((sum, r) => sum + r, 0) / ratingValues.length;
+      return Math.round((avg / 5) * 100);
+    };
+
+    return filteredTools.some((tool) => calculateMatchScore(tool) > 85);
+  }, [filteredTools]);
+
   // AI Panel handlers
   const handleToggleAIPanel = useCallback(() => {
     // Block toggle during animations to prevent layout conflicts
@@ -545,6 +596,25 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
 
   // Compute if AI panel toggle should be blocked
   const isAIPanelAnimationBlocked = isAnimatingGuidedRankings || isPreparingAnimation;
+
+  // Handle criteria updates from AI chat (e.g., "security is more important")
+  const handleAICriteriaUpdate = useCallback((updates: Record<string, number>) => {
+    console.log('🤖 Applying AI-triggered criteria updates:', updates);
+    setCriteria(prevCriteria => {
+      const newCriteria = prevCriteria.map(c => {
+        // Match by criterion ID or name (AI might return either)
+        const updateValue = updates[c.id] ?? updates[c.name.toLowerCase()];
+        if (updateValue !== undefined) {
+          console.log(`  → ${c.name}: ${c.userRating} → ${updateValue}`);
+          return { ...c, userRating: Math.max(1, Math.min(5, updateValue)) };
+        }
+        return c;
+      });
+      // Sync to Decision Space
+      syncCriteria(newCriteria);
+      return newCriteria;
+    });
+  }, [syncCriteria]);
 
   // Debug log for animation state (only when animation flag changes)
   useEffect(() => {
@@ -1207,40 +1277,12 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
       switch (currentStep) {
       case 'criteria-tools':
         return (
-          <SplitView
-            criteria={criteria}
-            selectedTools={selectedTools}
-            removedTools={removedTools}
-            filterConditions={filterConditions}
-            filterMode={filterMode}
-            onCriteriaChange={handleCriteriaChange}
-            onFullCriteriaReset={handleFullCriteriaReset}
-            onToolSelect={handleToolSelect}
-            onToolRemove={handleToolRemove}
-            onRestoreAllTools={handleRestoreAllTools}
-            onAddFilterCondition={handleAddFilterCondition}
-            onRemoveFilterCondition={handleRemoveFilterCondition}
-            onUpdateFilterCondition={handleUpdateFilterCondition}
-            onToggleFilterMode={handleToggleFilterMode}
-            tools={defaultTools}
-            onCompare={handleCompare}
-            comparedTools={comparedTools}
-            guidedButtonRef={guidedButtonRef}
-            onOpenGuidedRanking={onOpenGuidedRanking}
-            chartButtonPosition={chartButtonPosition}
-            disableAutoShuffle={disableAutoShuffle}
-            shuffleDurationMs={shuffleDurationMs}
-            onShuffleReady={(shuffleFn) => {
-              manualShuffleRef.current = shuffleFn;
-              console.log('🔗 Shuffle function registered');
-            }}
-            onShuffleControlReady={(disableFn, enableFn) => {
-              shuffleControlRef.current = { disable: disableFn, enable: enableFn };
-              console.log('🔗 Imperative shuffle control registered');
-            }}
-            isAnimatingGuidedRankings={isAnimatingGuidedRankings}
-            onAddToDecisionHub={addProductToSpace}
-            decisionHubProductIds={decisionSpaceProductIds}
+          <SetupView
+            tools={filteredTools}
+            addedTools={decisionHubTools}
+            onAddTool={(tool) => addProductToSpace(tool.id)}
+            onGuidedProfile={() => onOpenGuidedRanking && onOpenGuidedRanking()}
+            onAskAboutProducts={() => setIsScoutOverlayOpen(true)}
           />
         );
       case 'chart':
@@ -1410,61 +1452,18 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
       <MobileOptimizedLoader isHydrated={isHydrated}>
         {/* PPM Tool Embedded Application */}
         <div
-          className="min-h-screen"
-          style={{ backgroundColor: '#FFFFFF' }}
+          className="min-h-screen workspace-ambient-bg"
           role="application"
           aria-label="PPM Tool Finder"
         >
-          {/* Single Unified Header - starts after AI panel */}
+          {/* App Header with Decision Spaces UI */}
           {isHydrated && !isMobile && (
-            <header
-              className="fixed top-0 right-0 z-[80] bg-white/80 backdrop-blur-md border-b border-neutral-200/60"
-              style={{
-                left: isAIPanelExpanded
-                  ? 'var(--ai-panel-width, 380px)'
-                  : 'var(--ai-rail-width, 64px)',
-                transition: 'left 0.15s ease-out'
-              }}
-            >
-              <div className="h-14 px-6 font-sans flex items-center justify-between">
-                {/* Left Section - Logo and Navigation */}
-                <div className="flex items-center gap-8">
-                  <span className="text-lg font-semibold text-neutral-900 tracking-tight flex items-center">OpenDecision</span>
-                  <a href="#" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center">Spaces</a>
-                  <a href="#" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center">Resources</a>
-                  <a href="#" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center">Contact</a>
-                  <a href="#" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center">Trust</a>
-                </div>
-
-                {/* Right Section - Actions and Profile */}
-                <div className="flex items-center gap-4">
-                  <a
-                    href="#"
-                    onClick={(e) => { e.preventDefault(); onShowHowItWorks && onShowHowItWorks(); }}
-                    className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1"
-                  >
-                    How it Works
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                  </a>
-                  <div className="h-5 w-px bg-neutral-200" />
-                  <button className="flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                    </svg>
-                    Profile
-                  </button>
-                  <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-neutral-200 shadow-sm">
-                    <img
-                      src="https://api.dicebear.com/7.x/notionists/svg?scale=200&seed=192847"
-                      alt="User"
-                      className="w-full h-full"
-                    />
-                  </div>
-                </div>
-              </div>
-            </header>
+            <AppHeader
+              currentStep={currentStep}
+              onStepChange={setCurrentStep}
+              isAIPanelExpanded={isAIPanelExpanded}
+              onShowHowItWorks={onShowHowItWorks}
+            />
           )}
 
           {/* NavigationToggle removed - replaced by global Header */}
@@ -1518,6 +1517,8 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
                 criteria={criteria}
                 isAnimationBlocked={isAIPanelAnimationBlocked}
                 decisionSpaceId={spaceId}
+                hasHighMatchScore={hasHighMatchScore}
+                onCriteriaUpdate={handleAICriteriaUpdate}
               />
             </div>
           )}
@@ -1525,12 +1526,12 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
           {/* Main Content - Responsive margin for AI rail */}
           <main
             className={cn(
-              'min-h-screen bg-[#F8FAFB]',
+              'min-h-screen bg-[#f5f7f7]',
               isHydrated && isMobile && "pb-32"
             )}
             style={{
-              // Single header (56px) + spacing
-              paddingTop: isHydrated && !isMobile ? "calc(56px + 1.5rem)" : "1rem",
+              // Header (44px h-11) + minimal spacing
+              paddingTop: isHydrated && !isMobile ? "calc(44px + 0.5rem)" : "0.5rem",
               marginLeft: isHydrated && !isMobile
                 ? isAIPanelExpanded
                   ? 'calc(var(--ai-panel-width, 380px) + var(--ai-content-gap, 24px))'
@@ -1539,54 +1540,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
               transition: 'margin-left 0.15s ease-out',
             }}
           >
-            {/* Page Title, Actions and Tabs */}
-            {isHydrated && !isMobile && (
-              <div className="px-6 mb-6">
-                {/* Title Row with Space Actions */}
-                <div className="flex items-center justify-between mb-4">
-                  <h1 className="text-2xl font-semibold text-neutral-900 tracking-tight">Q4 Enterprise Software Overhaul</h1>
-                  <div className="flex items-center gap-3">
-                    <button className="px-4 py-2 bg-neutral-900 text-white text-sm font-medium rounded-xl hover:bg-neutral-800 transition-colors flex items-center gap-2 shadow-sm">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                      </svg>
-                      New Space
-                    </button>
-                    <button className="px-4 py-2 bg-white border border-neutral-200 text-neutral-700 text-sm font-medium rounded-xl hover:bg-neutral-50 hover:border-neutral-300 transition-colors shadow-sm">
-                      My Spaces
-                    </button>
-                  </div>
-                </div>
-
-                {/* Progress Indicator - Moved to ProgressStepper component */}
-
-                {/* Tabs */}
-                <div className="flex gap-1 border-b border-neutral-200/60">
-                  <button
-                    onClick={() => setCurrentStep('criteria-tools')}
-                    className={cn(
-                      "px-4 pb-3 text-sm transition-colors",
-                      currentStep !== 'decision-hub'
-                        ? "font-medium text-neutral-900 border-b-2 border-neutral-900 -mb-px"
-                        : "text-neutral-500 hover:text-neutral-700"
-                    )}
-                  >
-                    Setup
-                  </button>
-                  <button
-                    onClick={() => setCurrentStep('decision-hub')}
-                    className={cn(
-                      "px-4 pb-3 text-sm transition-colors",
-                      currentStep === 'decision-hub'
-                        ? "font-medium text-neutral-900 border-b-2 border-neutral-900 -mb-px"
-                        : "text-neutral-500 hover:text-neutral-700"
-                    )}
-                  >
-                    Decision Hub
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Page Title - Space name is now in AppHeader */}
 
             {/* Content container */}
             <div
@@ -1647,6 +1601,24 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
             }}
           />
         )}
+
+        {/* Scout FAB - Floating Action Button for Scout AI (Desktop only) */}
+        {isHydrated && !isMobile && (
+          <ScoutFAB
+            onClick={() => setIsScoutOverlayOpen(!isScoutOverlayOpen)}
+            isOpen={isScoutOverlayOpen}
+          />
+        )}
+
+        {/* Scout Overlay - Full-screen chat modal */}
+        <ScoutOverlay
+          isOpen={isScoutOverlayOpen}
+          onClose={() => setIsScoutOverlayOpen(false)}
+          context={aiContext}
+          tools={filteredTools}
+          criteria={criteria}
+          decisionSpaceId={spaceId ?? undefined}
+        />
 
       </MobileOptimizedLoader>
     </ErrorBoundary>

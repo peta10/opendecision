@@ -44,6 +44,7 @@ const nextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
+  productionBrowserSourceMaps: true,
   onDemandEntries: {
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,

@@ -8,7 +8,6 @@
  */
 
 import React, { useEffect, useRef, useState, KeyboardEvent, useCallback } from 'react';
-import { motion } from 'framer-motion';
 import {
   Paperclip,
   Mic,
@@ -35,7 +34,7 @@ import './ChatHistoryDropdown.css';
 // Fallback values (used during SSR and before CSS vars load)
 const DEFAULT_COLLAPSED_WIDTH = 64;
 const DEFAULT_EXPANDED_WIDTH = 380;
-const ANIMATION_DURATION = 0.08; // Fast, snappy animation
+// Animation is now handled via CSS for better performance
 
 // =============================================================================
 // HOOK: Responsive Layout Values (mirrors CSS clamp() logic)
@@ -445,8 +444,36 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   // Get prompts to show
   const promptsToShow = (hasStarted ? suggestedPrompts : initialPrompts).slice(0, 3);
 
+  // Track animation state to disable blur during transition
+  const [isAnimating, setIsAnimating] = useState(false);
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Handle width changes with animation tracking
+  const currentWidth = isExpanded ? expandedWidth : collapsedWidth;
+
+  useEffect(() => {
+    // Start animation
+    setIsAnimating(true);
+
+    // Clear any existing timeout
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+
+    // End animation after transition completes (60ms)
+    animationTimeoutRef.current = setTimeout(() => {
+      setIsAnimating(false);
+    }, 60);
+
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, [isExpanded]);
+
   return (
-    <motion.div
+    <div
       className={cn(
         'fixed top-0 left-0 h-screen flex flex-col z-40',
         'border-r border-white/20',
@@ -455,17 +482,15 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
         className
       )}
       style={{
+        width: currentWidth,
         background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.88) 100%)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-      }}
-      initial={false}
-      animate={{
-        width: isExpanded ? expandedWidth : collapsedWidth,
-      }}
-      transition={{
-        duration: ANIMATION_DURATION,
-        ease: [0.32, 0.72, 0, 1], // Snappy cubic-bezier
+        // Disable blur during animation for performance, enable after
+        backdropFilter: isAnimating ? 'none' : 'blur(20px)',
+        WebkitBackdropFilter: isAnimating ? 'none' : 'blur(20px)',
+        // Fast CSS transition - GPU accelerated
+        transition: 'width 50ms cubic-bezier(0.32, 0.72, 0, 1)',
+        willChange: 'width',
+        transform: 'translateZ(0)', // Force GPU layer
       }}
     >
       {/* Collapsed State - Rail with header-aligned top */}
@@ -807,7 +832,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 

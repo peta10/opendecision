@@ -48,6 +48,11 @@ export default function LandingPage() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Prefetch app page for instant navigation
+  useEffect(() => {
+    router.prefetch('/app');
+  }, [router]);
+
   // Auto-focus on desktop
   useEffect(() => {
     if (typeof window !== 'undefined' && window.innerWidth > 768) {

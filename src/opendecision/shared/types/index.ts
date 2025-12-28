@@ -293,6 +293,12 @@ export interface AIChatResponse {
   sources: AIChatSource[];
   /** Performance metrics */
   usage: AIChatUsage;
+  /**
+   * Optional criteria weight updates when AI detects user intent to adjust priorities.
+   * E.g., if user says "security is more important", AI returns { "security": 5 }
+   * Format: { criterionId: newRating (1-5) }
+   */
+  criteria_updates?: Record<string, number>;
 }
 
 /**

@@ -3,6 +3,7 @@ export const defaultTools = [
     id: 'beaee6ec-5fb5-4b63-a0db-f8f2cdd793e8', // Smartsheet
     name: 'Smartsheet',
     logo: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=64&h=64&fit=crop',
+    brandColor: 'linear-gradient(135deg, #1D6F42 0%, #26A96C 100%)',
     useCases: ['Waterfall', 'Marketing', 'R&D'],
     methodologies: ['Waterfall', 'Continuous Improvement'],
     functions: ['Marketing', 'Product & Design', 'Engineering'],
@@ -35,6 +36,7 @@ export const defaultTools = [
     id: 'e9e83125-f9b1-4f3a-b4d4-ba551756a48f', // Airtable
     name: 'Airtable',
     logo: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=64&h=64&fit=crop',
+    brandColor: 'linear-gradient(135deg, #FCB400 0%, #18BFFF 100%)',
     useCases: ['Waterfall', 'Agile', 'Marketing', 'R&D'],
     methodologies: ['Waterfall', 'Agile', 'Continuous Improvement'],
     functions: ['Marketing', 'Product & Design', 'Engineering', 'Sales & Account Management'],
@@ -67,6 +69,7 @@ export const defaultTools = [
     id: '3797e739-9685-471e-92de-4747025a8e22', // Monday.com
     name: 'Monday.com',
     logo: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=64&h=64&fit=crop',
+    brandColor: 'linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%)',
     useCases: ['Waterfall', 'Marketing'],
     methodologies: ['Waterfall', 'Continuous Improvement'],
     functions: ['Marketing', 'Sales & Account Management', 'Customer Service'],
@@ -99,6 +102,7 @@ export const defaultTools = [
     id: 'a5d6005e-69c6-4924-92f4-3fc3c42a7ec7', // ClickUp
     name: 'ClickUp',
     logo: 'https://images.unsplash.com/photo-1512758017271-d7b84c2113f1?w=64&h=64&fit=crop',
+    brandColor: 'linear-gradient(135deg, #7B68EE 0%, #9B8FFF 100%)',
     useCases: ['Waterfall', 'Marketing', 'R&D'],
     methodologies: ['Waterfall'],
     functions: ['Engineering', 'Product & Design', 'IT & Support'],
@@ -131,6 +135,7 @@ export const defaultTools = [
     id: '0223de82-dd95-4492-86ea-ccf3d9fa1618', // Asana
     name: 'Asana',
     logo: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=64&h=64&fit=crop',
+    brandColor: 'linear-gradient(135deg, #F06A6A 0%, #FFB7B7 100%)',
     useCases: ['Waterfall', 'Marketing'],
     methodologies: ['Waterfall'],
     functions: ['Marketing', 'Product & Design', 'Engineering'],
@@ -163,6 +168,7 @@ export const defaultTools = [
     id: '19df3927-561f-4b8c-bec1-43e8e2f0ee90', // Microsoft Project
     name: 'MS Project',
     logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=64&h=64&fit=crop',
+    brandColor: 'linear-gradient(135deg, #217346 0%, #33A852 100%)',
     useCases: ['Waterfall'],
     methodologies: ['Waterfall'],
     functions: ['Engineering', 'Manufacturing', 'Operations'],
@@ -193,6 +199,7 @@ export const defaultTools = [
   },
   {
     id: '00000000-0000-0000-0000-000000000001', // Hive (placeholder - not in DB)
+    brandColor: 'linear-gradient(135deg, #FF9500 0%, #FFCC00 100%)',
     name: 'Hive',
     logo: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=64&h=64&fit=crop',
     useCases: ['Waterfall', 'Marketing'],
@@ -225,6 +232,7 @@ export const defaultTools = [
   },
   {
     id: '62cbfd91-6c7c-401f-bb12-5d2070fe14a7', // Adobe Workfront
+    brandColor: 'linear-gradient(135deg, #FF0000 0%, #FF5252 100%)',
     name: 'Adobe Workfront',
     logo: 'https://images.unsplash.com/photo-1661956602116-aa6865609028?w=64&h=64&fit=crop',
     useCases: ['Waterfall', 'Marketing', 'R&D'],
@@ -257,6 +265,7 @@ export const defaultTools = [
   },
   {
     id: '76f23e50-93e0-4f8d-83f1-e74f227138d8', // Azure DevOps
+    brandColor: 'linear-gradient(135deg, #0078D4 0%, #4FC3F7 100%)',
     name: 'Azure DevOps',
     logo: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=64&h=64&fit=crop',
     useCases: ['Agile', 'R&D'],
@@ -289,6 +298,7 @@ export const defaultTools = [
   },
   {
     id: '2e20b91a-77e1-46dc-acdb-693a9b530c81', // Jira
+    brandColor: 'linear-gradient(135deg, #0052CC 0%, #4C9AFF 100%)',
     name: 'Jira',
     logo: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=64&h=64&fit=crop',
     useCases: ['Agile', 'R&D'],

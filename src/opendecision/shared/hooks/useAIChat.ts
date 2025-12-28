@@ -51,6 +51,12 @@ export interface UseAIChatOptions {
   onError?: (error: Error) => void;
   /** Auto-scroll behavior (default: true) */
   autoScroll?: boolean;
+  /**
+   * Callback when AI response contains criteria weight updates.
+   * Called with { criterionId: newRating } when user expresses preference changes.
+   * E.g., "security is more important" -> { "security": 5 }
+   */
+  onCriteriaUpdate?: (updates: Record<string, number>) => void;
 }
 
 export interface UseAIChatReturn {
@@ -113,6 +119,7 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
     decisionSpaceId,
     onMessageReceived,
     onError,
+    onCriteriaUpdate,
   } = options;
 
   // State
@@ -131,13 +138,15 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
   // Refs for callbacks (to avoid stale closures)
   const onMessageReceivedRef = useRef(onMessageReceived);
   const onErrorRef = useRef(onError);
+  const onCriteriaUpdateRef = useRef(onCriteriaUpdate);
   const isGeneratingTitle = useRef(false);
 
   // Update refs when callbacks change
   useEffect(() => {
     onMessageReceivedRef.current = onMessageReceived;
     onErrorRef.current = onError;
-  }, [onMessageReceived, onError]);
+    onCriteriaUpdateRef.current = onCriteriaUpdate;
+  }, [onMessageReceived, onError, onCriteriaUpdate]);
 
   // Initialize session ID and load chat history on mount
   useEffect(() => {
@@ -246,6 +255,13 @@ export const useAIChat = (options: UseAIChatOptions = {}): UseAIChatReturn => {
 
       // Notify callback
       onMessageReceivedRef.current?.(assistantMessage);
+
+      // If AI response contains criteria updates, apply them in real-time
+      // This enables "security is more important" -> instant slider/ranking updates
+      if (response.criteria_updates && Object.keys(response.criteria_updates).length > 0) {
+        console.log('🔄 AI detected criteria preference change:', response.criteria_updates);
+        onCriteriaUpdateRef.current?.(response.criteria_updates);
+      }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMsg);

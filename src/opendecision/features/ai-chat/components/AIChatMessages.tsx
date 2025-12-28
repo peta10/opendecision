@@ -8,9 +8,10 @@
  */
 
 import React, { useState } from 'react';
-import { User, Bot, Loader2, ThumbsUp, ThumbsDown, Check } from 'lucide-react';
+import { User, Loader2, ThumbsUp, ThumbsDown, Check } from 'lucide-react';
 import { AIChatMessage } from '@/opendecision/shared/types';
 import { cn } from '@/opendecision/shared/lib/utils';
+import { ScoutHead } from '@/opendecision/shared/components/scout';
 
 export interface AIChatMessagesProps {
   /** Array of chat messages to display */
@@ -129,14 +130,14 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onFeedback }) =>
       {/* Avatar */}
       <div
         className={cn(
-          'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
-          isUser ? 'bg-alpine-blue' : 'bg-gray-100'
+          'flex-shrink-0 flex items-center justify-center',
+          isUser ? 'w-8 h-8 rounded-full bg-alpine-blue' : 'w-8 h-8'
         )}
       >
         {isUser ? (
           <User className="w-4 h-4 text-white" />
         ) : (
-          <Bot className="w-4 h-4 text-gray-600" />
+          <ScoutHead size="xs" />
         )}
       </div>
 

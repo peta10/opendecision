@@ -424,128 +424,25 @@ export const ProductsPanelV2: React.FC<ProductsPanelV2Props> = ({
       style={{ background: 'transparent' }}
     >
       {/* =================================================================
-          HEADER: Products + Ask about products + Search
-          ================================================================= */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <h2
-          style={{
-            fontSize: 'var(--od-text-lg)',
-            fontWeight: 'var(--od-font-semibold)',
-            color: 'var(--od-text-primary)',
-            margin: 0,
-          }}
-        >
-          Products
-        </h2>
-        <button
-          onClick={onAskAboutProducts}
-          className="hidden sm:flex"
-          style={{
-            alignItems: 'center',
-            gap: '6px',
-            padding: '6px 14px',
-            background: 'var(--od-text-primary)',
-            color: 'white',
-            borderRadius: '20px',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '12px',
-            fontWeight: 'var(--od-font-medium)',
-          }}
-        >
-          <ScoutCompassIcon size={14} color="white" />
-          Ask about products
-        </button>
-        {/* Mobile: icon-only button */}
-        <button
-          onClick={onAskAboutProducts}
-          className="flex sm:hidden"
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '32px',
-            height: '32px',
-            background: 'var(--od-text-primary)',
-            color: 'white',
-            borderRadius: '50%',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-          title="Ask about products"
-        >
-          <ScoutCompassIcon size={16} color="white" />
-        </button>
-        <div className="relative flex-1 min-w-[150px]">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-            style={{ color: 'var(--od-text-muted)' }}
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tools..."
-            disabled={isLoading}
-            style={{
-              width: '100%',
-              paddingLeft: '36px',
-              paddingRight: '12px',
-              paddingTop: '8px',
-              paddingBottom: '8px',
-              background: 'var(--od-bg-sunken)',
-              border: '1px solid transparent',
-              borderRadius: 'var(--od-radius-md)',
-              fontSize: '13px',
-              color: 'var(--od-text-primary)',
-              outline: 'none',
-              opacity: isLoading ? 0.5 : 1,
-            }}
-          />
-        </div>
-      </div>
-
-      {/* =================================================================
-          ADDED SECTION - Minimal horizontal list
+          ADDED SECTION - With combined clickable link
           ================================================================= */}
       {addedTools.length > 0 && (
         <div
           className="mb-4 pb-4"
           style={{ borderBottom: '1px solid var(--od-border-divider)' }}
         >
-          {/* Added header */}
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span
-                style={{
-                  fontSize: '13px',
-                  fontWeight: 'var(--od-font-medium)',
-                  color: 'var(--od-text-secondary)',
-                }}
-              >
-                Added to Decision Hub
-              </span>
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: 'var(--od-text-muted)',
-                }}
-              >
-                ({addedTools.length})
-              </span>
-            </div>
-            <button
-              style={{
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '12px',
-                color: 'var(--od-scout)',
-                fontWeight: 'var(--od-font-medium)',
-              }}
-            >
-              Go to Decision Hub →
-            </button>
-          </div>
+          {/* Added header - combined clickable link */}
+          <button
+            className="flex items-center gap-1 mb-2 group"
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            <span style={{ fontSize: '13px', fontWeight: 'var(--od-font-medium)', color: 'var(--od-text-secondary)' }}>Added to</span>
+            <span style={{ fontSize: '13px', fontWeight: 'var(--od-font-medium)', color: 'var(--od-scout)' }}>DecisionHub</span>
+            <span style={{ fontSize: '12px', color: 'var(--od-text-muted)', marginLeft: '4px' }}>({addedTools.length})</span>
+            <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5" style={{ color: 'var(--od-scout)', marginLeft: '2px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
 
           {/* Added products - simple inline chips */}
           <div className="flex flex-wrap gap-2">
@@ -583,6 +480,60 @@ export const ProductsPanelV2: React.FC<ProductsPanelV2Props> = ({
           </div>
         </div>
       )}
+
+      {/* =================================================================
+          SEARCH BAR + ASK ABOUT PRODUCTS BUTTON
+          ================================================================= */}
+      <div className="flex items-center gap-2 mb-4">
+        <div className="relative flex-1 min-w-[150px]">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+            style={{ color: 'var(--od-text-muted)' }}
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search tools..."
+            disabled={isLoading}
+            style={{
+              width: '100%',
+              paddingLeft: '36px',
+              paddingRight: '12px',
+              paddingTop: '8px',
+              paddingBottom: '8px',
+              background: 'var(--od-bg-sunken)',
+              border: '1px solid transparent',
+              borderRadius: 'var(--od-radius-md)',
+              fontSize: '13px',
+              color: 'var(--od-text-primary)',
+              outline: 'none',
+              opacity: isLoading ? 0.5 : 1,
+            }}
+          />
+        </div>
+        <button
+          onClick={onAskAboutProducts}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 14px',
+            background: 'var(--od-text-primary)',
+            color: 'white',
+            borderRadius: '20px',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: '12px',
+            fontWeight: 'var(--od-font-medium)',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
+        >
+          <ScoutCompassIcon size={14} color="white" />
+          <span className="hidden sm:inline">Ask about products</span>
+        </button>
+      </div>
 
       {/* =================================================================
           PRODUCT CARDS - Floating style with circular match scores

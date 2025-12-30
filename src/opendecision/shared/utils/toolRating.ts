@@ -64,59 +64,57 @@ export const getToolRating = (tool: Tool, criterionId: string | Criterion): numb
 };
 
 /**
- * Calculate the match score for a tool based on selected criteria
- * Uses the documented scoring algorithm:
- * - Base score of 8 points for meeting requirements
- * - Bonus points for exceeding requirements (max 2)
- * - Penalties for falling short (7 - shortfall * 2)
- * - Perfect score of 10 if ALL criteria are met
+ * Calculate the WEIGHTED match score for a tool based on selected criteria.
+ * Criteria with higher user ratings (importance) count MORE in the final score.
+ *
+ * Formula: weightedScore = sum(criterionScore * userRating) / sum(userRatings)
+ *
  * @param tool - The tool object
  * @param criteria - Array of criteria to evaluate
  * @returns Score on 0-10 scale
  */
 export const calculateScore = (tool: Tool, criteria: Criterion[]): number => {
   try {
-    let totalScore = 0;
-    let meetsAllCriteria = true;
+    if (!criteria || criteria.length === 0) {
+      return 0;
+    }
+
+    let weightedSum = 0;
+    let totalWeight = 0;
 
     criteria.forEach((criterion) => {
       // Get tool's capability rating (1-5) from criteria_tools table
       const toolRating = getToolRating(tool, criterion);
-      
-      // Get user's importance ranking (1-5) from user_criteria table
+
+      // User rating IS the weight (1-5 scale)
       const userRating = criterion.userRating;
 
-      // Check if tool meets minimum requirement
-      if (toolRating < userRating) {
-        meetsAllCriteria = false;
-      }
-
       // Calculate individual criterion score
+      let criterionScore: number;
       if (toolRating >= userRating) {
         // Tool meets or exceeds requirement
         // Base score of 8 points + bonus for exceeding (max 2 bonus points)
         const excess = Math.min(toolRating - userRating, 2);
-        totalScore += 8 + excess;
+        criterionScore = 8 + excess;
       } else {
         // Tool falls short of requirement
         // Steeper penalty for not meeting requirements
         const shortfall = userRating - toolRating;
-        totalScore += Math.max(0, 7 - shortfall * 2);
+        criterionScore = Math.max(0, 7 - shortfall * 2);
       }
+
+      // Weight by user importance
+      weightedSum += criterionScore * userRating;
+      totalWeight += userRating;
     });
 
-    // Calculate average score across all criteria
-    let finalScore = totalScore / criteria.length;
+    // Calculate weighted average
+    const finalScore = totalWeight > 0 ? weightedSum / totalWeight : 0;
 
     // Only give perfect score if the calculated score is already very high
-    // This prevents artificially inflating scores
-    if (finalScore >= 9.8) {
-      finalScore = 10;
-    }
-
-    return finalScore;
+    return finalScore >= 9.8 ? 10 : finalScore;
   } catch (error) {
-    console.warn('Error calculating tool score:', error);
+    console.warn('Error calculating weighted tool score:', error);
     return 0;
   }
 };

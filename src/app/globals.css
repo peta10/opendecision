@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
+/* V2 Design System - Neutral Gray / Google Shopping inspired */
+@import './design-system-v2.css';
+
 /**
  * Enterprise-Grade Global Styles
  * 
@@ -1613,6 +1616,40 @@ html.lenis {
 
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* Products scroll container - subtle scrollbar on hover */
+.products-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.products-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.products-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.products-scroll-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.products-scroll-container:hover {
+  scrollbar-color: #D1D5DB transparent;
+}
+
+.products-scroll-container:hover::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+}
+
+.products-scroll-container:hover::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
 }
 
 /* Filter modal scrollbar - always visible */

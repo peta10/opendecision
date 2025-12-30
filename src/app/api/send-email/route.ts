@@ -63,17 +63,19 @@ function getToolRating(tool: any, criterion: any): number {
   }
 }
 
-// Helper function using the exact same scoring algorithm as the frontend
+// Helper function using WEIGHTED scoring algorithm (matches frontend)
+// Formula: weightedScore = sum(criterionScore * userRating) / sum(userRatings)
 function calculateTopRecommendations(tools: any[], criteria: any[]) {
   const scoredTools = tools.map(tool => {
-    let totalScore = 0;
+    let weightedSum = 0;
+    let totalWeight = 0;
     let meetsAllCriteria = true;
 
     criteria.forEach((criterion) => {
       // Get tool's capability rating (1-5) from criteria_tools table
       const toolRating = getToolRating(tool, criterion);
-      
-      // Get user's importance ranking (1-5) - this is the weight/userRating
+
+      // Get user's importance ranking (1-5) - this IS the weight
       const userRating = criterion.userRating || criterion.weight || 5;
 
       // Check if tool meets minimum requirement
@@ -81,28 +83,33 @@ function calculateTopRecommendations(tools: any[], criteria: any[]) {
         meetsAllCriteria = false;
       }
 
-      // Calculate individual criterion score using frontend algorithm
+      // Calculate individual criterion score
+      let criterionScore: number;
       if (toolRating >= userRating) {
         // Tool meets or exceeds requirement
         // Base score of 8 points + bonus for exceeding (max 2 bonus points)
         const excess = Math.min(toolRating - userRating, 2);
-        totalScore += 8 + excess;
+        criterionScore = 8 + excess;
       } else {
         // Tool falls short of requirement
         // Steeper penalty for not meeting requirements
         const shortfall = userRating - toolRating;
-        totalScore += Math.max(0, 7 - shortfall * 2);
+        criterionScore = Math.max(0, 7 - shortfall * 2);
       }
+
+      // Weight by user importance
+      weightedSum += criterionScore * userRating;
+      totalWeight += userRating;
     });
 
-    // Calculate average score across all criteria
-    let finalScore = totalScore / criteria.length;
+    // Calculate weighted average score
+    let finalScore = totalWeight > 0 ? weightedSum / totalWeight : 0;
 
     // Only give perfect score if the calculated score is already very high
     if (finalScore >= 9.8) {
       finalScore = 10;
     }
-    
+
     // Convert to percentage for display (0-10 scale to 0-100%)
     const percentageScore = (finalScore / 10) * 100;
 

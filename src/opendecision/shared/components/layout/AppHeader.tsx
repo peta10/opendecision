@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/opendecision/shared/lib/utils';
 import { useSpace } from '@/opendecision/shared/contexts/SpaceContext';
+import { useScrollAwareHeader } from '@/opendecision/shared/hooks/useScrollAwareHeader';
 import { ChevronDown, Plus, Folder, Pencil, Check, X } from 'lucide-react';
 
 interface AppHeaderProps {
@@ -122,47 +123,40 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
   const spaceName = currentSpace?.name || 'Untitled Space';
 
+  // Scroll-aware header behavior (Amazon-style)
+  const { isVisible } = useScrollAwareHeader({ threshold: 60 });
+
   return (
     <header
-      className="fixed top-0 right-0 z-[80]"
+      className={cn('fixed top-0 right-0 z-[80] od-v2')}
       style={{
         left: isAIPanelExpanded
           ? 'var(--ai-panel-width, 380px)'
           : 'var(--ai-rail-width, 64px)',
-        transition: 'left 0.15s ease-out',
-        background: 'rgba(255, 255, 255, 0.85)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(11, 30, 45, 0.08)',
-        boxShadow: '0 1px 3px rgba(11, 30, 45, 0.04)',
+        // V2: Solid white background, no blur effects
+        background: 'var(--od-bg-surface, #FFFFFF)',
+        borderBottom: '1px solid var(--od-border-subtle, rgba(0,0,0,0.04))',
+        boxShadow: 'var(--od-shadow-sm)',
+        // Scroll-aware: hide on scroll down, show on scroll up
+        transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
+        transition: 'left 0.15s ease-out, transform 0.2s ease',
       }}
     >
       <div className="h-14 px-5 font-sans flex items-center justify-between">
         {/* Left Section - Logo and Space Selector */}
         <div className="flex items-center gap-6">
-          {/* Logo */}
+          {/* Logo - V2: Solid Scout color, no gradient */}
           <div className="flex items-center gap-2.5">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, #6EDCD1 0%, #4BBEB3 100%)',
-              }}
+              style={{ background: 'var(--od-scout, #4BBEB3)' }}
             >
-              <svg
-                className="w-5 h-5 text-[#0B1E2D]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              <span className="text-white font-bold text-sm">OD</span>
             </div>
-            <span className="text-lg font-semibold text-neutral-900 tracking-tight">
+            <span
+              className="text-lg font-semibold tracking-tight"
+              style={{ color: 'var(--od-text-primary)' }}
+            >
               OpenDecision
             </span>
           </div>
@@ -298,27 +292,28 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </div>
         </div>
 
-        {/* Center Section - View Tabs */}
-        <div className="flex items-center gap-0.5 bg-neutral-100 p-0.5 rounded">
+        {/* Center Section - View Tabs (V2 styling) */}
+        <div
+          className="flex items-center gap-0.5 p-0.5 rounded"
+          style={{ background: 'var(--od-bg-sunken)' }}
+        >
           <button
             onClick={() => onStepChange('criteria-tools')}
-            className={cn(
-              'px-3 py-1 text-xs font-medium rounded transition-colors',
-              currentStep !== 'decision-hub'
-                ? 'bg-[#6EDCD1] text-[#0B1E2D]'
-                : 'text-neutral-600 hover:text-neutral-900'
-            )}
+            className="px-3 py-1 text-xs font-medium rounded transition-colors"
+            style={{
+              background: currentStep !== 'decision-hub' ? 'var(--od-scout-bg)' : 'transparent',
+              color: currentStep !== 'decision-hub' ? 'var(--od-scout)' : 'var(--od-text-secondary)',
+            }}
           >
             Decision Framing
           </button>
           <button
             onClick={() => onStepChange('decision-hub')}
-            className={cn(
-              'px-3 py-1 text-xs font-medium rounded transition-colors',
-              currentStep === 'decision-hub'
-                ? 'bg-[#6EDCD1] text-[#0B1E2D]'
-                : 'text-neutral-600 hover:text-neutral-900'
-            )}
+            className="px-3 py-1 text-xs font-medium rounded transition-colors"
+            style={{
+              background: currentStep === 'decision-hub' ? 'var(--od-scout-bg)' : 'transparent',
+              color: currentStep === 'decision-hub' ? 'var(--od-scout)' : 'var(--od-text-secondary)',
+            }}
           >
             Decision Hub
           </button>

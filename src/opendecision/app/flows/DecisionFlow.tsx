@@ -36,16 +36,14 @@ import { resetGuidedRankingCompletion, markGuidedRankingAsCompleted, getGuidedRa
 import { hasCriteriaBeenAdjusted } from '@/opendecision/shared/utils/criteriaAdjustmentState';
 import { checkAndTrackNewActive } from '@/lib/posthog';
 import { analytics } from '@/lib/analytics';
-import Link from 'next/link';
-import { User } from 'lucide-react';
-import { SecondaryNavBar } from '@/opendecision/shared/components/navigation/SecondaryNavBar';
 import { SaveButton } from '@/opendecision/shared/components/auth';
-import { AppHeader } from '@/opendecision/shared/components/layout/AppHeader';
-import { ScoutFAB } from '@/opendecision/shared/components/scout/ScoutFAB';
-import { SetupView } from '@/opendecision/features/setup/components';
+import { AppHeaderV2 } from '@/opendecision/shared/components/layout/AppHeaderV2';
+import { ScoutFABV2 } from '@/opendecision/shared/components/scout/ScoutFABV2';
+import { SetupViewV2 } from '@/opendecision/features/setup/components/SetupViewV2';
 import { AIChatProvider } from '@/opendecision/shared/contexts/AIChatContext';
 import { useCurrentSpace } from '@/opendecision/shared/contexts/SpaceContext';
 import { DecisionHubLayout } from '@/opendecision/features/decision-hub/components/DecisionHubLayout';
+import { DecisionHubV2 } from '@/opendecision/features/decision-hub/components/DecisionHubV2';
 import { StateTransition } from '@/opendecision/features/decision-hub/types/decisionState';
 
 // Dynamic imports for heavy components (reduces initial bundle)
@@ -55,7 +53,7 @@ const AIChatPanel = dynamic(
 );
 
 const ScoutOverlay = dynamic(
-  () => import('@/opendecision/features/ai-chat/components/ScoutOverlay').then(mod => ({ default: mod.ScoutOverlay })),
+  () => import('@/opendecision/features/ai-chat/components/ScoutOverlayV2').then(mod => ({ default: mod.ScoutOverlayV2 })),
   { ssr: false }
 );
 
@@ -1298,7 +1296,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
       switch (currentStep) {
       case 'criteria-tools':
         return (
-          <SetupView
+          <SetupViewV2
             tools={filteredTools}
             addedTools={decisionHubTools}
             onAddTool={(tool) => addProductToSpace(tool.id)}
@@ -1310,7 +1308,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
               }
             }}
             onGuidedProfile={() => onOpenGuidedRanking && onOpenGuidedRanking()}
-            onAskAboutProducts={() => setIsScoutOverlayOpen(true)}
+            onOpenAIChat={() => setIsScoutOverlayOpen(true)}
           />
         );
       case 'chart':
@@ -1337,26 +1335,27 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
         );
       case 'decision-hub':
         return (
-          <div className="h-[calc(100dvh-120px)] min-h-[500px]">
-            <DecisionHubLayout
-              candidates={decisionHubTools}
+          <div className="od-v2 p-4 md:p-6" style={{ background: 'var(--od-bg-base)' }}>
+            <DecisionHubV2
+              tools={decisionHubTools}
               criteria={criteria}
-              onWeightChange={handleWeightChange}
-              onRemoveCandidate={async (toolId) => {
+              onRemoveProduct={async (toolId) => {
                 try {
                   await removeProductFromSpace(toolId);
                 } catch (err) {
                   console.error('Failed to remove product:', err);
                 }
               }}
-              onAddCandidate={() => {
+              onAddProduct={() => {
                 // Switch to Setup tab to add more products
                 setCurrentStep('criteria-tools');
               }}
-              onStateChange={handleDecisionStateChange}
-              initialState={space?.decision_state || 'framing'}
-              spaceId={spaceId ?? undefined}
-              isScoutPanelVisible={isAIPanelExpanded}
+              onRatingClick={(tool, criterionId, rating) => {
+                // Open Scout overlay with context about the rating
+                setIsScoutOverlayOpen(true);
+                // TODO: Pass context to Scout about which tool/criterion was clicked
+                console.log(`AI explanation requested: ${tool.name} - ${criterionId}: ${rating}`);
+              }}
             />
           </div>
         );
@@ -1494,13 +1493,13 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
           role="application"
           aria-label="PPM Tool Finder"
         >
-          {/* App Header with Decision Spaces UI */}
+          {/* App Header - Single row minimal design */}
           {isHydrated && !isMobile && (
-            <AppHeader
+            <AppHeaderV2
               currentStep={currentStep}
               onStepChange={setCurrentStep}
-              isAIPanelExpanded={isAIPanelExpanded}
               onShowHowItWorks={onShowHowItWorks}
+              isAIPanelExpanded={isAIPanelExpanded}
             />
           )}
 
@@ -1642,7 +1641,7 @@ export const EmbeddedPPMToolFlow: React.FC<EmbeddedPPMToolFlowProps> = ({
 
         {/* Scout FAB - Floating Action Button for Scout AI (Desktop only) */}
         {isHydrated && !isMobile && (
-          <ScoutFAB
+          <ScoutFABV2
             onClick={() => setIsScoutOverlayOpen(!isScoutOverlayOpen)}
             isOpen={isScoutOverlayOpen}
           />

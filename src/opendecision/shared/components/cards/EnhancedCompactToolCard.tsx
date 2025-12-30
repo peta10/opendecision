@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronUp, ExternalLink, Star, HelpCircle, Plus, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, ExternalLink, Star, HelpCircle } from 'lucide-react';
 import { Tool, Criterion } from '@/opendecision/shared/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/opendecision/shared/components/ui/card';
 import { Button } from '@/opendecision/shared/components/ui/button';
@@ -8,6 +8,7 @@ import { cn } from '@/opendecision/shared/lib/utils';
 import { formatMatchScorePercentage } from '@/opendecision/shared/utils/toolRating';
 import { MethodologyTags } from '@/opendecision/shared/components/common/MethodologyTags';
 import { MobileTooltip } from '@/opendecision/shared/components/ui/MobileTooltip';
+import { AddToHubButton } from '@/opendecision/shared/components/ui/AddToHubButton';
 import '@/opendecision/shared/components/ui/ModernPill.css';
 import { useUnifiedMobileDetection } from '@/opendecision/shared/hooks/useUnifiedMobileDetection';
 import { analytics } from '@/lib/analytics';
@@ -378,32 +379,14 @@ export const EnhancedCompactToolCard: React.FC<EnhancedCompactToolCardProps> = (
               </Button>
             )}
             {onAddToDecisionHub && (
-              <Button
-                size="sm"
-                variant="secondary"
-                className={cn(
-                  "h-8 px-3 text-xs",
-                  isInDecisionHub
-                    ? "bg-teal-100 text-teal-700 hover:bg-teal-200"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                )}
+              <AddToHubButton
+                isAdded={isInDecisionHub}
                 onClick={(e) => {
                   e.stopPropagation();
                   onAddToDecisionHub();
                 }}
-              >
-                {isInDecisionHub ? (
-                  <>
-                    <Check className="w-3 h-3 mr-1" />
-                    In Hub
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-3 h-3 mr-1" />
-                    Add to Hub
-                  </>
-                )}
-              </Button>
+                size="sm"
+              />
             )}
             <Button
               size="sm"

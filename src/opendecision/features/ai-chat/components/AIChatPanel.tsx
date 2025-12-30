@@ -11,21 +11,19 @@ import React, { useEffect, useRef, useState, KeyboardEvent, useCallback } from '
 import {
   Paperclip,
   Mic,
+  MicOff,
+  Send,
+  Loader2,
 } from 'lucide-react';
 import { AudioVisualizerBar } from './AudioVisualizerBar';
 import { useVoiceRecording } from '@/opendecision/shared/hooks/useVoiceRecording';
-import { SparkleButton } from './SparkleButton';
 import { AIChatMessages } from './AIChatMessages';
-import { ChatHistoryDropdown } from './ChatHistoryDropdown';
-import { useAIChat, useInitialPrompts } from '@/opendecision/shared/hooks/useAIChat';
+import { useInitialPrompts } from '@/opendecision/shared/hooks/useAIChat';
 import { useSharedAIChat } from '@/opendecision/shared/contexts/AIChatContext';
 import { submitMessageFeedback, getOrCreateSessionId } from '@/opendecision/shared/services/aiChatService';
 import { AIChatContext, Tool, Criterion } from '@/opendecision/shared/types';
 import { cn } from '@/opendecision/shared/lib/utils';
-import { ScoutHead } from '@/opendecision/shared/components/scout';
-import './ScoutSendButton.css';
-import './AttachmentMenu.css';
-import './ScoutBackButton.css';
+import { ScoutCompassIcon } from '@/opendecision/shared/components/scout/ScoutCompass';
 import './ChatHistoryDropdown.css';
 
 // =============================================================================
@@ -126,23 +124,6 @@ export interface AIChatPanelProps {
 
 
 // =============================================================================
-// SCOUT AI MASCOT COMPONENT (CSS-rendered, no image file)
-// =============================================================================
-
-const ScoutMascot: React.FC<{ size?: 'small' | 'large' | 'sidebar'; pulseEyes?: boolean }> = ({ size = 'large', pulseEyes = false }) => {
-  // Map to ScoutHead sizes: small = sm (20px), large = lg (40px), sidebar = xl (56px)
-  const sizeMap = {
-    small: 'sm' as const,
-    large: 'lg' as const,
-    sidebar: 'xl' as const,
-  };
-
-  return (
-    <ScoutHead size={sizeMap[size]} pulseEyes={pulseEyes} />
-  );
-};
-
-// =============================================================================
 // ACTION BUTTON COMPONENT
 // =============================================================================
 
@@ -155,39 +136,38 @@ interface ActionButtonProps {
 const ActionButton: React.FC<ActionButtonProps> = ({ icon, label, onClick }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-neutral-100 rounded-xl hover:bg-neutral-50 hover:border-[#5BDFC2]/30 hover:shadow-sm transition-all text-left group"
+    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:shadow-sm transition-all text-left group"
+    style={{
+      background: 'var(--od-bg-surface)',
+      border: '1px solid var(--od-border-default)',
+    }}
   >
-    <span className="text-[#5BDFC2] group-hover:scale-110 transition-transform">{icon}</span>
-    <span className="text-sm text-neutral-700 group-hover:text-neutral-900">{label}</span>
+    <span className="group-hover:scale-110 transition-transform" style={{ color: 'var(--od-scout)' }}>{icon}</span>
+    <span className="text-sm" style={{ color: 'var(--od-text-secondary)' }}>{label}</span>
   </button>
 );
 
 // =============================================================================
-// STYLED CHAT INPUT COMPONENT
+// STYLED CHAT INPUT COMPONENT (Simplified Google-style)
 // =============================================================================
 
 interface StyledChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   placeholder?: string;
-  // Voice recording props
   isRecording?: boolean;
   onStartRecording?: () => void;
   onStopRecording?: () => void;
-  /** New finalized transcript segment to append */
   voiceTranscript?: string;
-  /** Real-time interim transcript (while speaking) */
   interimTranscript?: string;
-  /** Clear the transcript after consuming */
   onClearTranscript?: () => void;
-  /** Voice recording error */
   voiceError?: string | null;
 }
 
 const StyledChatInput: React.FC<StyledChatInputProps> = ({
   onSend,
   isLoading,
-  placeholder = 'Ask or build anything...',
+  placeholder = 'Message Scout...',
   isRecording = false,
   onStartRecording,
   onStopRecording,
@@ -198,27 +178,22 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
 }) => {
   const [value, setValue] = useState('');
   const lastTranscriptRef = useRef('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Append NEW voice transcript segments when they arrive
+  // Append voice transcript segments
   useEffect(() => {
     if (voiceTranscript && voiceTranscript !== lastTranscriptRef.current) {
-      console.log('[Input] Appending transcript:', voiceTranscript);
-      setValue(prev => {
-        const newValue = prev + (prev ? ' ' : '') + voiceTranscript.trim();
-        return newValue;
-      });
+      setValue(prev => prev + (prev ? ' ' : '') + voiceTranscript.trim());
       lastTranscriptRef.current = voiceTranscript;
-      // Clear the transcript so we don't re-append it
       onClearTranscript?.();
     }
   }, [voiceTranscript, onClearTranscript]);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+  // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 100)}px`;
     }
   }, [value]);
 
@@ -227,9 +202,7 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
     if (trimmed && !isLoading) {
       onSend(trimmed);
       setValue('');
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-      }
+      if (textareaRef.current) textareaRef.current.style.height = 'auto';
     }
   };
 
@@ -243,108 +216,72 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
   const canSend = value.trim().length > 0 && !isLoading;
 
   return (
-    <div className="w-full">
-      {/* Input container with clean border */}
-      <div className="border border-gray-200 rounded-2xl bg-white overflow-hidden">
-        {/* Textarea */}
-        <div className="px-4 pt-4 pb-3">
-          <textarea
-            ref={textareaRef}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={isRecording && interimTranscript ? interimTranscript : placeholder}
-            disabled={isLoading}
-            rows={3}
-            className={cn(
-              'w-full bg-transparent border-none resize-none outline-none',
-              'text-gray-900 text-sm',
-              'placeholder:text-gray-400',
-              isRecording && interimTranscript && 'placeholder:text-[#5BDFC2] placeholder:italic',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-              'min-h-[60px]'
-            )}
-            style={{ maxHeight: '150px' }}
-          />
-          {/* Voice error display */}
-          {voiceError && (
-            <p className="text-xs text-red-500 mt-1">{voiceError}</p>
+    <div className="w-full space-y-2">
+      {/* Compact input container */}
+      <div className="bg-gray-100 rounded-xl px-3 py-2">
+        {/* Text input */}
+        <textarea
+          ref={textareaRef}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={isRecording ? (interimTranscript || 'Listening...') : 'Ask anything...'}
+          disabled={isLoading}
+          rows={1}
+          className={cn(
+            'w-full bg-transparent resize-none outline-none',
+            'text-gray-900 text-sm',
+            'placeholder:text-gray-400',
+            isRecording && 'placeholder:text-emerald-500 placeholder:italic',
+            'disabled:opacity-50'
           )}
-        </div>
+          style={{ maxHeight: '60px', minHeight: '20px' }}
+        />
 
-        {/* Bottom toolbar */}
-        <div className="flex items-center justify-between px-3 pb-3">
-          {/* Left side - Attachment Menu */}
-          <div className="flex items-center">
-            <nav className="attachment-menu">
-              <input type="checkbox" className="menu-open" name="menu-open" id="menu-open" />
-              <label className="menu-open-button" htmlFor="menu-open">
-                <span className="lines line-1"></span>
-                <span className="lines line-2"></span>
-                <span className="lines line-3"></span>
-              </label>
-              <button type="button" className="menu-item item-green" title="Attach file">
-                <Paperclip />
-              </button>
-              <button
-                type="button"
-                className={cn('menu-item item-orange', isRecording && 'recording-active')}
-                title={isRecording ? 'Recording...' : 'Voice input'}
-                onClick={onStartRecording}
-                disabled={isRecording}
-              >
-                <Mic />
-              </button>
-            </nav>
+        {/* Buttons row */}
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-white/60 transition-colors"
+              title="Attach"
+            >
+              <Paperclip className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={isRecording ? onStopRecording : onStartRecording}
+              className={cn(
+                'w-8 h-8 rounded-full flex items-center justify-center transition-all',
+                isRecording
+                  ? 'bg-red-500 text-white'
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-white/60'
+              )}
+              title={isRecording ? 'Stop' : 'Voice'}
+            >
+              {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
           </div>
-
-          {/* Right side - Scout Send Button */}
           <button
             onClick={handleSend}
             disabled={!canSend}
-            className={cn('scout-send-btn', isLoading && 'is-loading')}
+            className={cn(
+              'w-8 h-8 rounded-full flex items-center justify-center transition-all',
+              canSend
+                ? 'bg-gray-900 text-white hover:bg-gray-700'
+                : 'bg-gray-300 text-gray-400'
+            )}
             type="button"
           >
-            <div className="air-streaks">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-            <div className="content-wrapper">
-              <div className="svg-wrapper-1">
-                <div className="svg-wrapper">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                  >
-                    <defs>
-                      <linearGradient
-                        id="mint-gradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="100%"
-                      >
-                        <stop offset="0%" stopColor="#5BDFC2"></stop>
-                        <stop offset="100%" stopColor="#0D9488"></stop>
-                      </linearGradient>
-                    </defs>
-                    <path fill="none" d="M0 0h24v24H0z"></path>
-                    <path
-                      fill="url(#mint-gradient)"
-                      d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-              <span className="btn-text">Send</span>
-            </div>
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </button>
         </div>
 
-        {/* Audio Visualizer Bar - shown when recording */}
+        {/* Audio Visualizer Bar - shown below buttons when recording */}
         {isRecording && onStopRecording && (
           <AudioVisualizerBar
             isRecording={isRecording}
@@ -352,6 +289,11 @@ const StyledChatInput: React.FC<StyledChatInputProps> = ({
           />
         )}
       </div>
+
+      {/* Voice error - small text below */}
+      {voiceError && (
+        <p className="text-xs text-red-500 px-3">{voiceError}</p>
+      )}
     </div>
   );
 };
@@ -472,18 +414,19 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
   return (
     <div
       className={cn(
-        'fixed top-0 left-0 h-screen flex flex-col z-40',
-        'border-r border-white/20',
-        // Add shadow when expanded (overlay effect)
-        isExpanded && 'shadow-xl shadow-neutral-900/10',
+        'fixed top-0 left-0 h-screen flex flex-col z-40 od-v2',
+        // V2: Use subtle border, no blur effects
+        'border-r',
+        // V2: Shadow for depth (no glow)
+        isExpanded && 'shadow-xl',
         className
       )}
       style={{
         width: currentWidth,
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.88) 100%)',
-        // Disable blur during animation for performance, enable after
-        backdropFilter: isAnimating ? 'none' : 'blur(20px)',
-        WebkitBackdropFilter: isAnimating ? 'none' : 'blur(20px)',
+        // V2: Solid white background, no gradients or blur
+        background: 'var(--od-bg-surface, #FFFFFF)',
+        borderColor: 'var(--od-border-subtle, rgba(0,0,0,0.04))',
+        boxShadow: isExpanded ? 'var(--od-shadow-lg)' : 'none',
         // Fast CSS transition - GPU accelerated
         transition: 'width 50ms cubic-bezier(0.32, 0.72, 0, 1)',
         willChange: 'width',
@@ -492,7 +435,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
     >
       {/* Collapsed State - Rail with header-aligned top */}
       {!isExpanded && (
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col" style={{ background: 'var(--od-bg-surface)' }}>
           {/* Header area - h-14 (56px) to match main header */}
           <div
             onClick={isAnimationBlocked ? undefined : handleToggle}
@@ -505,22 +448,20 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               }
             }}
             className={cn(
-              'w-full h-14 flex items-center justify-center cursor-pointer border-b border-white/30',
-              'hover:bg-[#5BDFC2]/10 transition-colors duration-150',
+              'w-full h-14 flex items-center justify-center cursor-pointer',
+              'hover:bg-[var(--od-bg-hover)] transition-colors duration-150',
               'group',
               isAnimationBlocked && 'opacity-50 cursor-not-allowed'
             )}
+            style={{ borderBottom: '1px solid var(--od-border-divider)' }}
             title="Open Scout AI"
           >
+            {/* V2: Use compass icon with Scout color, no gradient */}
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{
-                background: 'linear-gradient(135deg, #6EDCD1 0%, #4BBEB3 100%)',
-              }}
+              style={{ background: 'var(--od-scout, #4BBEB3)' }}
             >
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
+              <ScoutCompassIcon size={20} color="white" />
             </div>
           </div>
 
@@ -530,10 +471,13 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               onClick={isAnimationBlocked ? undefined : handleToggle}
               disabled={isAnimationBlocked}
               className={cn(
-                'p-3 rounded-full bg-[#5BDFC2]/20 hover:bg-[#5BDFC2]/30 transition-colors',
-                'text-neutral-600 hover:text-neutral-900',
+                'p-3 rounded-full transition-colors',
                 isAnimationBlocked && 'opacity-50 cursor-not-allowed'
               )}
+              style={{
+                background: 'var(--od-scout-bg)',
+                color: 'var(--od-text-secondary)',
+              }}
               title="Open Scout AI Chat"
             >
               <svg
@@ -549,7 +493,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 <path d="M9 18l6-6-6-6" />
               </svg>
             </button>
-            <span className="text-xs text-neutral-500 mt-2 writing-mode-vertical">Chat</span>
+            <span className="text-xs mt-2 writing-mode-vertical" style={{ color: 'var(--od-text-muted)' }}>Chat</span>
           </div>
         </div>
       )}
@@ -557,24 +501,25 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
       {/* Expanded State */}
       {isExpanded && (
         <div className="flex h-full overflow-hidden">
-          {/* Icon Sidebar - 64px wide with subtle glass effect */}
+          {/* Icon Sidebar - 64px wide, V2 styling (no glass effect) */}
           <div
-            className="w-16 flex-shrink-0 border-r border-white/20 flex flex-col items-center"
+            className="w-16 flex-shrink-0 flex flex-col items-center"
             style={{
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(248,250,250,0.8) 100%)',
+              background: 'var(--od-bg-panel, #F5F5F6)',
+              borderRight: '1px solid var(--od-border-divider)',
             }}
           >
             {/* Scout Logo - h-14 to match main header */}
-            <div className="h-14 flex items-center justify-center border-b border-white/30 w-full">
+            <div
+              className="h-14 flex items-center justify-center w-full"
+              style={{ borderBottom: '1px solid var(--od-border-divider)' }}
+            >
+              {/* V2: Compass icon with Scout color, no gradient */}
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{
-                  background: 'linear-gradient(135deg, #6EDCD1 0%, #4BBEB3 100%)',
-                }}
+                style={{ background: 'var(--od-scout, #4BBEB3)' }}
               >
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
+                <ScoutCompassIcon size={20} color="white" />
               </div>
             </div>
 
@@ -590,9 +535,13 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               disabled={isLoading}
               className={cn(
                 'w-12 h-10 rounded-lg flex items-center justify-center transition-all',
-                'bg-[#5BDFC2]/10 text-[#5BDFC2] hover:bg-[#5BDFC2]/20 border border-[#5BDFC2]/30',
                 isLoading && 'opacity-50 cursor-not-allowed'
               )}
+              style={{
+                background: 'var(--od-scout-bg)',
+                color: 'var(--od-scout)',
+                border: '1px solid var(--od-scout-border)',
+              }}
               title="New chat"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -602,7 +551,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Edit/Compose */}
             <button
-              className="w-12 h-10 rounded-lg flex items-center justify-center text-[#6EDCD1]/70 hover:text-[#6EDCD1] hover:bg-[#6EDCD1]/10 border border-transparent hover:border-[#6EDCD1]/20 transition-all"
+              className="w-12 h-10 rounded-lg flex items-center justify-center transition-all"
+              style={{
+                color: 'var(--od-text-muted)',
+                border: '1px solid transparent',
+              }}
               title="Compose"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -613,12 +566,12 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             {/* History Button */}
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className={cn(
-                'w-12 h-10 rounded-lg flex items-center justify-center transition-all border',
-                showHistory
-                  ? 'bg-[#5BDFC2]/20 text-[#0D9488] border-[#5BDFC2]/40'
-                  : 'text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 border-transparent hover:border-neutral-200'
-              )}
+              className="w-12 h-10 rounded-lg flex items-center justify-center transition-all"
+              style={{
+                background: showHistory ? 'var(--od-scout-bg)' : 'transparent',
+                color: showHistory ? 'var(--od-scout)' : 'var(--od-text-muted)',
+                border: showHistory ? '1px solid var(--od-scout-border)' : '1px solid transparent',
+              }}
               title="Chat history"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -628,7 +581,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Settings */}
             <button
-              className="w-12 h-10 rounded-lg flex items-center justify-center text-[#6EDCD1]/70 hover:text-[#6EDCD1] hover:bg-[#6EDCD1]/10 border border-transparent hover:border-[#6EDCD1]/20 transition-all"
+              className="w-12 h-10 rounded-lg flex items-center justify-center transition-all"
+              style={{
+                color: 'var(--od-text-muted)',
+                border: '1px solid transparent',
+              }}
               title="Settings"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -641,7 +598,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
 
             {/* Help */}
             <button
-              className="w-12 h-10 rounded-lg flex items-center justify-center text-[#6EDCD1]/70 hover:text-[#6EDCD1] hover:bg-[#6EDCD1]/10 border border-transparent hover:border-[#6EDCD1]/20 transition-all"
+              className="w-12 h-10 rounded-lg flex items-center justify-center transition-all"
+              style={{
+                color: 'var(--od-text-muted)',
+                border: '1px solid transparent',
+              }}
               title="Help"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -650,17 +611,23 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
             </button>
 
             {/* User Avatar */}
-            <div className="w-12 h-10 rounded-lg bg-[#5BDFC2] flex items-center justify-center text-white text-sm font-medium">
+            <div
+              className="w-12 h-10 rounded-lg flex items-center justify-center text-white text-sm font-medium"
+              style={{ background: 'var(--od-scout)' }}
+            >
               U
             </div>
             </div>
           </div>
 
           {/* Main Panel */}
-          <div className="flex-1 flex flex-col h-full overflow-hidden">
+          <div className="flex-1 flex flex-col h-full overflow-hidden" style={{ background: 'var(--od-bg-surface)' }}>
             {/* Header - h-14 (56px) to match main app header */}
-            <div className="flex items-center justify-between px-4 h-14 border-b border-white/30 flex-shrink-0">
-              <span className="text-sm font-medium text-neutral-900">
+            <div
+              className="flex items-center justify-between px-4 h-14 flex-shrink-0"
+              style={{ borderBottom: '1px solid var(--od-border-divider)' }}
+            >
+              <span className="text-sm font-medium" style={{ color: 'var(--od-text-primary)' }}>
                 {showHistory ? 'Chats' : 'New chat'}
               </span>
               <div className="flex items-center gap-1">
@@ -699,7 +666,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
               <div className="p-4">
                 {/* Search */}
                 <div className="relative mb-4">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--od-text-muted)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
                   <input
@@ -707,18 +674,18 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                     value={historySearch}
                     onChange={(e) => setHistorySearch(e.target.value)}
                     placeholder="Search chats"
-                    className="w-full pl-10 pr-4 py-2 text-sm border border-neutral-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#5BDFC2]/30 focus:border-[#5BDFC2] placeholder:text-neutral-400"
+                    className="od-input w-full pl-10 pr-4 py-2 text-sm rounded-xl"
                   />
                 </div>
 
                 {/* Chat History List */}
                 {chatHistory.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-sm text-neutral-400">No previous chats</p>
+                    <p className="text-sm" style={{ color: 'var(--od-text-muted)' }}>No previous chats</p>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-xs text-neutral-500 mb-2">Previous 30 days</p>
+                    <p className="text-xs mb-2" style={{ color: 'var(--od-text-tertiary)' }}>Previous 30 days</p>
                     <div className="space-y-1">
                       {chatHistory
                         .filter(chat =>
@@ -728,12 +695,11 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                         .map((chat) => (
                           <div
                             key={chat.id}
-                            className={cn(
-                              'group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all',
-                              chat.id === sessionId
-                                ? 'bg-[#5BDFC2]/10 text-[#0D9488]'
-                                : 'hover:bg-neutral-100 text-neutral-700'
-                            )}
+                            className="group flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all"
+                            style={{
+                              background: chat.id === sessionId ? 'var(--od-scout-bg)' : 'transparent',
+                              color: chat.id === sessionId ? 'var(--od-scout)' : 'var(--od-text-secondary)',
+                            }}
                             onClick={() => {
                               loadChatFromHistory(chat.id);
                               setShowHistory(false);
@@ -766,7 +732,7 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                 {messages.length === 0 ? (
                   /* Empty State - Scout AI branded */
                   <div className="pt-8 pb-4 flex flex-col items-center">
-                    <h2 className="text-lg font-medium text-neutral-900 mb-1">
+                    <h2 className="text-lg font-medium mb-1" style={{ color: 'var(--od-text-primary)' }}>
                       How can I help?
                     </h2>
                   </div>
@@ -775,14 +741,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                     <AIChatMessages messages={messages} onFeedback={handleFeedback} />
                     <div ref={messagesEndRef} />
 
-                    {/* Follow-up prompts - shown below AI response */}
+                    {/* Follow-up prompts - minimal pills */}
                     {promptsToShow.length > 0 && !isLoading && hasStarted && (
-                      <div className="flex flex-wrap gap-1.5 mt-3 pl-11">
+                      <div className="flex flex-wrap gap-2 mt-3">
                         {promptsToShow.map((prompt, index) => (
                           <button
                             key={index}
                             onClick={() => handleSuggestionClick(prompt)}
-                            className="text-left px-2.5 py-1.5 rounded-full bg-neutral-100 text-xs text-neutral-600 hover:bg-[#5BDFC2]/10 hover:text-neutral-800 transition-colors border border-neutral-200 hover:border-[#5BDFC2]/30"
+                            className="text-left px-3 py-1.5 text-xs text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-full border border-gray-200 transition-colors"
                           >
                             {prompt}
                           </button>
@@ -817,14 +783,14 @@ export const AIChatPanel: React.FC<AIChatPanelProps> = ({
                     voiceError={voiceError}
                   />
 
-                  {/* Suggestion prompts - below input */}
+                  {/* Initial suggestion prompts - minimal list */}
                   {messages.length === 0 && promptsToShow.length > 0 && !isLoading && (
-                    <div className="flex flex-col gap-2 mt-3">
+                    <div className="flex flex-col gap-1.5 mt-4">
                       {promptsToShow.map((prompt, index) => (
                         <button
                           key={index}
                           onClick={() => handleSuggestionClick(prompt)}
-                          className="text-left px-4 py-2.5 rounded-xl bg-white/80 border border-[#6EDCD1]/15 text-sm text-neutral-600 hover:bg-[#6EDCD1]/5 hover:border-[#6EDCD1]/30 hover:text-neutral-800 transition-colors"
+                          className="text-left px-4 py-2.5 text-sm text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
                         >
                           {prompt}
                         </button>

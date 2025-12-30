@@ -13,3 +13,5 @@ export { AIChatSuggestions } from './components/AIChatSuggestions';
 export { AISidebar } from './components/AISidebar';
 export { ChatHistoryDropdown } from './components/ChatHistoryDropdown';
 export { SparkleButton } from './components/SparkleButton';
+export { ScoutOverlay } from './components/ScoutOverlay';
+export { ScoutOverlayV2 } from './components/ScoutOverlayV2';

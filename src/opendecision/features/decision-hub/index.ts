@@ -14,6 +14,7 @@ export * from './utils/tradeoffDetection';
 
 // Components
 export { DecisionHub } from './components/DecisionHub';
+export { DecisionHubV2 } from './components/DecisionHubV2';
 export { DecisionHubLayout, ResponsiveDecisionHub } from './components/DecisionHubLayout';
 export { ComparisonMatrix } from './components/ComparisonMatrix';
 export { AnalysisPanel } from './components/AnalysisPanel';

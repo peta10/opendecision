@@ -184,27 +184,28 @@ export function useVoiceRecording(): UseVoiceRecordingReturn {
         };
 
         recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-          console.error('[Voice] Speech recognition error:', event.error, event.message);
-
-          // Handle specific errors
+          // Handle specific errors - only log real errors
           switch (event.error) {
             case 'not-allowed':
+              console.error('[Voice] Microphone access denied');
               setError('Microphone access denied. Please allow microphone access in browser settings.');
               break;
             case 'no-speech':
-              // This is normal - just means silence was detected
-              console.log('[Voice] No speech detected, continuing...');
+              // This is normal - just means silence was detected, don't log or show error
               break;
             case 'audio-capture':
+              console.error('[Voice] No microphone found');
               setError('No microphone found. Please connect a microphone.');
               break;
             case 'network':
+              console.error('[Voice] Network error');
               setError('Network error. Speech recognition requires an internet connection.');
               break;
             case 'aborted':
               // User or system stopped recognition - not an error
               break;
             default:
+              console.error('[Voice] Speech recognition error:', event.error, event.message);
               setError(`Speech recognition error: ${event.error}`);
           }
         };

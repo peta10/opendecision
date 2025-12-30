@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenDecision - Platform Overview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --mint: #6EDCD1;
+            --mint-dark: #4BBEB3;
+            --navy: #0B1E2D;
+            --gray-dark: #4A5E6D;
+            --gray-light: #7A8D9C;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--navy);
+            color: var(--white);
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            padding: 50px 80px 100px;
+            display: none;
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--navy) 0%, #1a3a4a 100%);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--mint) 0%, var(--mint-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(110, 220, 209, 0.3);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .slide-number {
+            font-size: 14px;
+            color: var(--gray-light);
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        h1 {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        h1 .gradient {
+            background: linear-gradient(135deg, var(--white) 0%, var(--mint) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 42px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--mint);
+        }
+
+        h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--white);
+        }
+
+        p {
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--gray-light);
+        }
+
+        .subtitle {
+            font-size: 28px;
+            color: var(--gray-light);
+            margin-bottom: 50px;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(110, 220, 209, 0.5);
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--mint) 0%, var(--mint-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .card p {
+            font-size: 16px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 60px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 64px;
+            font-weight: 700;
+            color: var(--mint);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: var(--gray-light);
+            margin-top: 8px;
+        }
+
+        .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 18px;
+            background: rgba(110, 220, 209, 0.15);
+            border: 1px solid rgba(110, 220, 209, 0.4);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--mint);
+        }
+
+        .tech-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .diagram {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre;
+            color: var(--mint);
+            overflow-x: auto;
+        }
+
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin: 50px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-box {
+            background: rgba(110, 220, 209, 0.1);
+            border: 2px solid var(--mint);
+            border-radius: 16px;
+            padding: 30px 40px;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .flow-box h3 {
+            color: var(--mint);
+            margin-bottom: 8px;
+        }
+
+        .flow-box p {
+            font-size: 14px;
+        }
+
+        .flow-arrow {
+            color: var(--mint);
+            font-size: 36px;
+            font-weight: 300;
+        }
+
+        .wireframe {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 0;
+            color: var(--navy);
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .wireframe-bar {
+            background: #f0f0f0;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .wireframe-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .wireframe-body {
+            padding: 24px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--mint);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy);
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .list-content h4 {
+            font-size: 18px;
+            margin-bottom: 4px;
+            color: var(--white);
+        }
+
+        .list-content p {
+            font-size: 15px;
+            color: var(--gray-light);
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--mint);
+            border-color: var(--mint);
+            color: var(--navy);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--mint), var(--mint-dark));
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(110, 220, 209, 0.2) 0%, rgba(75, 190, 179, 0.1) 100%);
+            border: 1px solid rgba(110, 220, 209, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(110, 220, 209, 0.2);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--mint);
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide.active .content {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .mini-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .mini-card h4 {
+            font-size: 16px;
+            color: var(--mint);
+            margin-bottom: 12px;
+        }
+
+        .mini-card ul {
+            list-style: none;
+        }
+
+        .mini-card li {
+            font-size: 14px;
+            color: var(--gray-light);
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .mini-card li::before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            color: var(--mint);
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+
+    <!-- Slide 1: Title -->
+    <div class="slide active" id="slide1">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">1 / 10</span>
+        </div>
+        <div class="center-content">
+            <h1><span class="gradient">OpenDecision</span></h1>
+            <p class="subtitle">AI-Powered Software Decision Platform</p>
+            <p style="max-width: 700px; margin-bottom: 20px;">
+                Help teams compare software tools and make confident purchasing decisions with AI guidance.
+            </p>
+            <div class="stat-row">
+                <div class="stat">
+                    <div class="stat-number">11</div>
+                    <div class="stat-label">Software Tools</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Evaluation Criteria</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">742</div>
+                    <div class="stat-label">Users Tracked</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: What It Does -->
+    <div class="slide" id="slide2">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">2 / 10</span>
+        </div>
+        <div class="content">
+            <h2>What Does OpenDecision Do?</h2>
+            <p style="margin-bottom: 40px;">A decision support platform that helps teams evaluate and compare software tools.</p>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon">1</div>
+                    <h3>Set Your Priorities</h3>
+                    <p>Users rate what matters most: ease of use, security, integrations, reporting, and more.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">2</div>
+                    <h3>Compare Options</h3>
+                    <p>See how different tools stack up against your criteria with visual charts and scores.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">3</div>
+                    <h3>Get AI Guidance</h3>
+                    <p>"Scout" AI assistant answers questions and provides personalized recommendations.</p>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 40px;">
+                <h3 style="margin-bottom: 16px;">The Problem We Solve</h3>
+                <p style="font-size: 18px;">Companies waste months evaluating software. OpenDecision provides a structured framework with AI support to make faster, more confident decisions.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Key Features -->
+    <div class="slide" id="slide3">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">3 / 10</span>
+        </div>
+        <div class="content">
+            <h2>Key Features</h2>
+
+            <div class="grid-2" style="margin-top: 30px;">
+                <div>
+                    <div class="list-item">
+                        <div class="list-icon">AI</div>
+                        <div class="list-content">
+                            <h4>Scout AI Assistant</h4>
+                            <p>Chat-based AI that answers questions about tools, supports voice input, and learns from your preferences</p>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-icon">HUB</div>
+                        <div class="list-content">
+                            <h4>Decision Hub</h4>
+                            <p>Side-by-side comparison matrix with weighted scoring based on your priorities</p>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-icon">VIZ</div>
+                        <div class="list-content">
+                            <h4>Visual Comparisons</h4>
+                            <p>Radar charts and match scores show how tools perform across criteria</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="list-item">
+                        <div class="list-icon">RATE</div>
+                        <div class="list-content">
+                            <h4>Criteria Weighting</h4>
+                            <p>Slider-based interface to set importance levels for each evaluation factor</p>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-icon">SAVE</div>
+                        <div class="list-content">
+                            <h4>Decision Spaces</h4>
+                            <p>Save and resume evaluations - works without login using anonymous accounts</p>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-icon">MAIL</div>
+                        <div class="list-content">
+                            <h4>Email Reports</h4>
+                            <p>Generate and send PDF-style recommendation reports to stakeholders</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: User Journey -->
+    <div class="slide" id="slide4">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">4 / 10</span>
+        </div>
+        <div class="content">
+            <h2>User Journey</h2>
+            <p style="margin-bottom: 20px;">Three phases guide users from initial setup to final decision.</p>
+
+            <div class="flow-container">
+                <div class="flow-box">
+                    <h3>FRAMING</h3>
+                    <p>Define what matters<br>Set criteria weights<br>Add products to compare</p>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">
+                    <h3>EVALUATING</h3>
+                    <p>Compare side-by-side<br>View match scores<br>Ask Scout questions</p>
+                </div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">
+                    <h3>DECIDED</h3>
+                    <p>Make final selection<br>Export report<br>Share with team</p>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 40px;">
+                <div class="mini-card">
+                    <h4>No Login Required</h4>
+                    <ul>
+                        <li>Anonymous sessions auto-created</li>
+                        <li>Progress saved locally</li>
+                        <li>Optional account upgrade</li>
+                    </ul>
+                </div>
+                <div class="mini-card">
+                    <h4>AI Throughout</h4>
+                    <ul>
+                        <li>Scout available at every step</li>
+                        <li>Context-aware responses</li>
+                        <li>Voice input supported</li>
+                    </ul>
+                </div>
+                <div class="mini-card">
+                    <h4>Flexible Workflow</h4>
+                    <ul>
+                        <li>Jump between phases</li>
+                        <li>Adjust criteria anytime</li>
+                        <li>Add/remove tools freely</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Technology Overview -->
+    <div class="slide" id="slide5">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">5 / 10</span>
+        </div>
+        <div class="content">
+            <h2>Technology Stack</h2>
+            <p style="margin-bottom: 40px;">Modern web technologies for fast, reliable performance.</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Frontend (What Users See)</h3>
+                    <p style="margin-bottom: 16px;">React-based web application</p>
+                    <div class="tech-grid">
+                        <span class="tech-badge">Next.js 15</span>
+                        <span class="tech-badge">React 18</span>
+                        <span class="tech-badge">TypeScript</span>
+                        <span class="tech-badge">Tailwind CSS</span>
+                        <span class="tech-badge">Framer Motion</span>
+                        <span class="tech-badge">Chart.js</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Backend (Behind the Scenes)</h3>
+                    <p style="margin-bottom: 16px;">Supabase platform with PostgreSQL</p>
+                    <div class="tech-grid">
+                        <span class="tech-badge">Supabase</span>
+                        <span class="tech-badge">PostgreSQL</span>
+                        <span class="tech-badge">Edge Functions</span>
+                        <span class="tech-badge">OpenAI API</span>
+                        <span class="tech-badge">Resend (Email)</span>
+                        <span class="tech-badge">PostHog</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 40px;">
+                <div class="grid-3">
+                    <div style="text-align: center;">
+                        <div style="font-size: 36px; font-weight: 700; color: var(--mint);">Netlify</div>
+                        <p style="font-size: 14px;">Hosting & Deployment</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 36px; font-weight: 700; color: var(--mint);">Supabase</div>
+                        <p style="font-size: 14px;">Database & Auth</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 36px; font-weight: 700; color: var(--mint);">OpenAI</div>
+                        <p style="font-size: 14px;">AI / GPT-4</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Architecture -->
+    <div class="slide" id="slide6">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">6 / 10</span>
+        </div>
+        <div class="content">
+            <h2>How It's Built</h2>
+            <p style="margin-bottom: 30px;">Code organized by feature for easy maintenance and scalability.</p>
+
+            <div class="two-col">
+                <div>
+                    <h3 style="margin-bottom: 20px;">Feature-Based Structure</h3>
+                    <p style="margin-bottom: 20px;">Each feature is self-contained with its own components, making it easy to update one part without affecting others.</p>
+
+                    <div style="margin-top: 30px;">
+                        <span class="tag">AI Chat</span>
+                        <span class="tag">Comparison</span>
+                        <span class="tag">Criteria</span>
+                        <span class="tag">Decision Hub</span>
+                        <span class="tag">Tools</span>
+                        <span class="tag">Ranking</span>
+                        <span class="tag">Profile</span>
+                        <span class="tag">Admin</span>
+                    </div>
+                </div>
+                <div class="diagram" style="font-size: 13px;">
+src/opendecision/
+│
+├── features/          ← Business features
+│   ├── ai-chat/       Scout AI assistant
+│   ├── comparison/    Charts & comparisons
+│   ├── criteria/      Criteria ratings
+│   ├── decision-hub/  Comparison matrix
+│   ├── tools/         Tool cards & filters
+│   └── ...
+│
+├── shared/            ← Reusable code
+│   ├── components/    UI building blocks
+│   ├── hooks/         Shared logic
+│   └── services/      API connections
+│
+└── data/              ← Static content
+    ├── tools.ts       Tool definitions
+    └── criteria.ts    Criteria list</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Database -->
+    <div class="slide" id="slide7">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">7 / 10</span>
+        </div>
+        <div class="content">
+            <h2>Database & Backend</h2>
+            <p style="margin-bottom: 30px;">Supabase provides database, authentication, and serverless functions.</p>
+
+            <div class="grid-2">
+                <div>
+                    <h3 style="margin-bottom: 20px;">Main Data Tables</h3>
+                    <div class="mini-card" style="margin-bottom: 16px;">
+                        <h4>Tools (11 records)</h4>
+                        <p style="font-size: 14px; color: var(--gray-light);">Software products being evaluated - Monday.com, Asana, Jira, etc.</p>
+                    </div>
+                    <div class="mini-card" style="margin-bottom: 16px;">
+                        <h4>Criteria (7 records)</h4>
+                        <p style="font-size: 14px; color: var(--gray-light);">Evaluation factors - Ease of Use, Security, Integrations, etc.</p>
+                    </div>
+                    <div class="mini-card" style="margin-bottom: 16px;">
+                        <h4>Decision Spaces (49 records)</h4>
+                        <p style="font-size: 14px; color: var(--gray-light);">User evaluation sessions with saved preferences</p>
+                    </div>
+                    <div class="mini-card">
+                        <h4>Email Reports (49 records)</h4>
+                        <p style="font-size: 14px; color: var(--gray-light);">Generated recommendation reports sent to users</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 20px;">AI & Analytics</h3>
+                    <div class="mini-card" style="margin-bottom: 16px;">
+                        <h4>Chat Sessions</h4>
+                        <p style="font-size: 14px; color: var(--gray-light);">Scout AI conversations linked to decision spaces</p>
+                    </div>
+                    <div class="mini-card" style="margin-bottom: 16px;">
+                        <h4>Tool Intel Chunks</h4>
+                        <p style="font-size: 14px; color: var(--gray-light);">AI-searchable documentation for each tool (RAG system)</p>
+                    </div>
+                    <div class="mini-card">
+                        <h4>Analytics Users (742 records)</h4>
+                        <p style="font-size: 14px; color: var(--gray-light);">Anonymous user tracking for product insights</p>
+                    </div>
+
+                    <div class="highlight-box" style="margin-top: 20px; padding: 20px;">
+                        <h4 style="color: var(--mint); margin-bottom: 8px;">3 Edge Functions</h4>
+                        <p style="font-size: 14px;">
+                            <strong>ai-chat</strong> - Scout AI responses<br>
+                            <strong>embed-chunks</strong> - AI search indexing<br>
+                            <strong>weekly-summary</strong> - Email reports
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Wireframe Landing -->
+    <div class="slide" id="slide8">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">8 / 10</span>
+        </div>
+        <div class="content">
+            <h2>Landing Page</h2>
+            <p style="margin-bottom: 30px;">Users start by asking Scout a question or clicking a quick action.</p>
+
+            <div class="wireframe" style="max-width: 900px; margin: 0 auto;">
+                <div class="wireframe-bar">
+                    <div class="wireframe-dot" style="background: #ff5f56;"></div>
+                    <div class="wireframe-dot" style="background: #ffbd2e;"></div>
+                    <div class="wireframe-dot" style="background: #27c93f;"></div>
+                    <span style="margin-left: auto; font-size: 12px; color: #999;">opendecision.ai</span>
+                </div>
+                <div class="wireframe-body" style="text-align: center; padding: 40px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #6EDCD1, #4BBEB3); border-radius: 10px;"></div>
+                            <span style="font-weight: 700; font-size: 18px;">OpenDecision</span>
+                        </div>
+                        <button style="padding: 10px 20px; background: linear-gradient(135deg, #6EDCD1, #4BBEB3); border: none; border-radius: 10px; color: white; font-weight: 600;">Get Started</button>
+                    </div>
+
+                    <div style="margin: 40px 0;">
+                        <span style="background: #e0f8f7; color: #4BBEB3; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;">The Decision Hub</span>
+                        <h1 style="font-size: 38px; margin: 24px 0; color: #0B1E2D; -webkit-text-fill-color: #0B1E2D; font-weight: 700;">What can Scout help you decide?</h1>
+                        <p style="color: #7A8D9C; font-size: 18px;">Compare tools. Make confident decisions.</p>
+                    </div>
+
+                    <div style="max-width: 550px; margin: 30px auto; background: #f5f7f8; border-radius: 16px; padding: 20px; text-align: left;">
+                        <div style="color: #999; font-size: 15px; margin-bottom: 40px;">Ask Scout anything about software decisions...</div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button style="padding: 12px 24px; background: linear-gradient(135deg, #6EDCD1, #4BBEB3); border: none; border-radius: 10px; color: white; font-weight: 600;">Ask Scout →</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; gap: 12px;">
+                        <button style="padding: 12px 18px; background: #f0f8f7; border: 1px solid #d0e8e6; border-radius: 10px; font-size: 14px; color: #4A5E6D;">Compare tools</button>
+                        <button style="padding: 12px 18px; background: #f0f8f7; border: 1px solid #d0e8e6; border-radius: 10px; font-size: 14px; color: #4A5E6D;">Get recommendations</button>
+                        <button style="padding: 12px 18px; background: #f0f8f7; border: 1px solid #d0e8e6; border-radius: 10px; font-size: 14px; color: #4A5E6D;">Learn more</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Wireframe App -->
+    <div class="slide" id="slide9">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">9 / 10</span>
+        </div>
+        <div class="content">
+            <h2>Main Application</h2>
+            <p style="margin-bottom: 30px;">Three-panel layout: Criteria (left), Tools (center), Scout AI (right).</p>
+
+            <div class="wireframe" style="max-width: 1000px; margin: 0 auto;">
+                <div class="wireframe-bar">
+                    <div class="wireframe-dot" style="background: #ff5f56;"></div>
+                    <div class="wireframe-dot" style="background: #ffbd2e;"></div>
+                    <div class="wireframe-dot" style="background: #27c93f;"></div>
+                    <span style="margin-left: auto; font-size: 12px; color: #999;">opendecision.ai/app</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 220px 1fr 280px; min-height: 400px;">
+                    <!-- Left: Criteria -->
+                    <div style="background: #f8f9fa; padding: 20px; border-right: 1px solid #e0e0e0;">
+                        <div style="font-size: 12px; font-weight: 600; color: #999; margin-bottom: 20px;">CRITERIA</div>
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #333;">Ease of Use</div>
+                            <div style="height: 6px; background: #e0e0e0; border-radius: 3px;">
+                                <div style="height: 100%; width: 70%; background: linear-gradient(90deg, #6EDCD1, #4BBEB3); border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #333;">Security</div>
+                            <div style="height: 6px; background: #e0e0e0; border-radius: 3px;">
+                                <div style="height: 100%; width: 90%; background: linear-gradient(90deg, #6EDCD1, #4BBEB3); border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #333;">Integrations</div>
+                            <div style="height: 6px; background: #e0e0e0; border-radius: 3px;">
+                                <div style="height: 100%; width: 50%; background: linear-gradient(90deg, #6EDCD1, #4BBEB3); border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #333;">Reporting</div>
+                            <div style="height: 6px; background: #e0e0e0; border-radius: 3px;">
+                                <div style="height: 100%; width: 80%; background: linear-gradient(90deg, #6EDCD1, #4BBEB3); border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center: Tools -->
+                    <div style="background: #fff; padding: 20px;">
+                        <div style="font-size: 12px; font-weight: 600; color: #999; margin-bottom: 20px;">TOOLS</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px;">
+                                <div style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 8px; margin-bottom: 12px;"></div>
+                                <div style="font-weight: 600; color: #333;">Monday.com</div>
+                                <div style="font-size: 13px; color: #4BBEB3; margin-top: 4px;">92% match</div>
+                            </div>
+                            <div style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px;">
+                                <div style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 8px; margin-bottom: 12px;"></div>
+                                <div style="font-weight: 600; color: #333;">Asana</div>
+                                <div style="font-size: 13px; color: #4BBEB3; margin-top: 4px;">88% match</div>
+                            </div>
+                            <div style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px;">
+                                <div style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 8px; margin-bottom: 12px;"></div>
+                                <div style="font-weight: 600; color: #333;">Jira</div>
+                                <div style="font-size: 13px; color: #4BBEB3; margin-top: 4px;">85% match</div>
+                            </div>
+                            <div style="border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px;">
+                                <div style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 8px; margin-bottom: 12px;"></div>
+                                <div style="font-weight: 600; color: #333;">ClickUp</div>
+                                <div style="font-size: 13px; color: #4BBEB3; margin-top: 4px;">82% match</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Scout -->
+                    <div style="background: #f0f8f7; padding: 20px; border-left: 2px solid #6EDCD1;">
+                        <div style="font-size: 12px; font-weight: 600; color: #4BBEB3; margin-bottom: 20px;">SCOUT AI</div>
+                        <div style="background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+                            <div style="font-size: 11px; color: #999; margin-bottom: 4px;">Scout</div>
+                            <div style="font-size: 13px; color: #333; line-height: 1.5;">Based on your priorities, Monday.com scores highest for security and reporting...</div>
+                        </div>
+                        <div style="background: #e8f5f3; border-radius: 10px; padding: 14px; margin-left: 20px; margin-bottom: 12px;">
+                            <div style="font-size: 11px; color: #999; margin-bottom: 4px;">You</div>
+                            <div style="font-size: 13px; color: #333;">What about integrations?</div>
+                        </div>
+                        <div style="border: 1px solid #d0e8e6; border-radius: 10px; padding: 14px; margin-top: auto; background: #fff;">
+                            <div style="font-size: 13px; color: #999;">Ask Scout...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Summary -->
+    <div class="slide" id="slide10">
+        <div class="slide-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="none"/>
+                    </svg>
+                </div>
+                <span class="logo-text">OpenDecision</span>
+            </div>
+            <span class="slide-number">10 / 10</span>
+        </div>
+        <div class="center-content">
+            <h1><span class="gradient">Summary</span></h1>
+            <p style="max-width: 700px; margin-bottom: 50px; font-size: 22px;">
+                OpenDecision helps teams make better software decisions faster with structured evaluation and AI guidance.
+            </p>
+
+            <div class="grid-3" style="max-width: 900px;">
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon" style="margin: 0 auto 16px;">FE</div>
+                    <h3>Modern Frontend</h3>
+                    <p>Next.js + React<br>Fast & responsive</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon" style="margin: 0 auto 16px;">BE</div>
+                    <h3>Scalable Backend</h3>
+                    <p>Supabase + PostgreSQL<br>Secure & reliable</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon" style="margin: 0 auto 16px;">AI</div>
+                    <h3>Scout AI</h3>
+                    <p>GPT-4 powered<br>Context-aware help</p>
+                </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 50px; max-width: 600px;">
+                <p style="font-size: 16px; text-align: center;">
+                    <strong style="color: var(--mint);">Supabase Project:</strong> vfqxzqhitumrxshrcqwr<br>
+                    <strong style="color: var(--mint);">Region:</strong> us-east-1 &nbsp;|&nbsp;
+                    <strong style="color: var(--mint);">Database:</strong> PostgreSQL 15.8
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()">← Previous</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 10;
+
+        function updateProgress() {
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            if (n < 1) currentSlide = totalSlides;
+            else if (n > totalSlides) currentSlide = 1;
+            else currentSlide = n;
+
+            document.getElementById('slide' + currentSlide).classList.add('active');
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+            updateProgress();
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+        });
+
+        updateProgress();
+    </script>
+</body>
+</html>

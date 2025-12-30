@@ -3,15 +3,14 @@
 /**
  * AIChatMessages Component
  *
- * Displays the list of chat messages with proper styling for user/assistant.
- * Includes thumbs up/down feedback buttons for assistant messages.
+ * Google-style minimal chat messages with clean typography.
+ * No avatars, simple bubbles, subtle feedback.
  */
 
 import React, { useState } from 'react';
-import { User, Loader2, ThumbsUp, ThumbsDown, Check } from 'lucide-react';
+import { Loader2, ThumbsUp, ThumbsDown, Check } from 'lucide-react';
 import { AIChatMessage } from '@/opendecision/shared/types';
 import { cn } from '@/opendecision/shared/lib/utils';
-import { ScoutHead } from '@/opendecision/shared/components/scout';
 
 export interface AIChatMessagesProps {
   /** Array of chat messages to display */
@@ -70,45 +69,42 @@ const FeedbackButtons: React.FC<FeedbackButtonsProps> = ({ messageContent, onFee
 
   if (feedbackState !== 'none') {
     return (
-      <div className="flex items-center gap-1 text-xs text-gray-400">
-        <Check className="w-3 h-3" />
-        <span>Thanks for feedback</span>
-      </div>
+      <span className="text-xs text-gray-400">Thanks</span>
     );
   }
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
       <button
         onClick={() => handleFeedback(true)}
         disabled={isSubmitting}
         className={cn(
-          'p-1 rounded hover:bg-gray-200 transition-colors',
-          'text-gray-400 hover:text-green-600',
+          'p-1 rounded-full transition-colors',
+          'text-gray-300 hover:text-gray-600 hover:bg-gray-100',
           isSubmitting && 'opacity-50 cursor-not-allowed'
         )}
         title="Helpful"
       >
-        <ThumbsUp className="w-3.5 h-3.5" />
+        <ThumbsUp className="w-3 h-3" />
       </button>
       <button
         onClick={() => handleFeedback(false)}
         disabled={isSubmitting}
         className={cn(
-          'p-1 rounded hover:bg-gray-200 transition-colors',
-          'text-gray-400 hover:text-red-500',
+          'p-1 rounded-full transition-colors',
+          'text-gray-300 hover:text-gray-600 hover:bg-gray-100',
           isSubmitting && 'opacity-50 cursor-not-allowed'
         )}
         title="Not helpful"
       >
-        <ThumbsDown className="w-3.5 h-3.5" />
+        <ThumbsDown className="w-3 h-3" />
       </button>
     </div>
   );
 };
 
 /**
- * Single message bubble component
+ * Single message bubble component - Google-style minimal
  */
 interface MessageBubbleProps {
   message: AIChatMessage;
@@ -123,72 +119,43 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onFeedback }) =>
   return (
     <div
       className={cn(
-        'flex gap-3 mb-4',
-        isUser ? 'flex-row-reverse' : 'flex-row'
+        'group mb-4',
+        isUser ? 'flex justify-end' : 'flex justify-start'
       )}
     >
-      {/* Avatar */}
-      <div
-        className={cn(
-          'flex-shrink-0 flex items-center justify-center',
-          isUser ? 'w-8 h-8 rounded-full bg-alpine-blue' : 'w-8 h-8'
-        )}
-      >
-        {isUser ? (
-          <User className="w-4 h-4 text-white" />
-        ) : (
-          <ScoutHead size="xs" />
-        )}
-      </div>
-
-      {/* Message Content */}
-      <div className="flex flex-col gap-1 max-w-[80%]">
+      <div className={cn('max-w-[85%]', isUser && 'text-right')}>
+        {/* Message Content */}
         <div
           className={cn(
-            'rounded-2xl px-4 py-3',
+            'inline-block text-left',
             isUser
-              ? 'bg-alpine-blue text-white rounded-tr-md'
-              : 'bg-neutral-100 text-neutral-800 rounded-tl-md',
-            hasError && 'bg-red-50 border border-red-200 text-red-800'
+              ? 'bg-gray-900 text-white rounded-2xl rounded-br-md px-4 py-2.5'
+              : 'text-gray-700',
+            hasError && 'bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-2.5'
           )}
         >
           {isLoading ? (
-            <div className="flex items-center gap-2 text-gray-500">
+            <div className="flex items-center gap-2 text-gray-400 py-1">
               <Loader2 className="w-4 h-4 animate-spin" />
               <span className="text-sm">Thinking...</span>
             </div>
           ) : (
             <>
               {/* Message text */}
-              <div className={cn('text-sm leading-relaxed whitespace-pre-wrap', isUser && 'text-white')}>
+              <div className={cn(
+                'text-sm leading-relaxed whitespace-pre-wrap',
+                isUser ? 'text-white' : 'text-gray-700'
+              )}>
                 {renderMessageContent(message.content)}
               </div>
 
-              {/* Sources (assistant only) */}
-              {!isUser && message.sources && message.sources.length > 0 && (
-                <div className="mt-3 pt-2 border-t border-gray-200">
-                  <p className="text-xs text-gray-500 mb-1">Sources:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {message.sources.slice(0, 3).map((source, idx) => (
-                      <span
-                        key={idx}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-white rounded text-xs text-gray-600"
-                      >
-                        {source.tool}
-                        {source.section && ` - ${source.section}`}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Tools mentioned (assistant only) */}
+              {/* Tools mentioned - minimal pills */}
               {!isUser && message.tools_mentioned && message.tools_mentioned.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {message.tools_mentioned.map((tool, idx) => (
                     <span
                       key={idx}
-                      className="inline-flex items-center gap-1 px-2 py-0.5 bg-alpine-blue/10 rounded-full text-xs text-alpine-blue font-medium"
+                      className="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600"
                     >
                       {tool}
                     </span>
@@ -199,9 +166,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, onFeedback }) =>
           )}
         </div>
 
-        {/* Feedback buttons (assistant only, not loading, no error) */}
+        {/* Feedback buttons - minimal, appears on hover */}
         {!isUser && !isLoading && !hasError && message.content && (
-          <FeedbackButtons messageContent={message.content} onFeedback={onFeedback} />
+          <div className="mt-1 ml-1">
+            <FeedbackButtons messageContent={message.content} onFeedback={onFeedback} />
+          </div>
         )}
       </div>
     </div>

@@ -1,0 +1,824 @@
+/**
+ * =============================================================================
+ * OPEN DECISION DESIGN SYSTEM V2
+ * Google Shopping / ChatGPT Inspired - Neutral Gray Contrast
+ * =============================================================================
+ *
+ * PHILOSOPHY:
+ * - NO glows, NO futuristic effects
+ * - Depth through subtle gray shade variations
+ * - Floating panels with shadow depth, not borders
+ * - Scout accent ONLY for AI-specific elements
+ * - Simple, effective, professional
+ */
+
+/* =============================================================================
+   COLOR SYSTEM - Neutral Grays with Scout Accent
+   ============================================================================= */
+
+:root {
+  /* -------------------------------------------------------------------------
+     BACKGROUND HIERARCHY (Darkest to Lightest for depth)
+     Inspired by Google Shopping's left filter panel
+     ------------------------------------------------------------------------- */
+
+  /* Base layer - main page background */
+  --od-bg-base: #F7F7F8;
+
+  /* Surface layer - cards and panels floating above base */
+  --od-bg-surface: #FFFFFF;
+
+  /* Elevated layer - elements that need more prominence */
+  --od-bg-elevated: #FFFFFF;
+
+  /* Sunken layer - recessed areas, input backgrounds */
+  --od-bg-sunken: #F0F0F1;
+
+  /* Sidebar/Panel background - slightly darker for contrast */
+  --od-bg-panel: #F5F5F6;
+
+  /* Hover states */
+  --od-bg-hover: #EBEBEC;
+
+  /* Active/Selected states */
+  --od-bg-active: #E5E5E6;
+
+  /* -------------------------------------------------------------------------
+     TEXT HIERARCHY
+     ------------------------------------------------------------------------- */
+
+  /* Primary text - headings, important content */
+  --od-text-primary: #1A1A1A;
+
+  /* Secondary text - body copy, descriptions */
+  --od-text-secondary: #4A4A4A;
+
+  /* Tertiary text - labels, captions */
+  --od-text-tertiary: #6B6B6B;
+
+  /* Muted text - placeholders, disabled states */
+  --od-text-muted: #9CA3AF;
+
+  /* Inverse text - on dark backgrounds */
+  --od-text-inverse: #FFFFFF;
+
+  /* -------------------------------------------------------------------------
+     BORDER SYSTEM - Subtle, almost invisible
+     ------------------------------------------------------------------------- */
+
+  /* Default border - barely visible separation */
+  --od-border-default: rgba(0, 0, 0, 0.06);
+
+  /* Subtle border - even lighter */
+  --od-border-subtle: rgba(0, 0, 0, 0.04);
+
+  /* Strong border - for emphasis when needed */
+  --od-border-strong: rgba(0, 0, 0, 0.12);
+
+  /* Divider - horizontal/vertical separators */
+  --od-border-divider: rgba(0, 0, 0, 0.08);
+
+  /* -------------------------------------------------------------------------
+     SHADOW SYSTEM - Depth without glow
+     ------------------------------------------------------------------------- */
+
+  /* Small shadow - subtle lift */
+  --od-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04),
+                  0 1px 3px rgba(0, 0, 0, 0.06);
+
+  /* Medium shadow - cards, panels */
+  --od-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.04),
+                  0 4px 8px rgba(0, 0, 0, 0.06);
+
+  /* Large shadow - elevated elements, modals */
+  --od-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.04),
+                  0 8px 16px rgba(0, 0, 0, 0.06),
+                  0 16px 32px rgba(0, 0, 0, 0.04);
+
+  /* XL shadow - floating panels, popovers */
+  --od-shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.06),
+                  0 16px 32px rgba(0, 0, 0, 0.08),
+                  0 32px 64px rgba(0, 0, 0, 0.04);
+
+  /* -------------------------------------------------------------------------
+     SCOUT AI ACCENT - ONLY for AI elements
+     ------------------------------------------------------------------------- */
+
+  /* Primary Scout color */
+  --od-scout: #4BBEB3;
+
+  /* Scout hover state */
+  --od-scout-hover: #3DAA9F;
+
+  /* Scout active state */
+  --od-scout-active: #2F968C;
+
+  /* Scout background tint - very subtle */
+  --od-scout-bg: rgba(75, 190, 179, 0.08);
+
+  /* Scout border */
+  --od-scout-border: rgba(75, 190, 179, 0.3);
+
+  /* -------------------------------------------------------------------------
+     INTERACTIVE STATES
+     ------------------------------------------------------------------------- */
+
+  /* Focus ring - accessible focus indicator */
+  --od-focus-ring: rgba(75, 190, 179, 0.4);
+
+  /* Success state */
+  --od-success: #22C55E;
+  --od-success-bg: rgba(34, 197, 94, 0.08);
+
+  /* Warning state */
+  --od-warning: #F59E0B;
+  --od-warning-bg: rgba(245, 158, 11, 0.08);
+
+  /* Error state */
+  --od-error: #EF4444;
+  --od-error-bg: rgba(239, 68, 68, 0.08);
+
+  /* -------------------------------------------------------------------------
+     LAYOUT DIMENSIONS
+     ------------------------------------------------------------------------- */
+
+  /* Decision Profile panel width */
+  --od-panel-width: 400px;
+
+  /* Header height */
+  --od-header-height: 56px;
+
+  /* Card border radius */
+  --od-radius-sm: 6px;
+  --od-radius-md: 8px;
+  --od-radius-lg: 12px;
+  --od-radius-xl: 16px;
+
+  /* Spacing scale */
+  --od-space-1: 4px;
+  --od-space-2: 8px;
+  --od-space-3: 12px;
+  --od-space-4: 16px;
+  --od-space-5: 20px;
+  --od-space-6: 24px;
+  --od-space-8: 32px;
+  --od-space-10: 40px;
+
+  /* -------------------------------------------------------------------------
+     TYPOGRAPHY
+     ------------------------------------------------------------------------- */
+
+  --od-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Font sizes */
+  --od-text-xs: 11px;
+  --od-text-sm: 13px;
+  --od-text-base: 14px;
+  --od-text-md: 15px;
+  --od-text-lg: 16px;
+  --od-text-xl: 18px;
+  --od-text-2xl: 20px;
+  --od-text-3xl: 24px;
+
+  /* Line heights */
+  --od-leading-tight: 1.25;
+  --od-leading-normal: 1.5;
+  --od-leading-relaxed: 1.625;
+
+  /* Font weights */
+  --od-font-normal: 400;
+  --od-font-medium: 500;
+  --od-font-semibold: 600;
+  --od-font-bold: 700;
+
+  /* -------------------------------------------------------------------------
+     TRANSITIONS
+     ------------------------------------------------------------------------- */
+
+  --od-transition-fast: 150ms ease;
+  --od-transition-normal: 200ms ease;
+  --od-transition-slow: 300ms ease;
+}
+
+
+/* =============================================================================
+   COMPONENT CLASSES
+   ============================================================================= */
+
+/* Base reset for v2 components */
+.od-v2 {
+  font-family: var(--od-font-sans);
+  color: var(--od-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* -------------------------------------------------------------------------
+   PANELS - Floating containers
+   ------------------------------------------------------------------------- */
+
+/* Decision Profile Panel - Left sidebar */
+.od-panel {
+  background: var(--od-bg-surface);
+  border-radius: var(--od-radius-xl);
+  box-shadow: var(--od-shadow-lg);
+  padding: var(--od-space-5);
+}
+
+/* Panel section */
+.od-panel-section {
+  padding: var(--od-space-4) 0;
+  border-bottom: 1px solid var(--od-border-divider);
+}
+
+.od-panel-section:last-child {
+  border-bottom: none;
+}
+
+/* Panel header */
+.od-panel-header {
+  font-size: var(--od-text-sm);
+  font-weight: var(--od-font-semibold);
+  color: var(--od-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--od-space-3);
+}
+
+/* -------------------------------------------------------------------------
+   PRODUCT CARDS - niche.com style
+   ------------------------------------------------------------------------- */
+
+/* Product card - full width, floating */
+.od-product-card {
+  background: var(--od-bg-surface);
+  border-radius: var(--od-radius-lg);
+  box-shadow: var(--od-shadow-md);
+  padding: var(--od-space-5);
+  transition: box-shadow var(--od-transition-normal),
+              transform var(--od-transition-normal);
+}
+
+.od-product-card:hover {
+  box-shadow: var(--od-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Product card header */
+.od-product-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--od-space-4);
+}
+
+/* Product logo */
+.od-product-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--od-radius-md);
+  background: var(--od-bg-sunken);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Product info */
+.od-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.od-product-name {
+  font-size: var(--od-text-lg);
+  font-weight: var(--od-font-semibold);
+  color: var(--od-text-primary);
+  margin: 0 0 var(--od-space-1) 0;
+}
+
+.od-product-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--od-space-3);
+  font-size: var(--od-text-sm);
+  color: var(--od-text-tertiary);
+}
+
+.od-product-meta-divider {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--od-text-muted);
+}
+
+/* Product description */
+.od-product-description {
+  font-size: var(--od-text-base);
+  color: var(--od-text-secondary);
+  line-height: var(--od-leading-relaxed);
+  margin-top: var(--od-space-3);
+}
+
+/* Product actions */
+.od-product-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--od-space-3);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* -------------------------------------------------------------------------
+   CRITERIA BARS - Inline rating display
+   ------------------------------------------------------------------------- */
+
+.od-criteria-bars {
+  display: flex;
+  gap: var(--od-space-3);
+  margin-top: var(--od-space-4);
+  flex-wrap: wrap;
+}
+
+.od-criteria-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--od-space-1);
+  min-width: 80px;
+}
+
+.od-criteria-bar-label {
+  font-size: var(--od-text-xs);
+  color: var(--od-text-tertiary);
+  white-space: nowrap;
+}
+
+.od-criteria-bar-track {
+  height: 6px;
+  background: var(--od-bg-sunken);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.od-criteria-bar-fill {
+  height: 100%;
+  background: var(--od-text-tertiary);
+  border-radius: 3px;
+  transition: width var(--od-transition-normal);
+}
+
+.od-criteria-bar-value {
+  font-size: var(--od-text-xs);
+  color: var(--od-text-secondary);
+  font-weight: var(--od-font-medium);
+}
+
+/* -------------------------------------------------------------------------
+   BUTTONS
+   ------------------------------------------------------------------------- */
+
+/* Base button */
+.od-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--od-space-2);
+  font-family: var(--od-font-sans);
+  font-size: var(--od-text-sm);
+  font-weight: var(--od-font-medium);
+  padding: var(--od-space-2) var(--od-space-4);
+  border-radius: var(--od-radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--od-transition-fast);
+  white-space: nowrap;
+}
+
+.od-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--od-bg-surface), 0 0 0 4px var(--od-focus-ring);
+}
+
+/* Primary button - Neutral */
+.od-btn-primary {
+  background: var(--od-text-primary);
+  color: var(--od-text-inverse);
+}
+
+.od-btn-primary:hover {
+  background: #333333;
+}
+
+.od-btn-primary:active {
+  background: #4A4A4A;
+}
+
+/* Secondary button - Ghost */
+.od-btn-secondary {
+  background: transparent;
+  color: var(--od-text-secondary);
+  border: 1px solid var(--od-border-strong);
+}
+
+.od-btn-secondary:hover {
+  background: var(--od-bg-hover);
+  border-color: var(--od-border-strong);
+}
+
+/* Scout button - ONLY for AI elements */
+.od-btn-scout {
+  background: var(--od-scout);
+  color: var(--od-text-inverse);
+}
+
+.od-btn-scout:hover {
+  background: var(--od-scout-hover);
+}
+
+.od-btn-scout:active {
+  background: var(--od-scout-active);
+}
+
+/* Ghost button */
+.od-btn-ghost {
+  background: transparent;
+  color: var(--od-text-secondary);
+}
+
+.od-btn-ghost:hover {
+  background: var(--od-bg-hover);
+  color: var(--od-text-primary);
+}
+
+/* Button sizes */
+.od-btn-sm {
+  padding: var(--od-space-1) var(--od-space-3);
+  font-size: var(--od-text-xs);
+}
+
+.od-btn-lg {
+  padding: var(--od-space-3) var(--od-space-6);
+  font-size: var(--od-text-base);
+}
+
+/* -------------------------------------------------------------------------
+   FORM ELEMENTS
+   ------------------------------------------------------------------------- */
+
+/* Text input */
+.od-input {
+  width: 100%;
+  padding: var(--od-space-3) var(--od-space-4);
+  font-family: var(--od-font-sans);
+  font-size: var(--od-text-base);
+  color: var(--od-text-primary);
+  background: var(--od-bg-sunken);
+  border: 1px solid transparent;
+  border-radius: var(--od-radius-md);
+  transition: all var(--od-transition-fast);
+}
+
+.od-input::placeholder {
+  color: var(--od-text-muted);
+}
+
+.od-input:hover {
+  background: var(--od-bg-hover);
+}
+
+.od-input:focus {
+  outline: none;
+  background: var(--od-bg-surface);
+  border-color: var(--od-scout);
+  box-shadow: 0 0 0 3px var(--od-focus-ring);
+}
+
+/* Textarea */
+.od-textarea {
+  width: 100%;
+  padding: var(--od-space-3) var(--od-space-4);
+  font-family: var(--od-font-sans);
+  font-size: var(--od-text-base);
+  color: var(--od-text-primary);
+  background: var(--od-bg-sunken);
+  border: 1px solid transparent;
+  border-radius: var(--od-radius-md);
+  resize: vertical;
+  min-height: 80px;
+  transition: all var(--od-transition-fast);
+}
+
+.od-textarea::placeholder {
+  color: var(--od-text-muted);
+}
+
+.od-textarea:focus {
+  outline: none;
+  background: var(--od-bg-surface);
+  border-color: var(--od-scout);
+  box-shadow: 0 0 0 3px var(--od-focus-ring);
+}
+
+/* Select dropdown */
+.od-select {
+  width: 100%;
+  padding: var(--od-space-2) var(--od-space-3);
+  padding-right: var(--od-space-8);
+  font-family: var(--od-font-sans);
+  font-size: var(--od-text-sm);
+  color: var(--od-text-primary);
+  background: var(--od-bg-sunken);
+  border: 1px solid transparent;
+  border-radius: var(--od-radius-md);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: all var(--od-transition-fast);
+}
+
+.od-select:hover {
+  background-color: var(--od-bg-hover);
+}
+
+.od-select:focus {
+  outline: none;
+  background-color: var(--od-bg-surface);
+  border-color: var(--od-scout);
+}
+
+/* -------------------------------------------------------------------------
+   CHIPS / TAGS - For added products
+   ------------------------------------------------------------------------- */
+
+.od-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--od-space-2);
+  padding: var(--od-space-1) var(--od-space-3);
+  font-size: var(--od-text-sm);
+  color: var(--od-text-secondary);
+  background: var(--od-bg-sunken);
+  border-radius: var(--od-radius-md);
+  transition: all var(--od-transition-fast);
+}
+
+.od-chip:hover {
+  background: var(--od-bg-hover);
+}
+
+.od-chip-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--od-text-muted);
+  cursor: pointer;
+  transition: all var(--od-transition-fast);
+}
+
+.od-chip-remove:hover {
+  background: var(--od-bg-active);
+  color: var(--od-text-primary);
+}
+
+/* -------------------------------------------------------------------------
+   COLLAPSIBLE SECTION
+   ------------------------------------------------------------------------- */
+
+.od-collapsible {
+  border-bottom: 1px solid var(--od-border-divider);
+}
+
+.od-collapsible:last-child {
+  border-bottom: none;
+}
+
+.od-collapsible-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--od-space-3) 0;
+  font-size: var(--od-text-sm);
+  font-weight: var(--od-font-medium);
+  color: var(--od-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--od-transition-fast);
+}
+
+.od-collapsible-trigger:hover {
+  color: var(--od-text-primary);
+}
+
+.od-collapsible-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--od-text-muted);
+  transition: transform var(--od-transition-normal);
+}
+
+.od-collapsible[data-state="open"] .od-collapsible-icon {
+  transform: rotate(180deg);
+}
+
+.od-collapsible-content {
+  padding-bottom: var(--od-space-4);
+}
+
+/* -------------------------------------------------------------------------
+   SCROLL-AWARE HEADER
+   ------------------------------------------------------------------------- */
+
+.od-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--od-header-height);
+  background: var(--od-bg-surface);
+  border-bottom: 1px solid var(--od-border-subtle);
+  z-index: 100;
+  transition: transform var(--od-transition-normal);
+}
+
+.od-header--hidden {
+  transform: translateY(-100%);
+}
+
+/* -------------------------------------------------------------------------
+   FLOATING AI BUTTON - Bottom right
+   ------------------------------------------------------------------------- */
+
+.od-ai-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--od-scout);
+  color: var(--od-text-inverse);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--od-shadow-lg);
+  transition: all var(--od-transition-normal);
+  z-index: 90;
+}
+
+.od-ai-fab:hover {
+  background: var(--od-scout-hover);
+  transform: scale(1.05);
+  box-shadow: var(--od-shadow-xl);
+}
+
+.od-ai-fab:active {
+  transform: scale(0.98);
+}
+
+/* -------------------------------------------------------------------------
+   SCOUT COMPASS - Simple animated symbol
+   ------------------------------------------------------------------------- */
+
+.od-compass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.od-compass svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Compass sizes */
+.od-compass--sm {
+  width: 16px;
+  height: 16px;
+}
+
+.od-compass--md {
+  width: 24px;
+  height: 24px;
+}
+
+.od-compass--lg {
+  width: 32px;
+  height: 32px;
+}
+
+/* Compass animation - subtle pulse, NO glow */
+.od-compass--animated {
+  animation: compass-pulse 3s ease-in-out infinite;
+}
+
+@keyframes compass-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* -------------------------------------------------------------------------
+   LAYOUT UTILITIES
+   ------------------------------------------------------------------------- */
+
+.od-layout {
+  display: grid;
+  grid-template-columns: var(--od-panel-width) 1fr;
+  gap: var(--od-space-6);
+  min-height: calc(100vh - var(--od-header-height));
+  padding: var(--od-space-6);
+  padding-top: calc(var(--od-header-height) + var(--od-space-6));
+  background: var(--od-bg-base);
+}
+
+/* Products container */
+.od-products-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--od-space-4);
+}
+
+/* Added products chips row */
+.od-added-products {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--od-space-2);
+  padding-bottom: var(--od-space-4);
+  border-bottom: 1px solid var(--od-border-divider);
+}
+
+.od-added-products:empty {
+  display: none;
+}
+
+/* -------------------------------------------------------------------------
+   RATING BUTTONS - 1-5 scale
+   ------------------------------------------------------------------------- */
+
+.od-rating-group {
+  display: flex;
+  gap: var(--od-space-1);
+}
+
+.od-rating-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--od-radius-md);
+  border: 1px solid var(--od-border-strong);
+  background: var(--od-bg-surface);
+  color: var(--od-text-tertiary);
+  font-size: var(--od-text-sm);
+  font-weight: var(--od-font-medium);
+  cursor: pointer;
+  transition: all var(--od-transition-fast);
+}
+
+.od-rating-btn:hover {
+  background: var(--od-bg-hover);
+  border-color: var(--od-text-tertiary);
+}
+
+.od-rating-btn--active {
+  background: var(--od-text-primary);
+  border-color: var(--od-text-primary);
+  color: var(--od-text-inverse);
+}
+
+/* -------------------------------------------------------------------------
+   STAR RATING
+   ------------------------------------------------------------------------- */
+
+.od-stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.od-star {
+  width: 14px;
+  height: 14px;
+  color: var(--od-text-muted);
+}
+
+.od-star--filled {
+  color: #FBBF24;
+}
+
+.od-star--half {
+  background: linear-gradient(90deg, #FBBF24 50%, var(--od-text-muted) 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}

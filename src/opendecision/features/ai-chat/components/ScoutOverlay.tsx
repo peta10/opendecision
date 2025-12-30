@@ -8,7 +8,6 @@ import { useInitialPrompts } from '@/opendecision/shared/hooks/useAIChat';
 import { useSharedAIChat } from '@/opendecision/shared/contexts/AIChatContext';
 import { AIChatMessages } from './AIChatMessages';
 import { AIChatContext, Tool, Criterion } from '@/opendecision/shared/types';
-import { ScoutHead } from '@/opendecision/shared/components/scout';
 import { AudioVisualizerBar } from './AudioVisualizerBar';
 import { useVoiceRecording } from '@/opendecision/shared/hooks/useVoiceRecording';
 import './ScoutSendButton.css';
@@ -285,14 +284,14 @@ export const ScoutOverlay: React.FC<ScoutOverlayProps> = ({
                       <AIChatMessages messages={messages} />
                       <div ref={messagesEndRef} />
 
-                      {/* Follow-up prompts */}
+                      {/* Follow-up prompts - minimal */}
                       {promptsToShow.length > 0 && !isLoading && hasStarted && (
-                        <div className="flex flex-wrap gap-1.5 mt-3 pl-11">
+                        <div className="flex flex-wrap gap-2 mt-3">
                           {promptsToShow.map((prompt, index) => (
                             <button
                               key={index}
                               onClick={() => handleSuggestionClick(prompt)}
-                              className="text-left px-2.5 py-1.5 rounded-full bg-neutral-100 text-xs text-neutral-600 hover:bg-[#5BDFC2]/10 hover:text-neutral-800 transition-colors border border-neutral-200 hover:border-[#5BDFC2]/30"
+                              className="text-left px-3 py-1.5 text-xs text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-full border border-gray-200 transition-colors"
                             >
                               {prompt}
                             </button>
@@ -423,14 +422,14 @@ export const ScoutOverlay: React.FC<ScoutOverlayProps> = ({
                       </div>
                     </div>
 
-                    {/* Suggestion prompts - below input */}
+                    {/* Initial suggestion prompts - minimal */}
                     {messages.length === 0 && promptsToShow.length > 0 && !isLoading && (
-                      <div className="flex flex-col gap-2 mt-3">
+                      <div className="flex flex-col gap-1.5 mt-4">
                         {promptsToShow.map((prompt, index) => (
                           <button
                             key={index}
                             onClick={() => handleSuggestionClick(prompt)}
-                            className="text-left px-4 py-2.5 rounded-xl bg-white/80 border border-[#6EDCD1]/15 text-sm text-neutral-600 hover:bg-[#6EDCD1]/5 hover:border-[#6EDCD1]/30 hover:text-neutral-800 transition-colors"
+                            className="text-left px-4 py-2.5 text-sm text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
                           >
                             {prompt}
                           </button>
